@@ -1,0 +1,76 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    width: 260px;
+    padding: 2rem 0.5rem;
+    margin: 10px 0;
+    text-align: center;
+    position: relative;
+    border-radius: 3rem;
+    background-color: #ffffff;
+    border: 3.0px solid rgba(56, 117, 109);
+  }
+  
+  .profpic {
+    border-radius: 50%;
+    width: 2rem; /* Ajusta el tamaño de la imagen según sea necesario */
+    height: auto; /* Ajusta la altura de la imagen */
+    margin-right: 8px; /* Espacio entre la imagen y el texto */
+  }
+  
+  .content {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    min-width: 1%;
+  }
+  
+  .content .remerita {
+    width: 150%;
+    height: auto;
+  }
+  
+  .description {
+    margin-top: 10px;
+    font-size: 14px;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .title {
+    font-weight: 600;
+    text-transform: uppercase;
+    color: black;
+    margin-top: 10px;
+    font-size: 25px;
+    letter-spacing: 1px;
+  }
+  
+  .Guardar {
+    border: none;
+    outline: none;
+    color: rgb(255, 255, 255);
+    font-weight: 400;
+    font-size: 2vw;
+    font-size: 1rem; /* Aumenta el tamaño de la fuente */
+    padding: .4rem 1rem; /* Aumenta el relleno */
+    background-color: rgba(56, 117, 109);
+    border-radius: 1rem;
+    width: 90%;
+    height: 1.7vw; /* Aumenta la altura */
+    text-shadow: 0px 4px 18px #2c3442;
+  }
+  
+  .guardador {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2vw;
+  }
+  

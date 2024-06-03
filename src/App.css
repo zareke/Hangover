@@ -5,8 +5,31 @@
                             'embedded-opentype', and 'svg' */
 }
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+
+.centrador{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+.wrapbusqueda{
+  display:flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 50%;
+  flex-wrap: wrap;  
+  gap:1rem
+}
+.item.odd{
+  padding: 10rem;
+}
+.item {
+  flex: 1 0 200px; /* Tamaño fijo para cada elemento */
+  margin-bottom: 20px; /* Margen inferior común para todos los elementos */
+}
 .header {
-  background-color: rgba(56, 117, 109, 1);
+
+  background-color: rgba(56, 117, 109);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -17,7 +40,7 @@
   right: 0;
   left: 0;
   top: 0;
-  z-index: 5;
+  z-index: 5; 
 
 }
 ul li{

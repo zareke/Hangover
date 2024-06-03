@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import './App.css';
-import './FilterButton.css';
+import React, { useState } from "react";
+import "./App.css";
+import "./components/FilterButton.css";
+import Carta from "./components/carta.jsx";
 
 function App() {
   const [isActive, setIsActive] = useState(false);
@@ -8,11 +9,11 @@ function App() {
   const handleClick = () => {
     setIsActive(!isActive);
   };
-
+  const cartas = [1,2,3,4,5]
   return (
     <div>
       <header className="header">
-        <h1>hangover</h1>
+        <h1>hansover</h1>
         <nav>
           <ul>
             <li>
@@ -40,11 +41,27 @@ function App() {
         </nav>
       </header>
       <div className="menuhamburguesa">
-        <button className={`menu__icon ${isActive ? 'active' : ''}`} onClick={handleClick}>
+        <button
+          className={`menu__icon ${isActive ? "active" : ""}`}
+          onClick={handleClick}
+        >
           <span></span>
           <span></span>
           <span></span>
         </button>
+      </div>
+
+      <div className="centrador">
+        <div className="wrapbusqueda">
+        {cartas.map((item, index) => (
+                <Carta
+                    key={index}
+                    className={`item ${index % 2 === 0 ? 'even' : 'odd'}`}
+                >
+                    {item}
+                </Carta>
+            ))}
+      </div>
       </div>
     </div>
   );
