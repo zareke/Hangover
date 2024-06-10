@@ -10,6 +10,14 @@ function Navbar() {
               <li>
                 <a href="#Sobre mí">Explorar</a>
               </li>
+                
+                <div className="busqueda">
+                    <form>
+                        <input type="search" id="gsearch" name="gsearch"></input>
+                    </form>
+                </div>
+
+
               <li>
                 <a href="#Conocimientos">Información</a>
               </li>

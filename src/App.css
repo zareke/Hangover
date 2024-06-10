@@ -15,12 +15,33 @@
 }
 .wrapbusqueda {
   display: grid;
-  grid-template-columns: repeat(5, 300px); /* Ajusta el ancho mínimo y máximo de las columnas */
-  grid-auto-rows: auto; /* Tamaño automático de las filas */
+  grid-template-columns: repeat(5, 1fr);
+  grid-auto-rows: 5; 
+  columns: 5;
+  grid-gap: 10px; 
+  justify-content: center;
+  padding: 20px; 
+  margin-top: 0px; 
+
+}
+
+.wrapbusqueda-impar {
+  display: block; /* Ajusta el ancho mínimo y máximo de las columnas */
+  grid-auto-rows: 5; /* Tamaño automático de las filas */
   grid-gap: 10px; /* Espacio entre las tarjetas */
   justify-content: center;
   padding: 20px; /* Añade un espacio interior para mejorar la apariencia */
   margin-top: 0px; /* Añade un margen superior para separar del navbar */
+}
+
+.wrapbusqueda-par {
+  display: block; /* Ajusta el ancho mínimo y máximo de las columnas */
+  grid-auto-rows: 5; /* Tamaño automático de las filas */
+  grid-gap: 1px; /* Espacio entre las tarjetas */
+  justify-content: center;
+  margin-top: 265px; 
+  margin-left: 10px;
+  
 }
 
   .card {
@@ -35,17 +56,18 @@
     border-radius: 3rem;
     background-color: #ffffff;
     border: 3.0px solid rgba(56, 117, 109);
-    grid-row-end: span 10; 
+ 
   }
 
-  .cardImpar {
+  /* .cardImpar {
     grid-row-start: span 1; /* Ajusta la posición vertical de las cartas impares */
-  }
+  /* } */
 
-  .cardPar {
-    grid-row-start: span 2; /* Deja las cartas pares en su posición predeterminada */
-  }
+  /* .cardPar {
+    grid-row-start: span 4; /* Deja las cartas pares en su posición predeterminada */
+  /* } */ 
 
+  
 
 /* .item.odd{
   padding: 10rem;
@@ -86,4 +108,34 @@ li a:hover {
 }
 *{
   font-family: "Quicksand", sans-serif;
+}
+
+
+.Botones{
+ 
+}
+
+.Recomendados{
+  color: rgb(255, 255, 255);
+  font-weight: 400;
+  transform: rotate(90deg);
+  font-size: 10px; 
+  background-color: rgba(56, 117, 109);
+  width: 15%;
+  border-top-right-radius: 21px;
+  border-top-left-radius: 21px;
+}
+
+.Seguidos{
+  color: rgb(255, 255, 255);
+  font-weight: 400;
+  transform: rotate(90deg);
+  font-size: 10px; 
+  background-color: #255952;
+  width: 15%;
+  position: fixed; /* Para mantenerlo fijo en la pantalla */
+  left: 0; /* Para pegarlo al límite izquierdo */
+  top: 50%; /* Para centrarlo verticalmente */
+  border-top-right-radius: 21px;
+  border-top-left-radius: 21px;
 }
