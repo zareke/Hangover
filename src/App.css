@@ -1,3 +1,4 @@
+
 @font-face {
   font-family: 'HangoverFont';
   src: local('HangoverFont'), url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap') format('woff');
@@ -12,23 +13,48 @@
   align-items: center;
   
 }
-.wrapbusqueda{
-  display:flex;
-  justify-content: space-around;
-  align-items: center;
-  max-width: 50%;
-  flex-wrap: wrap;  
-  gap:1rem
+.wrapbusqueda {
+  display: grid;
+  grid-template-columns: repeat(5, 300px); /* Ajusta el ancho mínimo y máximo de las columnas */
+  grid-auto-rows: auto; /* Tamaño automático de las filas */
+  grid-gap: 10px; /* Espacio entre las tarjetas */
+  justify-content: center;
+  padding: 20px; /* Añade un espacio interior para mejorar la apariencia */
+  margin-top: 0px; /* Añade un margen superior para separar del navbar */
 }
-.item.odd{
-  padding: 10rem;
-}
-.item {
-  flex: 1 0 200px; /* Tamaño fijo para cada elemento */
-  margin-bottom: 20px; /* Margen inferior común para todos los elementos */
-}
-.header {
 
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 260px;
+    padding: 2rem 0.5rem;
+    margin: 15px 1px;
+    text-align: center;
+    position: relative;
+    border-radius: 3rem;
+    background-color: #ffffff;
+    border: 3.0px solid rgba(56, 117, 109);
+    grid-row-end: span 10; 
+  }
+
+  .cardImpar {
+    grid-row-start: span 1; /* Ajusta la posición vertical de las cartas impares */
+  }
+
+  .cardPar {
+    grid-row-start: span 2; /* Deja las cartas pares en su posición predeterminada */
+  }
+
+
+/* .item.odd{
+  padding: 10rem;
+} */
+/* .item {
+  flex: 1 0 200px; /* Tamaño fijo para cada elemento */
+  /* margin-bottom: 20px; Margen inferior común para todos los elementos */
+/* } */ 
+.header {
   background-color: rgba(56, 117, 109);
   color: white;
   display: flex;
