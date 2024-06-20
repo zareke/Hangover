@@ -11,6 +11,7 @@
   display:flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   
 }
 .wrapbusqueda {
@@ -20,8 +21,10 @@
   columns: 5;
   grid-gap: 10px; 
   justify-content: center;
-  padding: 20px; 
-  margin-top: 0px; 
+  top:0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
 }
 
@@ -30,8 +33,6 @@
   grid-auto-rows: 5; /* Tamaño automático de las filas */
   grid-gap: 10px; /* Espacio entre las tarjetas */
   justify-content: center;
-  padding: 20px; /* Añade un espacio interior para mejorar la apariencia */
-  margin-top: 0px; /* Añade un margen superior para separar del navbar */
 }
 
 .wrapbusqueda-par {
@@ -39,8 +40,8 @@
   grid-auto-rows: 5; /* Tamaño automático de las filas */
   grid-gap: 1px; /* Espacio entre las tarjetas */
   justify-content: center;
-  margin-top: 265px; 
-  margin-left: 10px;
+ /* margin-top: 265px; */
+ margin-top: 14rem;
   
 }
 
@@ -48,7 +49,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 260px;
+    width: 240px;
     padding: 2rem 0.5rem;
     margin: 15px 1px;
     text-align: center;
@@ -112,30 +113,49 @@ li a:hover {
 
 
 .Botones{
- 
+ left: 0;
 }
 
 .Recomendados{
+  display: block;
+  transform-origin: top left;
+  transform: rotate(90deg) translate(0,-100%);
+  white-space: nowrap;
   color: rgb(255, 255, 255);
   font-weight: 400;
-  transform: rotate(90deg);
   font-size: 10px; 
   background-color: rgba(56, 117, 109);
   width: 15%;
+  left: 0;
   border-top-right-radius: 21px;
   border-top-left-radius: 21px;
+  position: fixed;
 }
-
 .Seguidos{
+  display: block;
+  transform-origin: top left;
+  transform: rotate(90deg) translate(0,-100%);
+  white-space: nowrap;
   color: rgb(255, 255, 255);
   font-weight: 400;
-  transform: rotate(90deg);
   font-size: 10px; 
   background-color: #255952;
   width: 15%;
-  position: fixed; /* Para mantenerlo fijo en la pantalla */
-  left: 0; /* Para pegarlo al límite izquierdo */
-  top: 50%; /* Para centrarlo verticalmente */
+  left: 0;
   border-top-right-radius: 21px;
   border-top-left-radius: 21px;
+  position: fixed;
+  margin-top: 17.8rem;
+
+}
+
+
+.wrapper1{
+  display: table;
+
+}
+
+.wrapper2{
+  padding: 50% 0;
+  height: 0;
 }

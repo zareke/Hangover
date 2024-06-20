@@ -22,12 +22,8 @@ function App() {
       <Navbar></Navbar>
 
       <div className="botones">
-        <div className="1">
-          <button className="Recomendados" onclick=""><h2>Recomendados</h2></button>
-        </div>
-        <div className="1">
-          <button className="Seguidos" onclick=""><h2>Seguidos</h2></button>
-        </div>
+        <div className="wrapper1"><div className="wrapper2"><button className="Recomendados" onclick=""><h2>Recomendados</h2></button></div></div>
+        <div className="wrapper1"><div className="wrapper2"><button className="Seguidos" onclick=""><h2>Seguidos</h2></button></div></div>
       </div>
 
 
@@ -45,22 +41,47 @@ function App() {
       <div className="centrador">
         <div className="wrapbusqueda">
           {/* Cartas impares */}
-          {/* <div className="wrapbusqueda-impar">
+          { <div className="wrapbusqueda-impar">
             {cartasImpares.map((item, index) => (
               <Carta key={index} className="cardImpar">
                 {item}
               </Carta>
             ))}
-          </div> */}
+          </div> }
 
           {/* Cartas pares */}
-          {/* <div className="wrapbusqueda-par">
+          { <div className="wrapbusqueda-par">
             {cartasPares.map((item, index) => (
               <Carta key={index} className="cardPar">
                 {item}
               </Carta>
             ))}
-          </div> */}
+          </div> }
+          {/* Cartas impares */}
+          { <div className="wrapbusqueda-impar">
+            {cartasImpares.map((item, index) => (
+              <Carta key={index} className="cardImpar">
+                {item}
+              </Carta>
+            ))}
+          </div> }
+
+          {/* Cartas pares */}
+          { <div className="wrapbusqueda-par">
+            {cartasPares.map((item, index) => (
+              <Carta key={index} className="cardPar">
+                {item}
+              </Carta>
+            ))}
+          </div> }
+
+          { <div className="wrapbusqueda-impar">
+            {cartasImpares.map((item, index) => (
+              <Carta key={index} className="cardImpar">
+                {item}
+              </Carta>
+            ))}
+          </div> }
         </div>
       </div>
     </div>
