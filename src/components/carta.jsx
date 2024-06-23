@@ -8,7 +8,7 @@ function Carta({ className }) {
       <div className="guardador">
         <div className="description">
           <img className="profpic" src={fotito} alt="fotito" />
-          <span>@ElUsuario</span>
+          <span className="user">@ElUsuario</span>
         </div>
         <button className="Guardar">Guardar</button>
       </div>

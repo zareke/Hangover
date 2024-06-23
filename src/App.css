@@ -54,11 +54,14 @@
     margin: 15px 1px;
     text-align: center;
     position: relative;
-    border-radius: 3rem;
+    border-radius: 2.6rem;
     background-color: #ffffff;
     border: 3.0px solid rgba(56, 117, 109);
- 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
+  .card:hover {
+    transform: scale(0.95);
+}
 
   /* .cardImpar {
     grid-row-start: span 1; /* Ajusta la posición vertical de las cartas impares */
@@ -85,30 +88,46 @@
   align-items: center;
   padding-left: 200px;
   padding-right: 200px;
-  position:fixed;
+  position: fixed;
   right: 0;
   left: 0;
   top: 0;
-  z-index: 5; 
-
+  z-index: 5;
 }
-ul li{
-  display: inline;
+
+ul {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
   margin-right: 20px;
 }
 
-li a{
-  color: rgb(255, 255, 255);
+li.busqueda {
+  margin-right: auto; /* Ajusta el margen derecho para que la barra de búsqueda esté alineada a la izquierda */
+}
+
+li a {
+  color: white;
   text-decoration: none;
-  text-align: center;
   font-weight: 200;
   font-size: 18px;
 }
+
 li a:hover {
   text-shadow: 0.001px 0 0 white;
 }
+
 *{
   font-family: "Quicksand", sans-serif;
+}
+
+.menuhamburguesa {
+  position: fixed;
+  top: 20vh; 
+  right: 2vw; 
 }
 
 
