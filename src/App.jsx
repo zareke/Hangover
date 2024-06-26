@@ -1,90 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import "./components/FilterButton.css";
-import Carta from "./components/carta.jsx";
 import Navbar from "./components/navbar.jsx";
-
+import Explorar from "./components/Explorar.jsx";
+import PostDetail from "./components/PostDetail.jsx"; // Import the PostDetail component
 
 function App() {
-  const [isActive, setIsActive] = useState(false);
-
-  const handleClick = () => {
-    setIsActive(!isActive);
-  };
-
-  const cartas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-  const cartasImpares = cartas.filter((_, index) => index % 2 !== 0);
-  const cartasPares = cartas.filter((_, index) => index % 2 === 0);
-
   return (
-    <div>
-      <Navbar></Navbar>
-
-      <div className="botones">
-        <div className="wrapper1"><div className="wrapper2"><button className="Recomendados" onclick=""><h2>Recomendados</h2></button></div></div>
-        <div className="wrapper1"><div className="wrapper2"><button className="Seguidos" onclick=""><h2>Seguidos</h2></button></div></div>
-      </div>
-
-
-      <div className="menuhamburguesa">
-        <button
-          className={`menu__icon ${isActive ? "active" : ""}`}
-          onClick={handleClick}
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-      </div>
-
-      <div className="centrador">
-        <div className="wrapbusqueda">
-          {/* Cartas impares */}
-          { <div className="wrapbusqueda-impar">
-            {cartasImpares.map((item, index) => (
-              <Carta key={index} className="cardImpar">
-                {item}
-              </Carta>
-            ))}
-          </div> }
-
-          {/* Cartas pares */}
-          { <div className="wrapbusqueda-par">
-            {cartasPares.map((item, index) => (
-              <Carta key={index} className="cardPar">
-                {item}
-              </Carta>
-            ))}
-          </div> }
-          {/* Cartas impares */}
-          { <div className="wrapbusqueda-impar">
-            {cartasImpares.map((item, index) => (
-              <Carta key={index} className="cardImpar">
-                {item}
-              </Carta>
-            ))}
-          </div> }
-
-          {/* Cartas pares */}
-          { <div className="wrapbusqueda-par">
-            {cartasPares.map((item, index) => (
-              <Carta key={index} className="cardPar">
-                {item}
-              </Carta>
-            ))}
-          </div> }
-
-          { <div className="wrapbusqueda-impar">
-            {cartasImpares.map((item, index) => (
-              <Carta key={index} className="cardImpar">
-                {item}
-              </Carta>
-            ))}
-          </div> }
-        </div>
-      </div>
-    </div>
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Explorar />} />
+        <Route path="/post/:id" element={<PostDetail />} />
+      </Routes>
+    </Router>
   );
 }
+
 export default App;

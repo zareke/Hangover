@@ -11,7 +11,12 @@ const PostDetail = ({ postId }) => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/post/${postId}`);
+        const response = await axios.get(`http://localhost:3508/post/${1}`, {
+  params: {
+    limitComments: 5,
+    offsetComments: 1
+  }
+});
         const [postInfo, commentsInfo] = response.data;
         setPost(postInfo[0]); // Assuming the post info is the first element in the array
         setComments(commentsInfo.collection); // Assuming comments are in the `collection` array
