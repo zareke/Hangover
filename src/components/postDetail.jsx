@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 import styles from './postdetail.module.css';
 
-const PostDetail = ({ postId }) => {
+const PostDetail = () => {
+  const { postId } = useParams(); // Ensure postId is correctly extracted from the URL
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,13 +13,14 @@ const PostDetail = ({ postId }) => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`http://localhost:3508/post/${1}`, {
-  params: {
-    limitComments: 5,
-    offsetComments: 1
-  }
-});
-        const [postInfo, commentsInfo] = response.data;
+        const response = await axios.get(`http://localhost:3508/post/${postId}`, {
+          params: {
+            limitComments: 5,
+            offsetComments: 0,
+          },
+        });
+
+        const [postInfo, commentsInfo] = response.data; // Adjust based on your API response structure
         setPost(postInfo[0]); // Assuming the post info is the first element in the array
         setComments(commentsInfo.collection); // Assuming comments are in the `collection` array
         setLoading(false);
@@ -29,7 +32,7 @@ const PostDetail = ({ postId }) => {
     };
 
     fetchPost();
-  }, [postId]);
+  }, [postId]); // Ensure postId is included in the dependency array
 
   if (loading) {
     return <div>Loading...</div>;
@@ -58,12 +61,15 @@ const PostDetail = ({ postId }) => {
       </div>
       <h3>Comments</h3>
       <ul className={styles.comments}>
-        {comments.map(comment => (
-          <li key={comment.comment.comment_id} className={styles.commentItem}>
-            <p>{comment.comment.content}</p>
-            <p className={styles.commentAuthor}>Comment by: {comment.comment.username}</p>
-          </li>
-        ))}
+        {comments.map((commentData) => {
+          const comment = commentData.comment;
+          return (
+            <li key={comment.comment_id} className={styles.commentItem}>
+              <p>{comment.content}</p>
+              <p className={styles.commentAuthor}>Comment by: {comment.username}</p>
+            </li>
+          );
+        })}
       </ul>
       {/* Pagination info for comments */}
       <div className={styles.pagination}>

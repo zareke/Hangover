@@ -1,41 +1,45 @@
-function Navbar() {
-   
+function Navbar({inicioSesion}, {user}) {
     return (
       
         <div>
         <header className="header">
           <h1>hansover</h1>
           <nav>
-            <ul>
+            <ul className="botonesNavbar">
               <li>
-                <a href="#Sobre mí">Explorar</a>
+                <a href="#Explorar">Explorar</a>
               </li>
                 
                 <div className="busqueda">
                     <form>
-                        <input type="search" id="gsearch" name="gsearch"></input>
+                      <input type="search" id="gsearch" name="gsearch" style={{ width: '300px' }}></input>
                     </form>
                 </div>
 
 
               <li>
-                <a href="#Conocimientos">Información</a>
+                <a href="#Info">Información</a>
               </li>
               <li>
-                <a href="#Experiencia">Nuevo diseño</a>
+                <a href="#NewDesign">Nuevo diseño</a>
               </li>
               <li>
-                <a href="#Educación">Perfil</a>
+                <a href="#Perfil">Perfil</a>
               </li>
               <li>
-                <a href="#Certificaciones">Garage</a>
+                <a href="#Biblioteca">Biblioteca</a>
               </li>
               <li>
-                <a href="#Contacto">Bolsa</a>
+                <a href="#Bolsa">Bolsa</a>
               </li>
               <li>
-                <a href="#Contacto">Iniciar sesión</a>
+                {inicioSesion ? (
+                  <a href="#IniciarSesion">Iniciar sesión</a>
+                ) : 
+                
+                <a href="#Perfil">{user}</a>}
               </li>
+
             </ul>
           </nav>
         </header>

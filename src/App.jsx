@@ -4,7 +4,7 @@ import "./App.css";
 import "./components/FilterButton.css";
 import Navbar from "./components/navbar.jsx";
 import Explorar from "./components/Explorar.jsx";
-import PostDetail from "./components/PostDetail.jsx"; // Import the PostDetail component
+import PostDetail from "./components/postDetail.jsx"; // Import the PostDetail component
 
 function App() {
   return (
@@ -12,7 +12,9 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Explorar />} />
-        <Route path="/post/:id" element={<PostDetail />} />
+        <Route path="post">
+          <Route path=":postId" element={<PostDetail/>}/>
+        </Route>
       </Routes>
     </Router>
   );

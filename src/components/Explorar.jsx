@@ -1,19 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import Carta from "./carta.jsx";
-//import "./Explorar.css"; // If you have specific styles for Explorar
 
 const Explorar = () => {
   const [isActive, setIsActive] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get('http://localhost:3508/post', {
+          params: {
+            limit: 10,
+            page: 1,
+          },
+        });
+        setPosts(response.data.collection);
+        console.log("posts",posts)
+      } catch (error) {
+        setError('Error fetching posts');
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   const handleClick = () => {
     setIsActive(!isActive);
   };
 
-  const cartas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const dividedPosts = posts.reduce(
+    (acc, post, index) => {
+      if (index % 4 === 0) acc[0].push(post);
+      else if (index % 4 === 1) acc[1].push(post);
+      else if (index % 4 === 2) acc[2].push(post);
+      else acc[3].push(post);
+      return acc;
+    },
+    [[], [], [], []]
+  );
 
-  const cartasImpares = cartas.filter((_, index) => index % 2 !== 0);
-  const cartasPares = cartas.filter((_, index) => index % 2 === 0);
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div>
@@ -47,45 +79,20 @@ const Explorar = () => {
 
       <div className="centrador">
         <div className="wrapbusqueda">
-          <div className="wrapbusqueda-impar">
-            {cartasImpares.map((item, index) => (
-              <Link key={index} to={`/post/${index + 1}`}>
-                <Carta className="cardImpar">{1}</Carta> 
-              </Link>
-            ))}ESTA CARTA
-          </div>
+          {dividedPosts.map((group, groupIndex) => (
+            <div key={groupIndex} className={`wrapbusqueda-group${groupIndex}`}>
+              {group.map((post, index) => {
 
-          <div className="wrapbusqueda-par">
-            {cartasPares.map((item, index) => (
-              <Link key={index} to={`/post/${index + 1}`}>
-                <Carta className="cardPar">{item}</Carta>
-              </Link>
-            ))}
-          </div>
-
-          <div className="wrapbusqueda-impar">
-            {cartasImpares.map((item, index) => (
-              <Link key={index} to={`/post/${index + 1}`}>
-                <Carta className="cardImpar">{item}</Carta>
-              </Link>
-            ))}
-          </div>
-
-          <div className="wrapbusqueda-par">
-            {cartasPares.map((item, index) => (
-              <Link key={index} to={`/post/${index + 1}`}>
-                <Carta className="cardPar">{item}</Carta>
-              </Link>
-            ))}
-          </div>
-
-          <div className="wrapbusqueda-impar">
-            {cartasImpares.map((item, index) => (
-              <Link key={index} to={`/post/${index + 1}`}>
-                <Carta className="cardImpar">{item}</Carta>
-              </Link>
-            ))}
-          </div>
+                return (  
+                  <Link key={post.id} to={`/post/${post.id}`}>
+                    <Carta className={`cardGroup${groupIndex}`}>
+                      {post.post.front_image}
+                    </Carta>
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
     </div>
