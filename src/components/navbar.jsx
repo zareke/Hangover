@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Navbar({inicioSesion}, {user}) {
     return (
       
@@ -33,11 +35,9 @@ function Navbar({inicioSesion}, {user}) {
                 <a href="#Bolsa">Bolsa</a>
               </li>
               <li>
-                {inicioSesion ? (
-                  <a href="#IniciarSesion">Iniciar sesión</a>
-                ) : 
-                
-                <a href="#Perfil">{user}</a>}
+                {!inicioSesion ? (<Link  to={`/login`}>
+                    Iniciar Sesion
+                  </Link>) : (<a href="#Perfil">{user}</a>)}
               </li>
 
             </ul>

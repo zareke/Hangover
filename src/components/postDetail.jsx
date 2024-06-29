@@ -17,19 +17,22 @@ const PostDetail = () => {
   const newComment = async () =>{
     const content=newCommentContent
     try{
+      const token=localStorage.getItem("token")
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
+      
       const response = await axios.post(config.url+"post/"+postId+"/comment",{
-        body:{
+       
           post_id:postId,
           content:content,
           parent_id:null
-        }
+        
       })
     }
     catch (e){
       console.error(e)
     }
   }
-
+//localStorage.getItem("token")
 
 
   useEffect(() => {
