@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import Carta from "./carta.jsx";
 
+
 const Explorar = () => {
   const [isActive, setIsActive] = useState(false);
   const [posts, setPosts] = useState([]);

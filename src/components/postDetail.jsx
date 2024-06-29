@@ -1,80 +1,138 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import styles from './postdetail.module.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import styles from "./postdetail.module.css";
+import Button from "./Button";
+import config from "../config"
 
 const PostDetail = () => {
-  const { postId } = useParams(); // Ensure postId is correctly extracted from the URL
+  const { postId } = useParams();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [commentsVisible, setCommentsVisible] = useState(true);
+  const [newCommentContent, setNewCommentContent] = useState("")
+  
+  const newComment = async () =>{
+    const content=newCommentContent
+    try{
+      const response = await axios.post(config.url+"post/"+postId+"/comment",{
+        body:{
+          post_id:postId,
+          content:content,
+          parent_id:null
+        }
+      })
+    }
+    catch (e){
+      console.error(e)
+    }
+  }
+
+
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`http://localhost:3508/post/${postId}`, {
-          params: {
-            limitComments: 5,
-            offsetComments: 0,
-          },
-        });
-
-        const [postInfo, commentsInfo] = response.data; // Adjust based on your API response structure
-        setPost(postInfo[0]); // Assuming the post info is the first element in the array
-        setComments(commentsInfo.collection); // Assuming comments are in the `collection` array
+        const request= config.url+"post/"+postId
+        const response = await axios.get(
+          request,
+          {
+            params: {
+              limitComments: 5,
+              offsetComments: 0,
+            },
+          }
+        );
+        const [postInfo, commentsInfo] = response.data;
+        setPost(postInfo[0]);
+        setComments(commentsInfo.collection);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching post:', error);
-        setError('Error fetching data');
+        console.error("Error fetching post:", error);
+        setError("Error fetching data");
         setLoading(false);
       }
     };
-
     fetchPost();
-  }, [postId]); // Ensure postId is included in the dependency array
+  }, [postId]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!post) {
-    return <div>No post found</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!post) return <div>No post found</div>;
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>{post.title}</h2>
-      <p className={styles.description}>{post.description}</p>
-      <img src={post.front_image} alt="Front Image" className={styles.image} />
-      <img src={post.back_image} alt="Back Image" className={styles.image} />
-      <div className={styles.creator}>
-        <img src={post.creatoruser.profile_photo} alt="Profile" />
-        <div className={styles.creatorInfo}>
-          <h3>{post.creatoruser.username}</h3>
-          <p>Follower Count: {post.creatoruser.follower_number}</p>
+      <div className={styles.contentWrapper}>
+        <div className={styles.imageSection}>
+          <div className={styles.thumbnails}>
+            <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images" alt="Thumbnail" className={styles.thumbnail} />
+            <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images" alt="Thumbnail" className={styles.thumbnail} />
+            <div className={styles.thumbnail}></div>
+          </div>
+          <div className={styles.mainImageContainer}>
+            <img
+              src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images"
+              alt="Front Image"
+              className={styles.mainImage}
+            />
+            <Button className={styles.remixButton}>Remix</Button>
+          </div>
         </div>
-      </div>
-      <h3>Comments</h3>
-      <ul className={styles.comments}>
-        {comments.map((commentData) => {
-          const comment = commentData.comment;
-          return (
-            <li key={comment.comment_id} className={styles.commentItem}>
-              <p>{comment.content}</p>
-              <p className={styles.commentAuthor}>Comment by: {comment.username}</p>
-            </li>
-          );
-        })}
-      </ul>
-      {/* Pagination info for comments */}
-      <div className={styles.pagination}>
-        <p>Total Comments: {comments.length}</p>
-        {/* Assuming commentsInfo.pagination is not needed to display */}
+        <div className={styles.infoSection}>
+          <div className={styles.titleAndButtons}>
+            <h2 className={styles.title}>{post.title}</h2>
+            <div className={styles.actionButtons}>
+              <Button>Guardar</Button>
+              <Button>Añadir a la Bolsa</Button>
+            </div>
+          </div>
+          <p className={styles.description}>{post.description}</p>
+          <div className={styles.creator}>
+            <img
+              src="https://randomuser.me/api/portraits/men/8.jpg"
+              alt="Profile"
+              className={styles.creatorImage}
+            />
+            <div className={styles.creatorInfo}>
+              <h3>{post.creatoruser.username}</h3>
+              <p>{post.creatoruser.follower_number} seguidores</p>
+            </div>
+          </div>
+          <div className={styles.commentsSection}>  
+            <h3 onClick={() => setCommentsVisible(!commentsVisible)}>
+              Comentarios {commentsVisible ? '▲' : '▼'}
+            </h3>
+            {commentsVisible && (
+              <div className={styles.commentsContainer}>
+                <ul className={styles.comments}>
+                  {comments.map((commentData) => (
+                    <li key={commentData.comment.comment_id} className={styles.commentItem}>
+                      <img src="https://randomuser.me/api/portraits/men/8.jpg" alt="Commenter" className={styles.commenterImage} />
+                      <div>
+                        <strong>{commentData.comment.username}</strong>
+                        <p>{commentData.comment.content}</p>
+                      </div>
+                      <button className={styles.replyButton}>Responder</button>
+                    </li>
+                  ))}
+                </ul>
+            <p className={styles.commentCount}>3 comentarios</p>
+            <div className={styles.newComment}>
+               <img
+                src="https://randomuser.me/api/portraits/men/8.jpg"
+                alt="Profile"
+                className={styles.creatorImage}
+                />
+              <div className={styles.newCommentText}>
+                <textarea onChange={(e)=> setNewCommentContent(e.target.value)}></textarea>
+                <img onClick={newComment}  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fsend-icon-2048x2020-jrvk5f1r.png&f=1&nofb=1&ipt=3c95031d77c15aa2faeb240e0df0b253cb279f3552087fad48513c0f1ffa0dde&ipo=images" alt="" />
+              </div>
+            </div>
+            </div>)}
+          </div>
+        </div>
       </div>
     </div>
   );
