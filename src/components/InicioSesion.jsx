@@ -12,6 +12,7 @@ const InicioSesion = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
+    e.preventDefault();
     console.log("handlelogin",username,password)
     
     try {
@@ -19,14 +20,16 @@ const InicioSesion = () => {
         username: username,
         password: password,
       });
-      console.log(response.data)
+      console.log("holaaaaaa", response.data);
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
+        closePopup();
+        window.location.reload();
 
-        //navigate("/");
       } else {
         // Manejar error
-        alert("Error, inicio de sesion fallido, no existe el usuario o la contraseña es incorrecta");
+        console.log("holaaaaaaaa x5");
+        window.confirm("Error, inicio de sesion fallido, no existe el usuario o la contraseña es incorrecta");
       }
     } catch (e) {
       console.error(e);
@@ -59,6 +62,7 @@ const InicioSesion = () => {
                     id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -68,9 +72,10 @@ const InicioSesion = () => {
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
                   />
                 </div>
-                <button type="submit" className="inicio-sesion-login-btn" onClick={handleLogin}>
+                <button type="submit" className="inicio-sesion-login-btn">
                   Login
                 </button>
               </form>
