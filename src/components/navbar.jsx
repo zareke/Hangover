@@ -19,18 +19,32 @@ const Navbar = ({ estaIniciadoSesion }) => {
   };
 
   const LogOut = () => {
-    localStorage.setItem("token", "");
+    localStorage.removeItem("token");
     setUser(null); // Clear user state on logout
   };
 
   useEffect(() => {
     if (estaIniciadoSesion) {
       const fetchUser = async () => {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(config.url + "user", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setUser(response.data); // Assuming user data is in response.data
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            console.error("No token found in local storage");
+            return;
+          }
+
+          const response = await axios.get(config.url + "user", {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (response.data) {
+            setUser(response.data); // Assuming user data is in response.data
+          } else {
+            console.error("No user data found in response");
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
       };
 
       fetchUser();
@@ -79,4 +93,3 @@ const Navbar = ({ estaIniciadoSesion }) => {
 };
 
 export default Navbar;
-

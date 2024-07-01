@@ -23,7 +23,7 @@ const InicioSesion = () => {
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
 
-        navigate("/");
+        //navigate("/");
       } else {
         // Manejar error
         alert("Error, inicio de sesion fallido, no existe el usuario o la contraseña es incorrecta");
