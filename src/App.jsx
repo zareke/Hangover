@@ -8,14 +8,14 @@ import PostDetail from "./components/postDetail.jsx"; // Import the PostDetail c
 import InicioSesion from "./components/InicioSesion.jsx"
 
 function App() {
-  if(!localStorage.getItem("token")){
-    localStorage.setItem("token", "");
-  }
+    if(!localStorage.getItem("token")){
+      localStorage.setItem("token", "");
+    }
   
   return (
     <Router>
 
-      <Navbar estaIniciadoSesion={ localStorage.getItem("token").length > 0}/>
+      <Navbar estaIniciadoSesion={ localStorage.getItem("token") !== "" }/>
       
       <Routes>
         <Route path="/" element={<Explorar />} />
