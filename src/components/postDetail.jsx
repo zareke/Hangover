@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import styles from "./postdetail.module.css";
@@ -13,6 +13,11 @@ const PostDetail = () => {
   const [error, setError] = useState(null);
   const [commentsVisible, setCommentsVisible] = useState(true);
   const [newCommentContent, setNewCommentContent] = useState("");
+  const commentsEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    commentsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const newComment = async () => {
     const content = newCommentContent;
@@ -69,6 +74,10 @@ const PostDetail = () => {
     };
     fetchPost();
   }, [postId]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [comments]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -143,6 +152,7 @@ const PostDetail = () => {
                     <img onClick={newComment} src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fsend-icon-2048x2020-jrvk5f1r.png&f=1&nofb=1&ipt=3c95031d77c15aa2faeb240e0df0b253cb279f3552087fad48513c0f1ffa0dde&ipo=images" alt="Send" />
                   </div>
                 </div>
+                <div ref={commentsEndRef}></div>
               </div>
             )}
           </div>

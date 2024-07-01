@@ -46,7 +46,7 @@ const Navbar = ({ estaIniciadoSesion }) => {
         <h1>hansover</h1>
         <nav>
           <ul className="botonesNavbar">
-            <li><a href="#Explorar">Explorar</a></li>
+            <li><a href="https://Pablo-Restrepo.github.io/Troll-Page-Scream/">Explorar</a></li>
             <li>
               <div className="busqueda">
                 <form>
