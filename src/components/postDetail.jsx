@@ -18,21 +18,22 @@ const PostDetail = () => {
     const content=newCommentContent
     try{
       const token=localStorage.getItem("token")
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
-      
-      const response = await axios.post(config.url+"post/"+postId+"/comment",{
-       
+      await axios.post(config.url+"post/"+postId+"/comment",{
+        
           post_id:postId,
           content:content,
           parent_id:null
         
+      },{
+        headers:{Authorization: `Bearer ${token}`} //"Authorization" o Authorization?? checkear
       })
+      console.log("token",token)
+
     }
     catch (e){
-      console.error(e)
+      console.error("ERROR EN POST COMMENT", e)
     }
   }
-//localStorage.getItem("token")
 
 
   useEffect(() => {

@@ -1,0 +1,149 @@
+/* Overlay for the popup */
+.inicio-sesion-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* Container for the popup content */
+  .inicio-sesion-popup-content {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Close button */
+  .inicio-sesion-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  /* Heading */
+  .yoyoyoyo {
+    background-color: #3a6351;
+    color: white;
+    padding: 20px;
+    margin: -20px -20px 20px -20px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    font-size: 24px;
+  }
+  
+  /* Buttons */
+  .inicio-sesion-login-btn, .inicio-sesion-guest-btn {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .inicio-sesion-login-btn .inicio-sesion-icon, .inicio-sesion-guest-btn .inicio-sesion-icon {
+    margin-right: 10px;
+  }
+  
+  .inicio-sesion-email-btn {
+    background-color: #e0e0e0;
+  }
+  
+  .inicio-sesion-google-btn {
+    background-color: #e0e0e0;
+  }
+  
+  .inicio-sesion-guest-btn {
+    background-color: #3a6351;
+    color: white;
+  }
+  
+  /* Terms and register text */
+  .inicio-sesion-terms, .inicio-sesion-register {
+    font-size: 12px;
+    color: #555;
+    margin-top: 10px;
+  }
+  
+  .inicio-sesion-terms a, .inicio-sesion-register a {
+    color: #3a6351;
+    text-decoration: none;
+  }
+  
+  .inicio-sesion-terms a:hover, .inicio-sesion-register a:hover {
+    text-decoration: underline;
+  }
+  
+  .inicio-sesion-terms b {
+    font-weight: bold;
+  }
+  
+  /* Divider */
+  .inicio-sesion-divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 20px 0;
+  }
+  
+  /* Specific styles to match the provided image */
+  .inicio-sesion-popup-content {
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  }
+  
+  .yoyoyoyo {
+    font-size: 24px;
+    color: white;
+    background-color: #3a6351;
+    padding: 20px;
+    margin: -30px -30px 20px -30px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  
+  button.inicio-sesion-login-btn, button.inicio-sesion-guest-btn {
+    padding: 15px;
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+  
+  button.inicio-sesion-guest-btn {
+    background-color: #3a6351;
+  }
+  
+  .inicio-sesion-terms, .inicio-sesion-register {
+    font-size: 14px;
+    color: #3a6351;
+    margin-top: 20px;
+  }
+  
+  .inicio-sesion-terms a, .inicio-sesion-register a {
+    color: #3a6351;
+    font-weight: bold;
+  }
+  
+  .inicio-sesion-terms a:hover, .inicio-sesion-register a:hover {
+    text-decoration: underline;
+  }
+  
