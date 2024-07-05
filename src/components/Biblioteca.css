@@ -1,0 +1,55 @@
+.library-container {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .library-container h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+  
+  .library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .library-item {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .library-item img {
+    width: 100%;
+    height: auto;
+  }
+  
+  .item-actions {
+    margin-top: 10px;
+  }
+  
+  .edit-btn,
+  .publish-btn {
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    margin: 5px;
+    padding: 10px;
+    width: 100px;
+  }
+  
+  .publish-btn {
+    background-color: #28a745;
+  }
+  
+  .edit-btn:hover,
+  .publish-btn:hover {
+    opacity: 0.8;
+  }
+  

@@ -6,6 +6,7 @@ import Navbar, { openModal, closeModal } from "./components/navbar.jsx";
 import Explorar from "./components/Explorar.jsx";
 import PostDetail from "./components/postDetail.jsx"; // Import the PostDetail component
 import InicioSesion from "./components/InicioSesion.jsx"
+import Biblioteca from "./components/Biblioteca.jsx"
 
 let isLoggedIn;
 
@@ -31,6 +32,7 @@ function App() {
         <Route path="post">
           <Route path=":postId" element={<PostDetail/>}/>
         </Route>
+        <Route path="/biblioteca" element={<Biblioteca/>}/>
       </Routes>
     </Router>
   );

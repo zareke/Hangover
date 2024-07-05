@@ -60,7 +60,7 @@ const Navbar = ({ estaIniciadoSesion }) => {
             <li><a href="#NewDesign">Nuevo diseño</a></li>
             <li><a href="#Perfil">Perfil</a></li>
             <li><a href="#Bolsa">Bolsa</a></li>
-            <li><a href="#Biblioteca">Biblioteca</a></li>
+            <li>{estaIniciadoSesion ? (<Link to="/Biblioteca">Biblioteca</Link>) : (<a onClick={openModal}>Biblioteca</a>)} </li>
             <li>
               {estaIniciadoSesion ?
               (
