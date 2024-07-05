@@ -29,10 +29,16 @@ const InicioSesion = () => {
       } else {
         // Manejar error
         console.log("holaaaaaaaa x5");
-        window.confirm("Error, inicio de sesion fallido, no existe el usuario o la contraseña es incorrecta");
+        
       }
     } catch (e) {
-      console.error(e);
+      if(e.response && e.response.status === 404){
+        window.confirm("Error, inicio de sesion fallido, no existe el usuario o la contraseña es incorrecta");
+      }
+      else{
+        console.error(e);
+      }
+      
     }
   };
 

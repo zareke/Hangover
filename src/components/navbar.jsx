@@ -4,6 +4,8 @@ import InicioSesion from './InicioSesion';
 import axios from "axios";
 import config from "../config";
 
+let openModal, closeModal;
+
 const Navbar = ({ estaIniciadoSesion }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [user, setUser] = useState(null);
@@ -26,11 +28,11 @@ const Navbar = ({ estaIniciadoSesion }) => {
     }
   }, [estaIniciadoSesion]);
 
-  const openModal = () => {
+  openModal = () => {
     setModalVisible(true);
   };
 
-  const closeModal = () => {
+  closeModal = () => {
     setModalVisible(false);
   };
 
@@ -38,6 +40,7 @@ const Navbar = ({ estaIniciadoSesion }) => {
 
     localStorage.setItem("token", "");
     setUser(null);
+    window.location.reload();
   };
 
   return (
@@ -46,7 +49,6 @@ const Navbar = ({ estaIniciadoSesion }) => {
         <h1>hansover</h1>
         <nav>
           <ul className="botonesNavbar">
-            <li><a href="https://Pablo-Restrepo.github.io/Troll-Page-Scream/">Explorar</a></li>
             <li>
               <div className="busqueda">
                 <form>
@@ -62,12 +64,12 @@ const Navbar = ({ estaIniciadoSesion }) => {
             <li>
               {estaIniciadoSesion ?
               (
-                user ? <a href="#Perfil">{user.id}</a> : null
+                user ? <a href="#Perfil">{user.id}</a> : null,
+                (<button onClick={LogOut}>Cerrar sesión</button>)
               ) : (
                 <a onClick={openModal}>Iniciar sesión</a>
               )}
             </li>
-            <li><button onClick={LogOut}>Cerrar sesión</button></li>
           </ul>
         </nav>
       </header>
@@ -80,5 +82,7 @@ const Navbar = ({ estaIniciadoSesion }) => {
     </div>
   );
 };
+
+export { openModal, closeModal };
 
 export default Navbar;
