@@ -25,6 +25,7 @@ const InicioSesion = () => {
         localStorage.setItem("token", response.data.token);
         closePopup();
         window.location.reload();
+
       } else {
         // Manejar error
         console.log("holaaaaaaaa x5");

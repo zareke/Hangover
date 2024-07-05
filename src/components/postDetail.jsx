@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import styles from "./postdetail.module.css";
@@ -12,43 +12,56 @@ const PostDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [commentsVisible, setCommentsVisible] = useState(true);
-  const [newCommentContent, setNewCommentContent] = useState("")
-  
-  const newComment = async () =>{
-    const content=newCommentContent
-    try{
-      const token=localStorage.getItem("token")
-      await axios.post(config.url+"post/"+postId+"/comment",{
-        
-          post_id:postId,
-          content:content,
-          parent_id:null
-        
-      },{
-        headers:{Authorization: `Bearer ${token}`} //"Authorization" o Authorization?? checkear
-      })
-      console.log("token",token)
+  const [newCommentContent, setNewCommentContent] = useState("");
+  const commentsEndRef = useRef(null);
 
-    }
-    catch (e){
-      console.error("ERROR EN POST COMMENT", e)
-    }
-  }
+  const scrollToBottom = () => {
+    commentsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
+  const newComment = async () => {
+    const content = newCommentContent;
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${config.url}post/${postId}/comment`,
+        {
+          post_id: postId,
+          content: content,
+          parent_id: null,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const newComment = response.data;
+      setComments((prevComments) => [
+        ...prevComments,
+        {
+          comment: {
+            comment_id: newComment.comment_id,
+            username: "YourUsername", // You should replace this with the actual username
+            content: newCommentContent,
+            // Add other necessary comment properties here
+          },
+        },
+      ]);
+      setNewCommentContent(""); // Clear the textarea
+    } catch (e) {
+      console.error("Error en post comment", e);
+    }
+  };
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const request= config.url+"post/"+postId
-        const response = await axios.get(
-          request,
-          {
-            params: {
-              limitComments: 5,
-              offsetComments: 0,
-            },
-          }
-        );
+        const request = `${config.url}post/${postId}`;
+        const response = await axios.get(request, {
+          params: {
+            limitComments: 5,
+            offsetComments: 0,
+          },
+        });
         const [postInfo, commentsInfo] = response.data;
         setPost(postInfo[0]);
         setComments(commentsInfo.collection);
@@ -61,6 +74,10 @@ const PostDetail = () => {
     };
     fetchPost();
   }, [postId]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [comments]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -104,7 +121,7 @@ const PostDetail = () => {
               <p>{post.creatoruser.follower_number} seguidores</p>
             </div>
           </div>
-          <div className={styles.commentsSection}>  
+          <div className={styles.commentsSection}>
             <h3 onClick={() => setCommentsVisible(!commentsVisible)}>
               Comentarios {commentsVisible ? '▲' : '▼'}
             </h3>
@@ -115,26 +132,29 @@ const PostDetail = () => {
                     <li key={commentData.comment.comment_id} className={styles.commentItem}>
                       <img src="https://randomuser.me/api/portraits/men/8.jpg" alt="Commenter" className={styles.commenterImage} />
                       <div>
-                        <strong>{commentData.comment.username}</strong>
+                        <strong>{commentData.comment.username} 1sem.</strong>
                         <p>{commentData.comment.content}</p>
                       </div>
                       <button className={styles.replyButton}>Responder</button>
                     </li>
                   ))}
                 </ul>
-            <p className={styles.commentCount}>3 comentarios</p>
-            <div className={styles.newComment}>
-               <img
-                src="https://randomuser.me/api/portraits/men/8.jpg"
-                alt="Profile"
-                className={styles.creatorImage}
-                />
-              <div className={styles.newCommentText}>
-                <textarea onChange={(e)=> setNewCommentContent(e.target.value)}></textarea>
-                <img onClick={newComment}  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fsend-icon-2048x2020-jrvk5f1r.png&f=1&nofb=1&ipt=3c95031d77c15aa2faeb240e0df0b253cb279f3552087fad48513c0f1ffa0dde&ipo=images" alt="" />
+                <hr className="inicio-sesion-divider" />
+                <p className={styles.commentCount}>3 comentarios</p>
+                <div className={styles.newComment}>
+                  <img
+                    src="https://randomuser.me/api/portraits/men/8.jpg"
+                    alt="Profile"
+                    className={styles.creatorImage}
+                  />
+                  <div className={styles.newCommentText}>
+                    <textarea value={newCommentContent} onChange={(e) => setNewCommentContent(e.target.value)}></textarea>
+                    <img onClick={newComment} src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fsend-icon-2048x2020-jrvk5f1r.png&f=1&nofb=1&ipt=3c95031d77c15aa2faeb240e0df0b253cb279f3552087fad48513c0f1ffa0dde&ipo=images" alt="Send" />
+                  </div>
+                </div>
+                <div ref={commentsEndRef}></div>
               </div>
-            </div>
-            </div>)}
+            )}
           </div>
         </div>
       </div>
