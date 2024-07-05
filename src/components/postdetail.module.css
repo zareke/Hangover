@@ -5,16 +5,12 @@
   transform: scale(1.2);
   
 }
-body{
-  overflow-x: hidden;
-}
 
 .contentWrapper {
   display: flex;
   max-width: 1200px;
   background-color: white;
   border-radius: 10px;
-  overflow: hidden;
 }
 
 .imageSection {
@@ -127,11 +123,39 @@ body{
   cursor: pointer;
 }
 
+/* Estilos para el contenedor de comentarios */
 .commentsContainer {
   border-radius: 5px;
   padding: 10px;
   max-height: 200px;
-  overflow-y: auto;
+  overflow-y: auto; /* Cambiado de overflow-x a overflow-y */
+}
+
+/* Estilos para la scrollbar */
+.commentsContainer::-webkit-scrollbar {
+  width: 0.45rem;
+  
+}
+
+.commentsContainer::-webkit-scrollbar-track {
+  background-color: #00000021;
+  border-radius: 2rem;
+  transition: background-color 10s ease-in-out;
+}
+.commentsContainer::-webkit-scrollbar-track:hover {
+  background-color: #00000021;
+}
+
+.commentsContainer::-webkit-scrollbar-thumb {
+  background: #303030;
+  border-radius: 2rem;
+  transition: background-color 10s ease-in-out;
+}
+
+
+.commentsContainer::-webkit-scrollbar-thumb:hover {
+  background-color : #181818;
+
 }
 
 .comments {
@@ -191,19 +215,19 @@ justify-content: center;
   border-radius: 10px;
   display: flex;
   justify-content: space-between;
-  height: 40px;
+  height: 1.5rem;
   background-color: white;
   padding: 0.2vh;
 }
 
-.newCommentText img{
-  width: 1rem;
+.newCommentText img{  
   cursor:pointer;
+  transform: scale(0.7);
 }
 .newCommentText textarea{
   border:none;
   outline: none;
   resize: none;
   white-space: nowrap;
-  
+  border-radius: 10px;
 }

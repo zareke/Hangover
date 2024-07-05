@@ -34,6 +34,7 @@ const PostDetail = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      
       const newComment = response.data;
       setComments((prevComments) => [
         ...prevComments,
@@ -51,7 +52,12 @@ const PostDetail = () => {
       console.error("Error en post comment", e);
     }
   };
-
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); //previene el salto de linea
+      newComment();
+    }
+  };
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -148,7 +154,7 @@ const PostDetail = () => {
                     className={styles.creatorImage}
                   />
                   <div className={styles.newCommentText}>
-                    <textarea value={newCommentContent} onChange={(e) => setNewCommentContent(e.target.value)}></textarea>
+                    <textarea  value={newCommentContent} onChange={(e) => setNewCommentContent(e.target.value)} onKeyDown={handleKeyDown} placeholder="Comenta aqui..."/>
                     <img onClick={newComment} src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fsend-icon-2048x2020-jrvk5f1r.png&f=1&nofb=1&ipt=3c95031d77c15aa2faeb240e0df0b253cb279f3552087fad48513c0f1ffa0dde&ipo=images" alt="Send" />
                   </div>
                 </div>
