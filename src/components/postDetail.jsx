@@ -54,7 +54,7 @@ const PostDetail = () => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if ((e.key === "Enter" && !e.shiftKey) && (e.target.value.trim() !== '')) {
       e.preventDefault(); //previene el salto de linea
       newComment();
     }

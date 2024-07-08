@@ -5,6 +5,9 @@
   transform: scale(1.2);
   
 }
+body{
+  overflow-x: hidden;
+}
 
 .contentWrapper {
   display: flex;
@@ -119,6 +122,10 @@
   border-radius: 15px;
   display: flex;
   flex-direction: column;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+
+  
 }
 
 .commentsSection h3 {
@@ -130,6 +137,7 @@
   flex-grow: 1;
   overflow-y: auto;
   margin-bottom: 10px;
+  overflow-x: hidden;
 }
 
 /* Estilos para el contenedor de comentarios */
@@ -175,7 +183,6 @@
   display: flex;
   align-items: flex-start;
   margin-bottom: 5px;
-
   color: white;
 }
 
@@ -197,7 +204,7 @@
 .commentItem p {
   margin: 5px 0;
   font-size: 12px;
-  text-wrap: wrap;
+  max-width: 22rem;
 }
 
 .replyButton {
