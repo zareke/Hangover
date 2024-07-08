@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import styles from "./postdetail.module.css";
 import Button from "./Button";
 import config from "../config";
-import Like from "../components/Like.jsx"
+import Like from "../components/Like.jsx";
+
 const PostDetail = () => {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
@@ -15,9 +16,11 @@ const PostDetail = () => {
   const [newCommentContent, setNewCommentContent] = useState("");
   const commentsEndRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState("");
+
   const scrollToBottom = () => {
     commentsEndRef.current?.scrollIntoView();
   };
+
   const newComment = async () => {
     const content = newCommentContent;
     try {
@@ -50,12 +53,34 @@ const PostDetail = () => {
       console.error("Error en post comment", e);
     }
   };
+
   const handleKeyDown = (e) => {
     if ((e.key === "Enter" && !e.shiftKey) && (e.target.value.trim() !== '')) {
       e.preventDefault(); 
       newComment();
     }
   };
+
+  const likePost = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${config.url}post/${postId}/like`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.status === 201) {
+        console.log("Post liked successfully!");
+      } else {
+        console.error("Failed to like the post");
+      }
+    } catch (e) {
+      console.error("Error liking post", e);
+    }
+  };
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -79,12 +104,15 @@ const PostDetail = () => {
     };
     fetchPost();
   }, [postId]);
+
   useEffect(() => {
     scrollToBottom();
   }, [comments]);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!post) return <div>No post found</div>;
+
   return (
     <div className={styles.container}>
       <div className={styles.contentWrapper}>
@@ -94,13 +122,12 @@ const PostDetail = () => {
               src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images"
               alt="Thumbnail"
               className={styles.thumbnail}
-              onMouseOver={()=> setSelectedImage("https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images")}
-
+              onMouseOver={() => setSelectedImage("https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images")}
             />
             <img
               src="https://brawlstars.shopping/wp-content/uploads/2023/04/BRAWL-STARS-T-SHIRT-SUMMER-30.png"
               alt="Thumbnail"
-              onMouseOver={()=> setSelectedImage("https://brawlstars.shopping/wp-content/uploads/2023/04/BRAWL-STARS-T-SHIRT-SUMMER-30.png")}
+              onMouseOver={() => setSelectedImage("https://brawlstars.shopping/wp-content/uploads/2023/04/BRAWL-STARS-T-SHIRT-SUMMER-30.png")}
               className={styles.thumbnail}
             />
             <div className={styles.thumbnail}></div>
@@ -164,8 +191,8 @@ const PostDetail = () => {
                 </div>
                 <div className={styles.commentTextArea}>
                   <div className={styles.detayes}>
-                  <p className={styles.commentCount}>3 comentarios</p>
-                  <Like className={styles.corason}/>
+                    <p className={styles.commentCount}>3 comentarios</p>
+                    <Like onClick={likePost} className={styles.corason} />
                   </div>
                   <div className={styles.newComment}>
                     <img
@@ -196,4 +223,5 @@ const PostDetail = () => {
     </div>
   );
 };
+
 export default PostDetail;
