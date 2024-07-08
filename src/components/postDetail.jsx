@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import styles from "./postdetail.module.css";
 import Button from "./Button";
-import config from "../config"
-
+import config from "../config";
+import Like from "../components/Like.jsx"
 const PostDetail = () => {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
@@ -12,46 +12,64 @@ const PostDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [commentsVisible, setCommentsVisible] = useState(true);
-  const [newCommentContent, setNewCommentContent] = useState("")
-  
-  const newComment = async () =>{
-    const content=newCommentContent
-    try{
-      const token=localStorage.getItem("token")
-      await axios.post(config.url+"post/"+postId+"/comment",{
-        
-          post_id:postId,
-          content:content,
-          parent_id:null
-        
-      },{
-        headers:{Authorization: `Bearer ${token}`} //"Authorization" o Authorization?? checkear
-      })
-      console.log("token",token)
+  const [newCommentContent, setNewCommentContent] = useState("");
+  const commentsEndRef = useRef(null);
+  const [selectedImage, setSelectedImage] = useState("");
+  const scrollToBottom = () => {
+    commentsEndRef.current?.scrollIntoView();
+  };
+  const newComment = async () => {
+    const content = newCommentContent;
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${config.url}post/${postId}/comment`,
+        {
+          post_id: postId,
+          content: content,
+          parent_id: null,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
+      const newComment = response.data;
+      setComments((prevComments) => [
+        ...prevComments,
+        {
+          comment: {
+            comment_id: newComment.comment_id,
+            username: "YourUsername",
+            content: newCommentContent,
+          },
+        },
+      ]);
+      setNewCommentContent(""); 
+    } catch (e) {
+      console.error("Error en post comment", e);
     }
-    catch (e){
-      console.error("ERROR EN POST COMMENT", e)
+  };
+  const handleKeyDown = (e) => {
+    if ((e.key === "Enter" && !e.shiftKey) && (e.target.value.trim() !== '')) {
+      e.preventDefault(); 
+      newComment();
     }
-  }
-
-
+  };
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const request= config.url+"post/"+postId
-        const response = await axios.get(
-          request,
-          {
-            params: {
-              limitComments: 5,
-              offsetComments: 0,
-            },
-          }
-        );
+        const request = `${config.url}post/${postId}`;
+        const response = await axios.get(request, {
+          params: {
+            limitComments: 5,
+            offsetComments: 0,
+          },
+        });
         const [postInfo, commentsInfo] = response.data;
         setPost(postInfo[0]);
         setComments(commentsInfo.collection);
+        setSelectedImage(/*postInfo[0].imageUrls[0]*/ "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images");
         setLoading(false);
       } catch (error) {
         console.error("Error fetching post:", error);
@@ -61,23 +79,35 @@ const PostDetail = () => {
     };
     fetchPost();
   }, [postId]);
-
+  useEffect(() => {
+    scrollToBottom();
+  }, [comments]);
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!post) return <div>No post found</div>;
-
   return (
     <div className={styles.container}>
       <div className={styles.contentWrapper}>
         <div className={styles.imageSection}>
           <div className={styles.thumbnails}>
-            <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images" alt="Thumbnail" className={styles.thumbnail} />
-            <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images" alt="Thumbnail" className={styles.thumbnail} />
+            <img
+              src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images"
+              alt="Thumbnail"
+              className={styles.thumbnail}
+              onMouseOver={()=> setSelectedImage("https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images")}
+
+            />
+            <img
+              src="https://brawlstars.shopping/wp-content/uploads/2023/04/BRAWL-STARS-T-SHIRT-SUMMER-30.png"
+              alt="Thumbnail"
+              onMouseOver={()=> setSelectedImage("https://brawlstars.shopping/wp-content/uploads/2023/04/BRAWL-STARS-T-SHIRT-SUMMER-30.png")}
+              className={styles.thumbnail}
+            />
             <div className={styles.thumbnail}></div>
           </div>
           <div className={styles.mainImageContainer}>
             <img
-              src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images"
+              src={selectedImage}
               alt="Front Image"
               className={styles.mainImage}
             />
@@ -104,42 +134,66 @@ const PostDetail = () => {
               <p>{post.creatoruser.follower_number} seguidores</p>
             </div>
           </div>
-          <div className={styles.commentsSection}>  
+          <div className={styles.commentsSection}>
             <h3 onClick={() => setCommentsVisible(!commentsVisible)}>
-              Comentarios {commentsVisible ? '▲' : '▼'}
+              Comentarios {commentsVisible ? "▲" : "▼"}
             </h3>
             {commentsVisible && (
-              <div className={styles.commentsContainer}>
-                <ul className={styles.comments}>
-                  {comments.map((commentData) => (
-                    <li key={commentData.comment.comment_id} className={styles.commentItem}>
-                      <img src="https://randomuser.me/api/portraits/men/8.jpg" alt="Commenter" className={styles.commenterImage} />
-                      <div>
-                        <strong>{commentData.comment.username}</strong>
-                        <p>{commentData.comment.content}</p>
-                      </div>
-                      <button className={styles.replyButton}>Responder</button>
-                    </li>
-                  ))}
-                </ul>
-            <p className={styles.commentCount}>3 comentarios</p>
-            <div className={styles.newComment}>
-               <img
-                src="https://randomuser.me/api/portraits/men/8.jpg"
-                alt="Profile"
-                className={styles.creatorImage}
-                />
-              <div className={styles.newCommentText}>
-                <textarea onChange={(e)=> setNewCommentContent(e.target.value)}></textarea>
-                <img onClick={newComment}  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fsend-icon-2048x2020-jrvk5f1r.png&f=1&nofb=1&ipt=3c95031d77c15aa2faeb240e0df0b253cb279f3552087fad48513c0f1ffa0dde&ipo=images" alt="" />
-              </div>
-            </div>
-            </div>)}
+              <>
+                <div className={styles.scrollableComments}>
+                  <ul className={styles.comments}>
+                    {comments.map((commentData) => (
+                      <li
+                        key={commentData.comment.comment_id}
+                        className={styles.commentItem}
+                      >
+                        <img
+                          src="https://randomuser.me/api/portraits/men/8.jpg"
+                          alt="Commenter"
+                          className={styles.commenterImage}
+                        />
+                        <div>
+                          <strong>{commentData.comment.username} 1sem.</strong>
+                          <p>{commentData.comment.content}</p>
+                        </div>
+                        <button className={styles.replyButton}>Responder</button>
+                      </li>
+                    ))}
+                  </ul>
+                  <div ref={commentsEndRef}></div>
+                </div>
+                <div className={styles.commentTextArea}>
+                  <div className={styles.detayes}>
+                  <p className={styles.commentCount}>3 comentarios</p>
+                  <Like className={styles.corason}/>
+                  </div>
+                  <div className={styles.newComment}>
+                    <img
+                      src="https://randomuser.me/api/portraits/men/8.jpg"
+                      alt="Profile"
+                      className={styles.creatorImage}
+                    />
+                    <div className={styles.newCommentText}>
+                      <textarea
+                        value={newCommentContent}
+                        onChange={(e) => setNewCommentContent(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Comenta aqui..."
+                      />
+                      <img
+                        onClick={newComment}
+                        src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fsend-icon-2048x2020-jrvk5f1r.png&f=1&nofb=1&ipt=3c95031d77c15aa2faeb240e0df0b253cb279f3552087fad48513c0f1ffa0dde&ipo=images"
+                        alt="Send"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 };
-
 export default PostDetail;

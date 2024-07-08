@@ -37,6 +37,7 @@ const Navbar = ({ estaIniciadoSesion }) => {
   };
 
   const LogOut = () => {
+
     localStorage.setItem("token", "");
     setUser(null);
     window.location.reload();
@@ -48,7 +49,6 @@ const Navbar = ({ estaIniciadoSesion }) => {
         <h1>hansover</h1>
         <nav>
           <ul className="botonesNavbar">
-            <li><Link to="/">Explorar</Link></li>
             <li>
               <div className="busqueda">
                 <form>
@@ -56,7 +56,7 @@ const Navbar = ({ estaIniciadoSesion }) => {
                 </form>
               </div>
             </li>
-            <li><a href="#Info">Información</a></li>
+            <li><a href="https://pablo-restrepo.github.io/Troll-Page-Scream/">Información</a></li>
             <li><a href="#NewDesign">Nuevo diseño</a></li>
             <li><a href="#Perfil">Perfil</a></li>
             <li><a href="#Bolsa">Bolsa</a></li>
@@ -86,5 +86,3 @@ const Navbar = ({ estaIniciadoSesion }) => {
 export { openModal, closeModal };
 
 export default Navbar;
-
-
