@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Carta from "./carta.jsx";
+import config from "../config"
 
 const Explorar = () => {
   const [isActive, setIsActive] = useState(false);
@@ -13,11 +14,14 @@ const Explorar = () => {
 
   const fetchPosts = useCallback(async (page) => {
     try {
-      const response = await axios.get('http://localhost:3508/post', {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${config.url}post`, {
         params: {
           limit: 10,
           page: page,
         },
+        headers: { Authorization: `Bearer ${token}` },
+        
       });
       setPosts((prevPosts) => [...prevPosts, ...response.data.collection]);
       setHasMore(response.data.pagination.nextPage !== null);
@@ -101,15 +105,13 @@ const Explorar = () => {
               {group.map((post, index) => {
                 const isLastPost = index === group.length - 1;
                 return (
-                  <Link
-                    key={post.id}
-                    to={`/post/${post.id}`}
-                    ref={isLastPost ? lastPostElementRef : null}
-                  >
-                    <Carta className={`cardGroup${groupIndex}`} profile_photo={post.post.creator_user.profile_photo} username={post.post.creator_user.username} cloth={post.post.front_image} >
-                      {post.post.front_image}
+                    <Carta className={`cardGroup${groupIndex}`} post_id={post.id} profile_photo={post.post.creator_user.profile_photo} username={post.post.creator_user.username} user_id={post.post.creator_user.id} cloth={post.post.front_image} >
+                        <Link
+                        key={post.id}
+                        to={`/post/${post.id}`}
+                        ref={isLastPost ? lastPostElementRef : null}
+                      ></Link>
                     </Carta>
-                  </Link>
                 );
               })}
             </div>

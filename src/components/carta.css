@@ -46,6 +46,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 2;
   }
   
   .title {
@@ -69,6 +70,7 @@
     width: 90%;
     height: 1.7vw; /* Aumenta la altura */
     text-shadow: 0px 4px 18px #2c3442;
+    z-index: 2;
   }
   
   .guardador {
@@ -76,5 +78,6 @@
     align-items: center;
     justify-content: center;
     gap: 2vw;
+    z-index: 2;
   }
   
