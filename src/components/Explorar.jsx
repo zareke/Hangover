@@ -1,33 +1,49 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Carta from "./carta.jsx";
-
 
 const Explorar = () => {
   const [isActive, setIsActive] = useState(false);
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef();
+
+  const fetchPosts = useCallback(async (page) => {
+    try {
+      const response = await axios.get('http://localhost:3508/post', {
+        params: {
+          limit: 10,
+          page: page,
+        },
+      });
+      setPosts((prevPosts) => [...prevPosts, ...response.data.collection]);
+      setHasMore(response.data.pagination.nextPage !== null);
+      setPage((prevPage) => prevPage + 1);
+    } catch (error) {
+      setError("Error fetching posts");
+      console.error("Error fetching posts:", error);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get('http://localhost:3508/post', {
-          params: {
-            limit: 10,
-            page: 1,
-          },
-        });
-        setPosts(response.data.collection);
-        console.log("posts",posts)
-      } catch (error) {
-        setError('Error fetching posts');
-        console.error('Error fetching posts:', error);
-      }
-    };
+    fetchPosts(1);
+  }, [fetchPosts]);
 
-    fetchPosts();
-  }, []);
+  const lastPostElementRef = useCallback(
+    (node) => {
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          fetchPosts(page);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [fetchPosts, hasMore, page]
+  );
 
   const handleClick = () => {
     setIsActive(!isActive);
@@ -83,10 +99,14 @@ const Explorar = () => {
           {dividedPosts.map((group, groupIndex) => (
             <div key={groupIndex} className={`wrapbusqueda-group${groupIndex}`}>
               {group.map((post, index) => {
-
-                return (  
-                  <Link key={post.id} to={`/post/${post.id}`}>
-                    <Carta className={`cardGroup${groupIndex}`}>
+                const isLastPost = index === group.length - 1;
+                return (
+                  <Link
+                    key={post.id}
+                    to={`/post/${post.id}`}
+                    ref={isLastPost ? lastPostElementRef : null}
+                  >
+                    <Carta className={`cardGroup${groupIndex}`} profile_photo={post.post.creator_user.profile_photo} username={post.post.creator_user.username} cloth={post.post.front_image} >
                       {post.post.front_image}
                     </Carta>
                   </Link>
