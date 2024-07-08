@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import styles from "./postdetail.module.css";
 import Button from "./Button";
 import config from "../config";
-
+import Like from "../components/Like.jsx"
 const PostDetail = () => {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
@@ -14,11 +14,10 @@ const PostDetail = () => {
   const [commentsVisible, setCommentsVisible] = useState(true);
   const [newCommentContent, setNewCommentContent] = useState("");
   const commentsEndRef = useRef(null);
-
+  const [selectedImage, setSelectedImage] = useState("");
   const scrollToBottom = () => {
     commentsEndRef.current?.scrollIntoView();
   };
-
   const newComment = async () => {
     const content = newCommentContent;
     try {
@@ -41,25 +40,22 @@ const PostDetail = () => {
         {
           comment: {
             comment_id: newComment.comment_id,
-            username: "YourUsername", // You should replace this with the actual username
+            username: "YourUsername",
             content: newCommentContent,
-            // Add other necessary comment properties here
           },
         },
       ]);
-      setNewCommentContent(""); // Clear the textarea
+      setNewCommentContent(""); 
     } catch (e) {
       console.error("Error en post comment", e);
     }
   };
-
   const handleKeyDown = (e) => {
     if ((e.key === "Enter" && !e.shiftKey) && (e.target.value.trim() !== '')) {
-      e.preventDefault(); //previene el salto de linea
+      e.preventDefault(); 
       newComment();
     }
   };
-
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -73,6 +69,7 @@ const PostDetail = () => {
         const [postInfo, commentsInfo] = response.data;
         setPost(postInfo[0]);
         setComments(commentsInfo.collection);
+        setSelectedImage(/*postInfo[0].imageUrls[0]*/ "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images");
         setLoading(false);
       } catch (error) {
         console.error("Error fetching post:", error);
@@ -82,15 +79,12 @@ const PostDetail = () => {
     };
     fetchPost();
   }, [postId]);
-
   useEffect(() => {
     scrollToBottom();
   }, [comments]);
-
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!post) return <div>No post found</div>;
-
   return (
     <div className={styles.container}>
       <div className={styles.contentWrapper}>
@@ -100,17 +94,20 @@ const PostDetail = () => {
               src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images"
               alt="Thumbnail"
               className={styles.thumbnail}
+              onMouseOver={()=> setSelectedImage("https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images")}
+
             />
             <img
-              src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images"
+              src="https://brawlstars.shopping/wp-content/uploads/2023/04/BRAWL-STARS-T-SHIRT-SUMMER-30.png"
               alt="Thumbnail"
+              onMouseOver={()=> setSelectedImage("https://brawlstars.shopping/wp-content/uploads/2023/04/BRAWL-STARS-T-SHIRT-SUMMER-30.png")}
               className={styles.thumbnail}
             />
             <div className={styles.thumbnail}></div>
           </div>
           <div className={styles.mainImageContainer}>
             <img
-              src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images"
+              src={selectedImage}
               alt="Front Image"
               className={styles.mainImage}
             />
@@ -166,7 +163,10 @@ const PostDetail = () => {
                   <div ref={commentsEndRef}></div>
                 </div>
                 <div className={styles.commentTextArea}>
+                  <div className={styles.detayes}>
                   <p className={styles.commentCount}>3 comentarios</p>
+                  <Like className={styles.corason}/>
+                  </div>
                   <div className={styles.newComment}>
                     <img
                       src="https://randomuser.me/api/portraits/men/8.jpg"
@@ -196,5 +196,4 @@ const PostDetail = () => {
     </div>
   );
 };
-
 export default PostDetail;
