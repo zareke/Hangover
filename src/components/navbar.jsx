@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import InicioSesion from './InicioSesion';
 import axios from 'axios';
@@ -84,11 +84,13 @@ const Navbar = () => {
       </header>
 
       {/* Renderizar el componente de inicio de sesión si modalVisible es true */}
+      {console.log(modalVisible)}
       {modalVisible && (
         <div id="myModal">
           <InicioSesion closeModal={closeModal} />
         </div>
       )}
+      
     </div>
   );
 };

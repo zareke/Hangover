@@ -8,7 +8,7 @@ import { AuthContext } from "../AuthContext"; // Asegúrate de importar AuthCont
 function Carta({ className, profile_photo, username, user_id, cloth, post_id }) {
   const { isLoggedIn, openModalNavBar } = useContext(AuthContext); // Obtén isLoggedIn y openModalNavBar del contexto
 
-  const guardarHandler = async () => {
+  const guardarHandler = async (event) => {
     if (isLoggedIn) {
       
       try {
@@ -23,12 +23,13 @@ function Carta({ className, profile_photo, username, user_id, cloth, post_id }) 
     } else {
       openModalNavBar(); // Llama a openModalNavBar si el usuario no está autenticado
     }
+    event.preventDefault();
   }
 
   return (
     <div className={`card ${className}`}>
       <div className="guardador">
-        <Link className="description" to={`/post/${user_id}`}>
+        <Link className="description" to={`/user/${user_id}`}>
           <img className="profpic" src={profile_photo} alt="Foto de perfil" />
           <span className="user">{username}</span>
         </Link>
