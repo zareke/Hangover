@@ -22,7 +22,7 @@
   display: flex;
   flex-direction: column;
   margin-right: 20px;
- 
+  
 }
 
 .thumbnail {
@@ -110,11 +110,15 @@
   color: #666;
 }
 
-.commentsSection{
+.commentsSection {
   padding: 0.3vw;
   background-color: #2c7a7b;
-  color:white;
+  color: white;
+  width: 25rem;
+  height: 30rem;
   border-radius: 15px;
+  display: flex;
+  flex-direction: column;
 }
 
 .commentsSection h3 {
@@ -122,34 +126,36 @@
   margin-bottom: 10px;
   cursor: pointer;
 }
+.scrollableComments {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
 
 /* Estilos para el contenedor de comentarios */
 .commentsContainer {
-  border-radius: 5px;
-  padding: 10px;
-  max-height: 200px;
-  overflow-y: auto; /* Cambiado de overflow-x a overflow-y */
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
 }
 
 /* Estilos para la scrollbar */
-.commentsContainer::-webkit-scrollbar {
+.scrollableComments::-webkit-scrollbar {
   width: 0.45rem;
-  
 }
 
-.commentsContainer::-webkit-scrollbar-track {
+.scrollableComments::-webkit-scrollbar-track {
   background-color: #00000021;
   border-radius: 2rem;
-  transition: background-color 10s ease-in-out;
-}
-.commentsContainer::-webkit-scrollbar-track:hover {
-  background-color: #00000021;
 }
 
-.commentsContainer::-webkit-scrollbar-thumb {
+.scrollableComments::-webkit-scrollbar-thumb {
   background: #303030;
   border-radius: 2rem;
-  transition: background-color 10s ease-in-out;
+}
+
+.scrollableComments::-webkit-scrollbar-thumb:hover {
+  background-color: #181818;
 }
 
 
@@ -163,18 +169,19 @@
   flex-direction: column;
   list-style-type: none;
   padding: 0;
+  margin: 0;
 }
-
 .commentItem {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
+
   color: white;
 }
 
 .commenterImage {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: auto;
   border-radius: 50%;
   margin-right: 10px;
 }
@@ -184,12 +191,13 @@
 }
 
 .commentItem strong {
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .commentItem p {
   margin: 5px 0;
-  font-size: 14px;
+  font-size: 12px;
+  text-wrap: wrap;
 }
 
 .replyButton {
@@ -218,16 +226,29 @@ justify-content: center;
   height: 1.5rem;
   background-color: white;
   padding: 0.2vh;
+  width: 100rem;
 }
 
 .newCommentText img{  
   cursor:pointer;
   transform: scale(0.7);
 }
-.newCommentText textarea{
-  border:none;
-  outline: none;
+.newCommentText textarea {
+  width: 100%;
+  min-height: 20px;
+  max-height: 100px;
   resize: none;
-  white-space: nowrap;
+  overflow-y: hidden;
+  box-sizing: border-box;
+  padding: 5px;
+  border: none;
+  outline: none;
   border-radius: 10px;
+}
+
+
+.commentTextArea {
+  background-color: #2c7a7b;
+  padding: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
