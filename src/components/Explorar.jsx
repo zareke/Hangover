@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo, memo } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Carta from "./carta.jsx";
@@ -13,6 +13,7 @@ const Explorar = () => {
   const observer = useRef();
 
   const fetchPosts = useCallback(async (page) => {
+    console.log(page);
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(`${config.url}post`, {
@@ -24,8 +25,9 @@ const Explorar = () => {
         
       });
       setPosts((prevPosts) => [...prevPosts, ...response.data.collection]);
+      console.log(posts);
       setHasMore(response.data.pagination.nextPage !== null);
-      setPage((prevPage) => prevPage + 1);
+      setPage(page + 1);
     } catch (error) {
       setError("Error fetching posts");
       console.error("Error fetching posts:", error);
@@ -34,7 +36,7 @@ const Explorar = () => {
 
   useEffect(() => {
     fetchPosts(1);
-  }, [fetchPosts]);
+  }, []);
 
   const lastPostElementRef = useCallback(
     (node) => {
@@ -53,16 +55,13 @@ const Explorar = () => {
     setIsActive(!isActive);
   };
 
-  const dividedPosts = posts.reduce(
-    (acc, post, index) => {
-      if (index % 4 === 0) acc[0].push(post);
-      else if (index % 4 === 1) acc[1].push(post);
-      else if (index % 4 === 2) acc[2].push(post);
-      else acc[3].push(post);
+  const dividedPosts = useMemo(() => {
+    return posts.reduce((acc, post, index) => {
+      const groupIndex = index % 4;
+      acc[groupIndex].push(post);
       return acc;
-    },
-    [[], [], [], []]
-  );
+    }, [[], [], [], []]);
+  }, [posts]);
 
   if (error) {
     return <div>{error}</div>;
@@ -124,4 +123,4 @@ const Explorar = () => {
   );
 };
 
-export default Explorar;
+export default memo(Explorar);

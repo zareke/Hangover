@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef, memo } from 'react';
 import { Link } from 'react-router-dom';
 import InicioSesion from './InicioSesion';
 import axios from 'axios';
@@ -84,7 +84,6 @@ const Navbar = () => {
       </header>
 
       {/* Renderizar el componente de inicio de sesión si modalVisible es true */}
-      {console.log(modalVisible)}
       {modalVisible && (
         <div id="myModal">
           <InicioSesion closeModal={closeModal} />
@@ -97,4 +96,4 @@ const Navbar = () => {
 
 export { openModal, closeModal };
 
-export default Navbar;
+export default memo(Navbar);
