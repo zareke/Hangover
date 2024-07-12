@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef, memo } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import InicioSesion from './InicioSesion';
 import axios from 'axios';
@@ -96,4 +96,4 @@ const Navbar = () => {
 
 export { openModal, closeModal };
 
-export default memo(Navbar);
+export default Navbar;

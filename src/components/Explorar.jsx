@@ -14,25 +14,37 @@ const Explorar = () => {
 
   const fetchPosts = useCallback(async (page) => {
     console.log(page);
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${config.url}post`, {
-        params: {
-          limit: 10,
-          page: page,
-        },
-        headers: { Authorization: `Bearer ${token}` },
+    if(hasMore){
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${config.url}post`, {
+          params: {
+            limit: 10,
+            page: page,
+          },
+          headers: { Authorization: `Bearer ${token}` },
+          
+        });
+        // Filtrar nuevos posts para evitar duplicados
+        const newPosts = response.data.collection.filter(newPost => {
+          // Verificar si el nuevo post no está presente en posts
+          return !posts.some(existingPost => existingPost.id === newPost.id);
+        });
+
+        console.log(posts);
+
+
+        setPosts([...posts, ...newPosts]); // Agregar solo nuevos posts
         
-      });
-      setPosts((prevPosts) => [...prevPosts, ...response.data.collection]);
-      console.log(posts);
-      setHasMore(response.data.pagination.nextPage !== null);
-      setPage(page + 1);
-    } catch (error) {
-      setError("Error fetching posts");
-      console.error("Error fetching posts:", error);
+        setHasMore(response.data.pagination.nextPage !== false);
+        setPage(page + 1);
+      } catch (error) {
+        setError("Error fetching posts");
+        console.error("Error fetching posts:", error);
+      }
     }
-  }, []);
+    
+  }, [posts]);
 
   useEffect(() => {
     fetchPosts(1);

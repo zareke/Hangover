@@ -16,13 +16,13 @@ function App() {
         <Router>
             <Navbar />
             <Routes>
-                <Route path="/" element={<Explorar />} />
-                <Route path="/login" element={<InicioSesion />} />
-                <Route path="post">
-                    <Route path=":postId" element={<PostDetail />} />
+                <Route exact path="/" element={<Explorar />} />
+                <Route exact path="/login" element={<InicioSesion />} />
+                <Route exact path="post">
+                    <Route exact path=":postId" element={<PostDetail />} />
                 </Route>
-                <Route path="/biblioteca" element={<Biblioteca />} />
-            </Routes>
+                <Route exact path="/biblioteca" element={<Biblioteca />} />
+            </Routes>   
         </Router>
     </AuthProvider>
 );
