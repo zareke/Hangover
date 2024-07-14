@@ -46,6 +46,7 @@ const LibraryPage = () => {
   return (
     <div className="library-container">
       <h1>Mi biblioteca</h1>
+      <div className="cuadrado">
       <button onClick={setItemsGuardados}>guardados</button>
       <button onClick={setItemsLikeados}>likeados</button>
       <div className="library-grid">
@@ -57,6 +58,7 @@ const LibraryPage = () => {
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );

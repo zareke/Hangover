@@ -58,7 +58,7 @@ const Navbar = () => {
                 </form>
               </div>
             </li>
-            <li><a href="#Info">Información</a></li>
+            <li><a href="https://pablo-restrepo.github.io/Troll-Page-Scream/">Información</a></li>
             <li><a href="#NewDesign">Nuevo diseño</a></li>
             <li><a href="#Perfil">Perfil</a></li>
             <li><a href="#Bolsa">Bolsa</a></li>
