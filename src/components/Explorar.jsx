@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo, memo } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Carta from "./carta.jsx";
+import config from "../config"
 
 const Explorar = () => {
   const [isActive, setIsActive] = useState(false);
@@ -12,25 +13,42 @@ const Explorar = () => {
   const observer = useRef();
 
   const fetchPosts = useCallback(async (page) => {
-    try {
-      const response = await axios.get('http://localhost:3508/post', {
-        params: {
-          limit: 10,
-          page: page,
-        },
-      });
-      setPosts((prevPosts) => [...prevPosts, ...response.data.collection]);
-      setHasMore(response.data.pagination.nextPage !== null);
-      setPage((prevPage) => prevPage + 1);
-    } catch (error) {
-      setError("Error fetching posts");
-      console.error("Error fetching posts:", error);
+    console.log(page);
+    if(hasMore){
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${config.url}post`, {
+          params: {
+            limit: 10,
+            page: page,
+          },
+          headers: { Authorization: `Bearer ${token}` },
+          
+        });
+        // Filtrar nuevos posts para evitar duplicados
+        const newPosts = response.data.collection.filter(newPost => {
+          // Verificar si el nuevo post no está presente en posts
+          return !posts.some(existingPost => existingPost.id === newPost.id);
+        });
+
+        console.log(posts);
+
+
+        setPosts([...posts, ...newPosts]); // Agregar solo nuevos posts
+        
+        setHasMore(response.data.pagination.nextPage !== false);
+        setPage(page + 1);
+      } catch (error) {
+        setError("Error fetching posts");
+        console.error("Error fetching posts:", error);
+      }
     }
-  }, []);
+    
+  }, [posts]);
 
   useEffect(() => {
     fetchPosts(1);
-  }, [fetchPosts]);
+  }, []);
 
   const lastPostElementRef = useCallback(
     (node) => {
@@ -49,16 +67,13 @@ const Explorar = () => {
     setIsActive(!isActive);
   };
 
-  const dividedPosts = posts.reduce(
-    (acc, post, index) => {
-      if (index % 4 === 0) acc[0].push(post);
-      else if (index % 4 === 1) acc[1].push(post);
-      else if (index % 4 === 2) acc[2].push(post);
-      else acc[3].push(post);
+  const dividedPosts = useMemo(() => {
+    return posts.reduce((acc, post, index) => {
+      const groupIndex = index % 4;
+      acc[groupIndex].push(post);
       return acc;
-    },
-    [[], [], [], []]
-  );
+    }, [[], [], [], []]);
+  }, [posts]);
 
   if (error) {
     return <div>{error}</div>;
@@ -101,15 +116,15 @@ const Explorar = () => {
               {group.map((post, index) => {
                 const isLastPost = index === group.length - 1;
                 return (
-                  <Link
-                    key={post.id}
-                    to={`/post/${post.id}`}
-                    ref={isLastPost ? lastPostElementRef : null}
-                  >
-                    <Carta className={`cardGroup${groupIndex}`} profile_photo={post.post.creator_user.profile_photo} username={post.post.creator_user.username} cloth={post.post.front_image} >
-                      {post.post.front_image}
+                      <Link
+                        key={post.id}
+                        to={`/post/${post.id}`}
+                        ref={isLastPost ? lastPostElementRef : null}
+                      >
+                    <Carta className={`cardGroup${groupIndex}`} post_id={post.id} profile_photo={post.post.creator_user.profile_photo} username={post.post.creator_user.username} user_id={post.post.creator_user.id} cloth={post.post.front_image} >
+                        
                     </Carta>
-                  </Link>
+                    </Link>
                 );
               })}
             </div>
@@ -120,4 +135,4 @@ const Explorar = () => {
   );
 };
 
-export default Explorar;
+export default memo(Explorar);

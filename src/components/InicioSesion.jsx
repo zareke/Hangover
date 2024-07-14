@@ -4,7 +4,7 @@ import axios from "axios";
 import config from "../config";
 import "./InicioSesion.css";
 
-const InicioSesion = () => {
+const InicioSesion = ({closeModal}) => {
   const [showPopup, setShowPopup] = useState(true);
   const [showLoginInputs, setShowLoginInputs] = useState(false);
   const [username, setUsername] = useState("");
@@ -44,6 +44,7 @@ const InicioSesion = () => {
 
   const closePopup = () => {
     setShowPopup(false);
+    closeModal();
   };
 
   const loadLogInInputs = () => {

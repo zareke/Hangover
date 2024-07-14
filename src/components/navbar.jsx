@@ -1,32 +1,34 @@
-import { Link } from "react-router-dom";
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import InicioSesion from './InicioSesion';
-import axios from "axios";
-import config from "../config";
+import axios from 'axios';
+import config from '../config';
+import { AuthContext } from '../AuthContext'; // Importar el contexto de autenticación
 
 let openModal, closeModal;
 
-const Navbar = ({ estaIniciadoSesion }) => {
+const Navbar = () => {
+  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext); // Obtener estado de inicio de sesión desde el contexto
   const [modalVisible, setModalVisible] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       try {
-        const response = await axios.get(config.url + "user", {
+        const response = await axios.get(config.url + 'user', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setUser(response.data); // Assuming user data is in response.data
+        setUser(response.data); // Suponiendo que los datos del usuario están en response.data
       } catch (error) {
-        console.error("Error fetching user:", error);
+        console.error('Error fetching user:', error);
       }
     };
 
-    if (estaIniciadoSesion) {
+    if (isLoggedIn) {
       fetchUser();
     }
-  }, [estaIniciadoSesion]);
+  }, [isLoggedIn]);
 
   openModal = () => {
     setModalVisible(true);
@@ -37,10 +39,10 @@ const Navbar = ({ estaIniciadoSesion }) => {
   };
 
   const LogOut = () => {
-
-    localStorage.setItem("token", "");
+    localStorage.setItem('token', '');
     setUser(null);
-    window.location.reload();
+    setIsLoggedIn(false); // Actualizar estado de inicio de sesión en el contexto
+    window.location.reload(); // Recargar la página para limpiar el estado
   };
 
   return (
@@ -60,12 +62,19 @@ const Navbar = ({ estaIniciadoSesion }) => {
             <li><a href="#NewDesign">Nuevo diseño</a></li>
             <li><a href="#Perfil">Perfil</a></li>
             <li><a href="#Bolsa">Bolsa</a></li>
-            <li>{estaIniciadoSesion ? (<Link to="/Biblioteca">Biblioteca</Link>) : (<a onClick={openModal}>Biblioteca</a>)} </li>
             <li>
-              {estaIniciadoSesion ?
-              (
-                user ? <a href="#Perfil">{user.id}</a> : null,
-                (<button onClick={LogOut}>Cerrar sesión</button>)
+              {isLoggedIn ? (
+                <Link to="/Biblioteca">Biblioteca</Link>
+              ) : (
+                <a onClick={openModal}>Biblioteca</a>
+              )}
+            </li>
+            <li>
+              {isLoggedIn ? (
+                <>
+                  {user ? <a href="#Perfil">{user.id}</a> : null}
+                  <button onClick={LogOut}>Cerrar sesión</button>
+                </>
               ) : (
                 <a onClick={openModal}>Iniciar sesión</a>
               )}
@@ -74,11 +83,13 @@ const Navbar = ({ estaIniciadoSesion }) => {
         </nav>
       </header>
 
+      {/* Renderizar el componente de inicio de sesión si modalVisible es true */}
       {modalVisible && (
         <div id="myModal">
           <InicioSesion closeModal={closeModal} />
         </div>
       )}
+      
     </div>
   );
 };
