@@ -1,4 +1,4 @@
 const config = {
-    url:"http://localhost:3002/"
+    url:"http://localhost:3508/"
 }
 export default config

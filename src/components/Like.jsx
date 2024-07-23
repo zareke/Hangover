@@ -1,11 +1,12 @@
 import React from "react";
 import "./like.css"; // Asegúrate de tener los estilos en un archivo CSS separado
 
-const Like = () => {
+
+const Like = ({func}) => {
   return (
     <label className="container">
-      <input  type="checkbox" />
-      <div className="checkmark">
+      <input  type="checkbox" /> {/* nota para los chicos front: por que carajo es una checkbox esto tipo wtf??? si es una checkbox no se ocmo poner para que si no esta logueado no ponga like */}
+      <div  className="checkmark">
         <svg viewBox="0 0 256 256">
           <rect fill="none" height="256" width="256"></rect>
           <path
