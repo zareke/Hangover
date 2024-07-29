@@ -48,9 +48,10 @@ const Navbar = () => {
   return (
     <div>
       <header className="header">
-        <h1>hansover</h1>
+        <h1><Link to="/">Hangover</Link></h1>
         <nav>
           <ul className="botonesNavbar">
+          <li><Link to="/">Explorar</Link></li>
             <li>
               <div className="busqueda">
                 <form>
@@ -58,7 +59,7 @@ const Navbar = () => {
                 </form>
               </div>
             </li>
-            <li><a href="https://pablo-restrepo.github.io/Troll-Page-Scream/">Información</a></li>
+            <li><a href="">Información</a></li>
             <li><a href="#NewDesign">Nuevo diseño</a></li>
             <li><a href="#Perfil">Perfil</a></li>
             <li><a href="#Bolsa">Bolsa</a></li>

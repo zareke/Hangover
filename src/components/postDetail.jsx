@@ -99,18 +99,24 @@ const PostDetail = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
+        const token=localStorage.getItem("token")
         const request = `${config.url}post/${postId}`;
         const response = await axios.get(request, {
           params: {
             limitComments: 5,
             offsetComments: 0,
           },
+          headers: { Authorization: `Bearer ${token}` },
         });
-        const [postInfo, commentsInfo] = response.data;
+
+        const postInfo = response.data[0]
+        const commentsInfo=response.data[1]
+        setSaved(response.data[3])
         setPost(postInfo[0]);
         setComments(commentsInfo.collection);
         setSelectedImage(
-          "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images"
+          postInfo.front_image //seria postinfo mepa fijense la req
+
         );
         setLoading(false);
       } catch (error) {
@@ -126,31 +132,31 @@ const PostDetail = () => {
     scrollToBottom();
   }, [comments]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Instalando virus...</div>; //Loading...
   if (error) return <div>Error: {error}</div>;
   if (!post) return <div>No post found</div>;
-
+ 
   return (
     <div className={styles.container}>
       <div className={styles.contentWrapper}>
         <div className={styles.imageSection}>
           <div className={styles.thumbnails}>
             <img
-              src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images"
+              src={post.front_image}
               alt="Thumbnail"
               className={styles.thumbnail}
               onMouseOver={() =>
                 setSelectedImage(
-                  "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvantageapparel.com%2FImages%2FProductImages%2FHigh%2F0270_Dark_Grey_front.png&f=1&nofb=1&ipt=c577db866b9922c1990e440ca550bff073c1e6a4852775e4173d6a57e0e98c34&ipo=images"
+                  post.front_image
                 )
               }
             />
             <img
-              src="https://brawlstars.shopping/wp-content/uploads/2023/04/BRAWL-STARS-T-SHIRT-SUMMER-30.png"
+              src={post.back_image}
               alt="Thumbnail"
               onMouseOver={() =>
                 setSelectedImage(
-                  "https://brawlstars.shopping/wp-content/uploads/2023/04/BRAWL-STARS-T-SHIRT-SUMMER-30.png"
+                  post.back_image
                 )
               }
               className={styles.thumbnail}

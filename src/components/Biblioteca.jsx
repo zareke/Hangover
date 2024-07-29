@@ -17,9 +17,10 @@ const LibraryPage = () => {
         const response = await axios.get(config.url + 'user/library', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log(response);
+        console.log("response",response);
         setItems(response.data);
         setDisplayedItems(response.data.liked); // Initially display liked items
+        
       } catch (error) {
         console.error('Error fetching items', error);
       }
@@ -51,10 +52,10 @@ const LibraryPage = () => {
       <button onClick={setItemsLikeados}>likeados</button>
       <div className="library-grid">
         {displayedItems.map(item => (
-          <div key={item.id} className="library-item">
+          <div key={item.postId} className="library-item">
             <img src={item.front_image} alt="imagen" />
             <div className="item-actions">
-              <button className="edit-btn" onClick={() => handleViewDesign(item.id)}>Ver Diseño</button>
+              <button className="edit-btn" onClick={() => handleViewDesign(item.postId)}>Ver Diseño</button>
             </div>
           </div>
         ))}
