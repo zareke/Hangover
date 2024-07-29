@@ -5,11 +5,11 @@ import axios from 'axios';
 import config from '../config';
 
 const LibraryPage = () => {
-  const [displayedItems, setDisplayedItems] = useState([]);
-  const [items, setItems] = useState([]);
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const [items, setItems] = useState({ saved: [], liked: [] });
+  const [activeTab, setActiveTab] = useState('liked');
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // Fetch items from the API when the component mounts
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -17,11 +17,20 @@ const LibraryPage = () => {
         const response = await axios.get(config.url + 'user/library', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log("response",response);
-        setItems(response.data);
-        setDisplayedItems(response.data.liked); // Initially display liked items
         
+        if (response.data && typeof response.data === 'object') {
+          if (Array.isArray(response.data.saved) && Array.isArray(response.data.liked)) {
+            setItems(response.data);
+          } else {
+            setError("API response format is incorrect");
+            console.error("Incorrect data format:", response.data);
+          }
+        } else {
+          setError("Invalid API response");
+          console.error("Invalid response:", response.data);
+        }
       } catch (error) {
+        setError("Error fetching items");
         console.error('Error fetching items', error);
       }
     };
@@ -29,37 +38,44 @@ const LibraryPage = () => {
     fetchItems();
   }, []);
 
-  // Function to display saved items
   const setItemsGuardados = () => {
-    setDisplayedItems(items.saved);
+    setActiveTab('saved');
   };
 
-  // Function to display liked items
   const setItemsLikeados = () => {
-    setDisplayedItems(items.liked);
+    setActiveTab('liked');
   };
 
-  // Function to handle the click on the "Ver Diseño" button
   const handleViewDesign = (postId) => {
     navigate(`/post/${postId}`);
   };
+
+  const displayedItems = items[activeTab] || [];
+
+  if (error) {
+    return <div className="error-message">{error}</div>;
+  }
 
   return (
     <div className="library-container">
       <h1>Mi biblioteca</h1>
       <div className="cuadrado">
-      <button onClick={setItemsGuardados}>guardados</button>
-      <button onClick={setItemsLikeados}>likeados</button>
-      <div className="library-grid">
-        {displayedItems.map(item => (
-          <div key={item.postId} className="library-item">
-            <img src={item.front_image} alt="imagen" />
-            <div className="item-actions">
-              <button className="edit-btn" onClick={() => handleViewDesign(item.postId)}>Ver Diseño</button>
+        <button onClick={setItemsGuardados} className={activeTab === 'saved' ? 'active' : ''}>
+          Guardados ({items.saved.length})
+        </button>
+        <button onClick={setItemsLikeados} className={activeTab === 'liked' ? 'active' : ''}>
+          Likeados ({items.liked.length})
+        </button>
+        <div className="library-grid" key={activeTab}>
+          {displayedItems.map((item, index) => (
+            <div key={`${activeTab}-${item.id}-${index}`} className="library-item">
+              <img src={item.front_image} alt={`Design ${item.id}`} />
+              <div className="item-actions">
+                <button className="edit-btn" onClick={() => handleViewDesign(item.id)}>Ver Diseño</button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
       </div>
     </div>
   );

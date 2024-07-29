@@ -13,6 +13,7 @@ const PostDetail = () => {
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isLiked, setIsLiked] = useState(false);
   const [error, setError] = useState(null);
   const [commentsVisible, setCommentsVisible] = useState(true);
   const [newCommentContent, setNewCommentContent] = useState("");
@@ -71,6 +72,69 @@ const PostDetail = () => {
       newComment();
     }
   };
+  const shouldBeLiked = async () =>{
+    
+    if (true) {
+      console.log("CHE YA TERMINO EL RECREO EH")
+      try {
+        const token = localStorage.getItem("token");
+       
+        const response = await axios.get(
+          `${config.url}post/${postId}/like/fetch`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (response.status === 201) {
+          console.log("Post is liked");
+          setIsLiked(true);
+        } else {
+          console.error("Post is not liked");
+          setIsLiked(false);
+        }
+      } catch (e) {
+        console.error("Error checking liked post", e);
+      }
+    } 
+  }
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const request = `${config.url}post/${postId}`;
+        const response = await axios.get(request, {
+          params: {
+            limitComments: 5,
+            offsetComments: 0,
+          },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const postInfo = response.data[0];
+        const commentsInfo = response.data[1];
+        setSaved(response.data[3]);
+        setPost(postInfo[0]);
+        setComments(commentsInfo.collection);
+        setSelectedImage(
+          postInfo[0].front_image //seria postinfo mepa fijense la req
+        );
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching post:", error);
+        setError("Error fetching data");
+        setLoading(false);
+      }
+    };
+    fetchPost();
+  }, [postId]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [comments]);
+
+  if (loading) return <div>Instalando virus...</div>; //Loading...
+  if (error) return <div>Error: {error}</div>;
+  if (!post) return <div>No post found</div>;
 
   const likePost = async () => {
     if (isLoggedIn) {
@@ -95,47 +159,6 @@ const PostDetail = () => {
       openModalNavBar();
     }
   };
-
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const token=localStorage.getItem("token")
-        const request = `${config.url}post/${postId}`;
-        const response = await axios.get(request, {
-          params: {
-            limitComments: 5,
-            offsetComments: 0,
-          },
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const postInfo = response.data[0]
-        const commentsInfo=response.data[1]
-        setSaved(response.data[3])
-        setPost(postInfo[0]);
-        setComments(commentsInfo.collection);
-        setSelectedImage(
-          postInfo.front_image //seria postinfo mepa fijense la req
-
-        );
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching post:", error);
-        setError("Error fetching data");
-        setLoading(false);
-      }
-    };
-    fetchPost();
-  }, [postId]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [comments]);
-
-  if (loading) return <div>Instalando virus...</div>; //Loading...
-  if (error) return <div>Error: {error}</div>;
-  if (!post) return <div>No post found</div>;
- 
   return (
     <div className={styles.container}>
       <div className={styles.contentWrapper}>
@@ -145,20 +168,12 @@ const PostDetail = () => {
               src={post.front_image}
               alt="Thumbnail"
               className={styles.thumbnail}
-              onMouseOver={() =>
-                setSelectedImage(
-                  post.front_image
-                )
-              }
+              onMouseOver={() => setSelectedImage(post.front_image)}
             />
             <img
               src={post.back_image}
               alt="Thumbnail"
-              onMouseOver={() =>
-                setSelectedImage(
-                  post.back_image
-                )
-              }
+              onMouseOver={() => setSelectedImage(post.back_image)}
               className={styles.thumbnail}
             />
             <div className={styles.thumbnail}></div>
@@ -177,9 +192,24 @@ const PostDetail = () => {
             <h2 className={styles.title}>{post.title}</h2>
             <div className={styles.actionButtons}>
               {saved ? (
-                <Button onClick={() => eliminarGuardadoHandler(postId, setSaved)}>Guardado</Button>
+                <Button
+                  onClick={() => eliminarGuardadoHandler(postId, setSaved)}
+                >
+                  Guardado
+                </Button>
               ) : (
-                <Button onClick={() => guardarHandler(postId, setSaved, isLoggedIn, openModalNavBar)}>Guardar</Button>
+                <Button
+                  onClick={() =>
+                    guardarHandler(
+                      postId,
+                      setSaved,
+                      isLoggedIn,
+                      openModalNavBar
+                    )
+                  }
+                >
+                  Guardar
+                </Button>
               )}
               <Button>Añadir a la Bolsa</Button>
             </div>
@@ -218,7 +248,9 @@ const PostDetail = () => {
                           <strong>{commentData.comment.username} 1sem.</strong>
                           <p>{commentData.comment.content}</p>
                         </div>
-                        <button className={styles.replyButton}>Responder</button>
+                        <button className={styles.replyButton}>
+                          Responder
+                        </button>
                       </li>
                     ))}
                   </ul>
@@ -227,8 +259,9 @@ const PostDetail = () => {
                 <div className={styles.commentTextArea}>
                   <div className={styles.detayes}>
                     <p className={styles.commentCount}>3 comentarios</p>
-                    <div onClick={likePost}>
-                      <Like className={styles.corason} />
+                    <div>
+                     
+                       <Like elPost={likePost} shouldBeChecked={isLiked} shouldBeCheckedFunction={shouldBeLiked} className={styles.corason}></Like>
                     </div>
                   </div>
                   <div className={styles.newComment}>

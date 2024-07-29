@@ -11,7 +11,7 @@ function Carta({ className, profile_photo, username, user_id, cloth, post_id }) 
   return (
     <div className={`card ${className}`}>
       <div className="guardador">
-        <Link className="description" to={`/user/${user_id}`}>
+        <Link className="description" to={`/puser/${user_id}`}>
           <img className="profpic" src={profile_photo} alt="Foto de perfil" />
           <span className="user">{username}</span>
         </Link>

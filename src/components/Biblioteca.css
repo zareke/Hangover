@@ -1,6 +1,7 @@
 .library-container {
-    padding: 20px;
+    padding: 20px 10vw 2px 10vw;
     text-align: center;
+    height: 100%;
   }
   
   .library-container h1 {
@@ -12,6 +13,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
+    
   }
   
   .library-item {
@@ -55,5 +57,6 @@
   
 
   .cuadrado{
-    background-color: antiquewhite;
+    background-color: rgba(56, 117, 109, 0.466);
+    padding: 2vh 1vw 2vh 1vw
   }

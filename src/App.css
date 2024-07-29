@@ -74,6 +74,8 @@
   top: 0;
   z-index: 5;
   flex-wrap: wrap; /* Allow wrapping for smaller screens */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle drop shadow */
+
 }
 
 ul {

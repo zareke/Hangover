@@ -1,0 +1,60 @@
+.profile-container {
+    padding: 20px;
+    text-align: center;
+    background: url('path_to_background_image') no-repeat center center fixed; 
+    background-size: cover;
+    color: white;
+  }
+  
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(56, 117, 109, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .profile-pic {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+  }
+  
+  .profile-info {
+    flex: 1;
+    text-align: left;
+    margin-left: 20px;
+  }
+  
+  .profile-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+  }
+  
+  .profile-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  
+  .profile-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+  }
+  
+  .item-card {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .item-card img {
+    width: 100%;
+    border-radius: 10px;
+  }
+  

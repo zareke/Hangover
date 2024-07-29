@@ -7,6 +7,8 @@ import Explorar from "./components/Explorar.jsx";
 import PostDetail from "./components/postDetail.jsx"; // Import the PostDetail component
 import InicioSesion from "./components/InicioSesion.jsx";
 import Biblioteca from "./components/Biblioteca.jsx";
+import Informacion from "./components/Informacion.jsx"
+import Profile from "./components/Profile.jsx"
 import { AuthProvider } from "./AuthContext";
 
 function App() {
@@ -16,10 +18,14 @@ function App() {
         <Router>
             <Navbar />
             <Routes>
+                <Route exact path ="/informacion" element={<Informacion/>}/>
                 <Route exact path="/" element={<Explorar />} />
                 <Route exact path="/login" element={<InicioSesion />} />
                 <Route exact path="post">
                     <Route exact path=":postId" element={<PostDetail />} />
+                </Route>
+                <Route exact path="user">
+                    <Route exact path=":userId" element={<Profile/>}/>
                 </Route>
                 <Route exact path="/biblioteca" element={<Biblioteca />} />
             </Routes>   

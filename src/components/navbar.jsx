@@ -20,6 +20,7 @@ const Navbar = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(response.data); // Suponiendo que los datos del usuario están en response.data
+        console.log("response:" ,response)
       } catch (error) {
         console.error('Error fetching user:', error);
       }
@@ -48,7 +49,7 @@ const Navbar = () => {
   return (
     <div>
       <header className="header">
-        <h1><Link to="/">Hangover</Link></h1>
+        <h1><Link to="/">hgvr</Link></h1>
         <nav>
           <ul className="botonesNavbar">
           <li><Link to="/">Explorar</Link></li>
@@ -59,7 +60,7 @@ const Navbar = () => {
                 </form>
               </div>
             </li>
-            <li><a href="">Información</a></li>
+            <li><Link to="/informacion">Información</Link></li>
             <li><a href="#NewDesign">Nuevo diseño</a></li>
             <li><a href="#Perfil">Perfil</a></li>
             <li><a href="#Bolsa">Bolsa</a></li>
