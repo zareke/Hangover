@@ -74,13 +74,13 @@ const PostDetail = () => {
   };
   const shouldBeLiked = async () =>{
     
-    if (true) {
+    if (isLoggedIn) {
       console.log("CHE YA TERMINO EL RECREO EH")
       try {
         const token = localStorage.getItem("token");
        
         const response = await axios.get(
-          `${config.url}post/${postId}/like/fetch`,
+          `${config.url}post/${postId}/like/fetch`,{},
           {
             headers: { Authorization: `Bearer ${token}` },
           }

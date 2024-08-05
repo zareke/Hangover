@@ -4,31 +4,34 @@ import { useParams } from "react-router-dom";
 import Button from "./Button";
 import config from "../config";
 import { AuthContext } from "../AuthContext";
+import { guardarHandler,eliminarGuardadoHandler,followHandler } from "../savehandlers";
 
 const Profile = () => {
   const { userId } = useParams();
-  const [userData, setUserData] = useState({});
-  const { token } = useContext(AuthContext);
-  
+  const [userData, setUserData] = useState(null); // Initialize with null
+  const { isLoggedIn,openModalNavBar } = useContext(AuthContext); //i dont know que does esto asi que i dont use it you know
+  const [follows,setFollows] = useState(false)
+
+
   useEffect(() => {
-    console.log("hola?")
     const fetchUserData = async () => {
-      const token = localStorage.getItem("token")
       try {
+        const token2 = localStorage.getItem("token") 
         const response = await axios.get(`${config.url}user/profile/${userId}`, {
-          
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token2}` },
         });
-        console.log(response);
+        console.log("Response data:", response.data);
         setUserData(response.data);
-        console.log("aaaa", userData);
+        setFollows(userData.follows)
       } catch (error) {
         console.error("Error fetching user data", error);
       }
     };
 
     fetchUserData();
-  }, [userId]);
+  }, [userId]); // Include userId and token in dependencies
+
+ 
 
   if (!userData) return <div>Loading...</div>;
 
@@ -47,18 +50,18 @@ const Profile = () => {
           </div>
         </div>
         <div className="profile-actions">
-          <Button text="Seguir" />
+          {follows ? <Button onClick={() => followHandler(userId,setFollows,isLoggedIn,openModalNavBar)} text="Dejar de segir"/> : <Button text="Seguir"/>}
           <Button text="Mensaje" />
           <Button text="Dar Insignia" />
         </div>
       </header>
       <section className="profile-content">
-        {/*userData.items.map((item) => (
+        {userData.items && userData.items.map((item) => (
           <div key={item.id} className="item-card">
             <img src={item.image} alt={item.name} />
             <p>{item.name}</p>
           </div>
-        ))*/}
+        ))}
       </section>
     </div>
   );

@@ -34,3 +34,22 @@ export const eliminarGuardadoHandler = async (postId, setSaved) => {
     console.error("Error al eliminar guardado:", error);
   }
 };
+
+export const followHandler = async (userId,setFollow,isLoggedIn,openModalNavBar) => {
+  if (isLoggedIn) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(`${config.url}follow/${userId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.status === 201) {
+        setFollow(true);
+      }
+    } catch (error) {
+      console.error("Error al guardar:", error);
+    }
+  } else {
+    openModalNavBar();
+  }
+}
