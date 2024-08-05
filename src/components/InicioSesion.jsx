@@ -13,14 +13,12 @@ const InicioSesion = ({closeModal}) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("handlelogin",username,password)
     
     try {
       const response = await axios.post(config.url + "user/login/", {
         username: username,
         password: password,
       });
-      console.log("holaaaaaa", response.data);
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         closePopup();
@@ -28,7 +26,6 @@ const InicioSesion = ({closeModal}) => {
 
       } else {
         // Manejar error
-        console.log("holaaaaaaaa x5");
         
       }
     } catch (e) {

@@ -13,11 +13,10 @@ const Explorar = () => {
   const observer = useRef();
 
   const fetchPosts = useCallback(async (page) => {
-    console.log(page);
     if(hasMore){
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`${config.url}post`, {
+        const response = await axios.get(`${config.url}post`, { //trae todos los posts sin importar visibilidad creo
           params: {
             limit: 10,
             page: page,
@@ -31,7 +30,6 @@ const Explorar = () => {
           return !posts.some(existingPost => existingPost.id === newPost.id);
         });
 
-        console.log(posts);
 
 
         setPosts([...posts, ...newPosts]); // Agregar solo nuevos posts
@@ -110,7 +108,7 @@ const Explorar = () => {
       </div>
 
       <div className="centrador">
-        <div className="wrapbusqueda">
+        <div className="wrapbusqueda"> 
           {dividedPosts.map((group, groupIndex) => (
             <div key={groupIndex} className={`wrapbusqueda-group${groupIndex}`}>
               {group.map((post, index) => {

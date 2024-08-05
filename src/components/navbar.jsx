@@ -20,7 +20,6 @@ const Navbar = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(response.data); // Suponiendo que los datos del usuario están en response.data
-        console.log("response:" ,response)
       } catch (error) {
         console.error('Error fetching user:', error);
       }

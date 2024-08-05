@@ -20,7 +20,6 @@ const Profile = () => {
         const response = await axios.get(`${config.url}user/profile/${userId}`, {
           headers: { Authorization: `Bearer ${token2}` },
         });
-        console.log("Response data:", response.data);
         setUserData(response.data);
         setFollows(response.data.follows)
       } catch (error) {
@@ -56,10 +55,12 @@ const Profile = () => {
         </div>
       </header>
       <section className="profile-content">
-        {userData.items && userData.items.map((item) => (
+        {userData.posts.map(item => (
           <div key={item.id} className="item-card">
-            <img src={item.image} alt={item.name} />
-            <p>{item.name}</p>
+            
+            <img src={item.image} alt={item.title} />
+            <p>{item.title}</p>
+            {/*falta guardar */}
           </div>
         ))}
       </section>
