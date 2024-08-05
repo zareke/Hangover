@@ -1,19 +1,14 @@
 import "./like.css";
 
 
-const Like = ({elPost,shouldBeChecked,shouldBeCheckedFunction}) =>{
-    const handleCheckboxChange = (event) => {
-        // If you need to update the state
-        shouldBeCheckedFunction();
-        event.target.checked = shouldBeChecked;
-      };
+const Like = ({isAlredyChecked,likePostFunc}) =>{
+   
     return (
         <label className="container">
        <input
   type="checkbox"
-  checked={shouldBeChecked}
-  onChange={handleCheckboxChange}
-  onClick={elPost}
+  onClick={likePostFunc}
+  checked = {isAlredyChecked}
 />{" "}
         {/* nota para los chicos front: por que carajo es una checkbox esto tipo wtf??? si es una checkbox no se ocmo poner para que si no esta logueado no ponga like */}
         <div className="checkmark">

@@ -6,19 +6,19 @@ import Button from "./Button";
 import config from "../config";
 import Like from "../components/Like.jsx";
 import { AuthContext } from "../AuthContext";
-import { guardarHandler, eliminarGuardadoHandler } from "../savehandlers.js";
+import { guardarHandler, eliminarGuardadoHandler } from "../universalhandlers.js";
 
 const PostDetail = () => {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isLiked, setIsLiked] = useState(false);
   const [error, setError] = useState(null);
   const [commentsVisible, setCommentsVisible] = useState(true);
   const [newCommentContent, setNewCommentContent] = useState("");
   const commentsEndRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState("");
+  const [isChecked, setIsChecked] = useState(false);
   const [saved, setSaved] = useState(false);
 
   const { isLoggedIn, openModalNavBar } = useContext(AuthContext);
@@ -72,31 +72,7 @@ const PostDetail = () => {
       newComment();
     }
   };
-  const shouldBeLiked = async () =>{
-    
-    if (isLoggedIn) {
-      console.log("CHE YA TERMINO EL RECREO EH")
-      try {
-        const token = localStorage.getItem("token");
-       
-        const response = await axios.get(
-          `${config.url}post/${postId}/like/fetch`,{},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        if (response.status === 201) {
-          console.log("Post is liked");
-          setIsLiked(true);
-        } else {
-          console.error("Post is not liked");
-          setIsLiked(false);
-        }
-      } catch (e) {
-        console.error("Error checking liked post", e);
-      }
-    } 
-  }
+ 
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -119,6 +95,7 @@ const PostDetail = () => {
           postInfo[0].front_image //seria postinfo mepa fijense la req
         );
         setLoading(false);
+        setIsChecked(response.data[2])
       } catch (error) {
         console.error("Error fetching post:", error);
         setError("Error fetching data");
@@ -135,7 +112,13 @@ const PostDetail = () => {
   if (loading) return <div>Instalando virus...</div>; //Loading...
   if (error) return <div>Error: {error}</div>;
   if (!post) return <div>No post found</div>;
-
+const changeLikeState = async () =>{
+  if(isChecked){
+dislikePost()
+  }else{
+    likePost()
+  }
+}
   const likePost = async () => {
     if (isLoggedIn) {
       try {
@@ -149,11 +132,38 @@ const PostDetail = () => {
         );
         if (response.status === 201) {
           console.log("Post liked successfully!");
+          setIsChecked(true);
         } else {
           console.error("Failed to like the post");
         }
       } catch (e) {
         console.error("Error liking post", e);
+      }
+    } else {
+      openModalNavBar();
+    }
+  };
+  const dislikePost = async () => {
+    if (isLoggedIn) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.delete(
+          `${config.url}post/${postId}/like`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (response.status === 200) {
+          console.log("Post disliked successfully!");
+          setIsChecked(false);
+        } else {
+          console.error("Failed to dislike the post");
+        }
+      } catch (e) {
+        console.error("Error disliking post", e);
+        if (e.response && e.response.data && e.response.data.error) {
+          console.error("Server error:", e.response.data.error);
+        }
       }
     } else {
       openModalNavBar();
@@ -261,7 +271,7 @@ const PostDetail = () => {
                     <p className={styles.commentCount}>3 comentarios</p>
                     <div>
                      
-                       <Like elPost={likePost} shouldBeChecked={isLiked} shouldBeCheckedFunction={shouldBeLiked} className={styles.corason}></Like>
+                       <Like likePostFunc={changeLikeState} isAlredyChecked={isChecked} styles={styles.corason}></Like>
                     </div>
                   </div>
                   <div className={styles.newComment}>

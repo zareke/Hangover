@@ -39,10 +39,9 @@ export const followHandler = async (userId,setFollow,isLoggedIn,openModalNavBar)
   if (isLoggedIn) {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(`${config.url}follow/${userId}`, {}, {
+      const response = await axios.post(`${config.url}user/follow/${userId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
       if (response.status === 201) {
         setFollow(true);
       }
@@ -51,5 +50,19 @@ export const followHandler = async (userId,setFollow,isLoggedIn,openModalNavBar)
     }
   } else {
     openModalNavBar();
+  }
+}
+export const unFollowHandler = async (userId,setFollow) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.delete(`${config.url}user/follow/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (response.status === 200) {
+      setFollow(false);
+    }
+  } catch (error) {
+    console.error("Error al eliminar seguido:", error);
   }
 }

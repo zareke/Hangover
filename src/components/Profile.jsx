@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import Button from "./Button";
 import config from "../config";
 import { AuthContext } from "../AuthContext";
-import { guardarHandler,eliminarGuardadoHandler,followHandler } from "../savehandlers";
+import { guardarHandler,eliminarGuardadoHandler,followHandler, unFollowHandler } from "../universalhandlers";
 
 const Profile = () => {
   const { userId } = useParams();
@@ -22,7 +22,7 @@ const Profile = () => {
         });
         console.log("Response data:", response.data);
         setUserData(response.data);
-        setFollows(userData.follows)
+        setFollows(response.data.follows)
       } catch (error) {
         console.error("Error fetching user data", error);
       }
@@ -50,7 +50,7 @@ const Profile = () => {
           </div>
         </div>
         <div className="profile-actions">
-          {follows ? <Button onClick={() => followHandler(userId,setFollows,isLoggedIn,openModalNavBar)} text="Dejar de segir"/> : <Button text="Seguir"/>}
+          {follows ? (<Button onClick={() => unFollowHandler(userId,setFollows)} text="Dejar de segir"/>) : (<Button text="Seguir" onClick={() => followHandler(userId,setFollows,isLoggedIn,openModalNavBar)}/>)} 
           <Button text="Mensaje" />
           <Button text="Dar Insignia" />
         </div>

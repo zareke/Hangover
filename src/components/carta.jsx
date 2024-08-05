@@ -2,7 +2,7 @@ import "./carta.css";
 import { Link } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../AuthContext";
-import { guardarHandler, eliminarGuardadoHandler } from "../savehandlers.js";
+import { guardarHandler, eliminarGuardadoHandler } from "../universalhandlers.js";
 
 function Carta({ className, profile_photo, username, user_id, cloth, post_id }) {
   const { isLoggedIn, openModalNavBar } = useContext(AuthContext);
