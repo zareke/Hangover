@@ -18,6 +18,7 @@ const LibraryPage = () => {
         const response = await axios.get(config.url + 'user/library', {
           headers: { Authorization: `Bearer ${token}` }
         });
+        console.log(response.data)
         
         if (response.data && typeof response.data === 'object') {
           if (Array.isArray(response.data.saved) && Array.isArray(response.data.liked)) {

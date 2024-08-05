@@ -5,13 +5,13 @@ import Button from "./Button";
 import config from "../config";
 import { AuthContext } from "../AuthContext";
 import { guardarHandler,eliminarGuardadoHandler,followHandler, unFollowHandler } from "../universalhandlers";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { userId } = useParams();
   const [userData, setUserData] = useState(null); // Initialize with null
   const { isLoggedIn,openModalNavBar } = useContext(AuthContext); //i dont know que does esto asi que i dont use it you know
-  const [follows,setFollows] = useState(false)
-
+  const [follows,setFollows] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -50,19 +50,19 @@ const Profile = () => {
         </div>
         <div className="profile-actions">
           {follows ? (<Button onClick={() => unFollowHandler(userId,setFollows)} text="Dejar de segir"/>) : (<Button text="Seguir" onClick={() => followHandler(userId,setFollows,isLoggedIn,openModalNavBar)}/>)} 
-          <Button text="Mensaje" />
+          {isLoggedIn ? (<Link to={`/privateChat/${userData.own_id}/${userData.user_data.id}`}><Button text="Mensaje" /></Link>): openModalNavBar()}
           <Button text="Dar Insignia" />
         </div>
       </header>
       <section className="profile-content">
-        {userData.posts.map(item => (
+        {userData.posts !== undefined && userData.posts !== null ? userData.posts.map(item => (
           <div key={item.id} className="item-card">
             
             <img src={item.image} alt={item.title} />
             <p>{item.title}</p>
             {/*falta guardar */}
           </div>
-        ))}
+        )) : null}
       </section>
     </div>
   );

@@ -9,6 +9,7 @@ import InicioSesion from "./components/InicioSesion.jsx";
 import Biblioteca from "./components/Biblioteca.jsx";
 import Informacion from "./components/Informacion.jsx"
 import Profile from "./components/Profile.jsx"
+import Chat from "./components/Chat.jsx"
 import { AuthProvider } from "./AuthContext";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
                 <Route exact path="user">
                     <Route exact path=":userId" element={<Profile/>}/>
                 </Route>
+                <Route exact path="privateChat/:ownId/:userId" element={<Chat/>}></Route>
                 <Route exact path="/biblioteca" element={<Biblioteca />} />
             </Routes>   
         </Router>
