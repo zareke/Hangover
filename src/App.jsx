@@ -13,7 +13,6 @@ import Chat from "./components/Chat.jsx"
 import { AuthProvider } from "./AuthContext";
 
 function App() {
-
   return (
     <AuthProvider>
         <Router>
@@ -22,7 +21,7 @@ function App() {
                 <Route exact path ="/informacion" element={<Informacion/>}/>
                 <Route exact path="/" element={<Explorar />} />
                 <Route exact path="/login" element={<InicioSesion />} />
-                <Route exact path="post">
+                <Route exact path="/post">
                     <Route exact path=":postId" element={<PostDetail />} />
                 </Route>
                 <Route exact path="user">

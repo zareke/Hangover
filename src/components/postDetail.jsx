@@ -77,7 +77,7 @@ const PostDetail = () => {
     const fetchPost = async () => {
       try {
         const token = localStorage.getItem("token");
-        const request = `${config.url}post/${postId}`;
+        const request = `${config.url}/post/${postId}`;
         const response = await axios.get(request, {
           params: {
             limitComments: 5,
@@ -124,7 +124,7 @@ dislikePost()
       try {
         const token = localStorage.getItem("token");
         const response = await axios.post(
-          `${config.url}post/${postId}/like`,
+          `${config.url}/post/${postId}/like`,
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -148,7 +148,7 @@ dislikePost()
       try {
         const token = localStorage.getItem("token");
         const response = await axios.delete(
-          `${config.url}post/${postId}/like`,
+          `${config.url}/post/${postId}/like`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

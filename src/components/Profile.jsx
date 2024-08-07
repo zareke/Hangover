@@ -6,6 +6,7 @@ import config from "../config";
 import { AuthContext } from "../AuthContext";
 import { guardarHandler,eliminarGuardadoHandler,followHandler, unFollowHandler } from "../universalhandlers";
 import { Link } from "react-router-dom";
+import { openModal } from "./navbar";
 
 const Profile = () => {
   const { userId } = useParams();
@@ -17,7 +18,7 @@ const Profile = () => {
     const fetchUserData = async () => {
       try {
         const token2 = localStorage.getItem("token") 
-        const response = await axios.get(`${config.url}user/profile/${userId}`, {
+        const response = await axios.get(`${config.url}/user/profile/${userId}`, {
           headers: { Authorization: `Bearer ${token2}` },
         });
         setUserData(response.data);
@@ -50,7 +51,15 @@ const Profile = () => {
         </div>
         <div className="profile-actions">
           {follows ? (<Button onClick={() => unFollowHandler(userId,setFollows)} text="Dejar de segir"/>) : (<Button text="Seguir" onClick={() => followHandler(userId,setFollows,isLoggedIn,openModalNavBar)}/>)} 
-          {isLoggedIn ? (<Link to={`/privateChat/${userData.own_id}/${userData.user_data.id}`}><Button text="Mensaje" /></Link>): openModalNavBar()}
+          <Link to={`/privateChat/${userData.own_id}/${userData.user_data.id}`} onClick={(e) => {
+              if (!isLoggedIn) {
+                e.preventDefault();
+                openModalNavBar();
+              }
+            }}>
+            <Button text="Mensaje"/>
+          </Link>
+
           <Button text="Dar Insignia" />
         </div>
       </header>

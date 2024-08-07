@@ -16,7 +16,7 @@ const Explorar = () => {
     if(hasMore){
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`${config.url}post`, { //trae todos los posts sin importar visibilidad creo
+        const response = await axios.get(`${config.url}/post`, { //trae todos los posts sin importar visibilidad creo
           params: {
             limit: 10,
             page: page,

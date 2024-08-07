@@ -15,7 +15,7 @@ const LibraryPage = () => {
     const fetchItems = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(config.url + 'user/library', {
+        const response = await axios.get(config.url + '/user/library', {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log(response.data)

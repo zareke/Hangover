@@ -16,7 +16,7 @@ const Navbar = () => {
     const fetchUser = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get(config.url + 'user', {
+        const response = await axios.get(config.url + '/user', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(response.data); // Suponiendo que los datos del usuario están en response.data

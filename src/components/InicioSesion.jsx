@@ -15,7 +15,7 @@ const InicioSesion = ({closeModal}) => {
     e.preventDefault();
     
     try {
-      const response = await axios.post(config.url + "user/login/", {
+      const response = await axios.post(config.url + "/user/login/", {
         username: username,
         password: password,
       });
