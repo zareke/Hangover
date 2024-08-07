@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
+import { useParams } from 'react-router-dom';
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import styled from 'styled-components';
@@ -108,9 +109,13 @@ const Chat = () => {
   const socket = useRef(null);
   const messageInputRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const { ownId, userId} = useParams();
+  console.log(typeof +ownId)
+  const users = [+ownId, +userId];
 
   useEffect(() => {
     socket.current = io(config.url);
+    socket.current.emit('set users', { users: users });
     socket.current.on('chat message', (content, id, sender_user, date_sent, userConnected) => {
       const message = {
         content,
@@ -188,7 +193,7 @@ const Chat = () => {
         <SubmitButton type="submit">Enviar</SubmitButton>
       </ChatForm>
 
-      <EmojiPickerContainer visible={emojiPickerVisible} id="emojiPicker">
+      <EmojiPickerContainer visible={emojiPickerVisible}>
           <Picker 
                    data={data}
                    onEmojiSelect={addEmoji}
