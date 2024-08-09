@@ -4,6 +4,8 @@ import './Biblioteca.css';
 import axios from 'axios';
 import config from '../config';
 import Carta from './carta.jsx'
+import saveicon from '../vendor/imgs/saveicon.png'
+import likeicon from '../vendor/imgs/likeicon.png'
 
 const LibraryPage = () => {
   const [items, setItems] = useState({ saved: [], liked: [] });
@@ -18,6 +20,7 @@ const LibraryPage = () => {
         const response = await axios.get(config.url + 'user/library', {
           headers: { Authorization: `Bearer ${token}` }
         });
+        console.log("api data ", response)
         
         if (response.data && typeof response.data === 'object') {
           if (Array.isArray(response.data.saved) && Array.isArray(response.data.liked)) {
@@ -41,6 +44,7 @@ const LibraryPage = () => {
 
   const setItemsGuardados = () => {
     setActiveTab('saved');
+    
   };
 
   const setItemsLikeados = () => {
@@ -59,21 +63,29 @@ const LibraryPage = () => {
 
   return (
     <div className="library-container">
-      <h1>Mi biblioteca</h1>
-      <div classname ="filtros">
-      <div className="cuadrado">
+
+      <div className='contaiAyCasiEhTePensasteQueLoIbaADecirFzJajajajajaNadaMeDetendra'>
+      <div className="filtros">
+      <h2 className='libraryTitle'>Mi biblioteca</h2>
+      <div className='filtericons'>
         <button onClick={setItemsGuardados} className={activeTab === 'saved' ? 'active' : ''}>
-          Guardados ({items.saved.length})
+          <img class="iconLibrary" src={saveicon} alt="" />
         </button>
+
         <button onClick={setItemsLikeados} className={activeTab === 'liked' ? 'active' : ''}>
-          Likeados ({items.liked.length})
+          <img class="iconLibrary" src={likeicon} alt="" />
         </button>
-        <div className="library-grid" key={activeTab}>
+      </div>
+      </div>
+      </div>
+
+      <div className="cuadrado">
+          <div className="library-grid" key={activeTab}>
           {displayedItems.map((item, index) => (
             <div key={`${activeTab}-${item.id}-${index}`} className="library-item">
               {console.log(item,"HOLA")}
               {/* <img src={item.front_image} alt={`Design ${item.id}`} /> */
-               <Carta className={`cardGroup${index}`} post_id={item.id}/* profile_photo={item.post.creator_user.profile_photo} username={item.post.creator_user.username} user_id={item.post.creator_user.id} cloth={item.post.front_image} *//>
+               <Carta className={`cardGroup${index}`} post_id={item.id} cloth={item.front_image} /* profile_photo={item.post.creator_user.profile_photo} username={item.post.creator_user.username} user_id={item.post.creator_user.id} cloth={item.post.front_image} *//>
               }
               <div className="item-actions">
                 <button className="edit-btn" onClick={() => handleViewDesign(item.id)}>Ver Diseño</button>
@@ -82,7 +94,6 @@ const LibraryPage = () => {
           ))}
         </div>
         </div>
-      </div>
     </div>
   );
 };
