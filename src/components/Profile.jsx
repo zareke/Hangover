@@ -55,15 +55,15 @@ const Profile = () => {
         </div>
       </header>
       <section className="profile-content">
-        {userData.posts.map(item => (
+        {userData.posts !== null ? userData.posts.map(item => (
           <div key={item.id} className="item-card">
             
             <img src={item.image} alt={item.title} />
             <p>{item.title}</p>
             {/*falta guardar */}
           </div>
-        ))}
-      </section>
+        )):null}
+      </section>  
     </div>
   );
 };

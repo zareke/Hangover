@@ -7,23 +7,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
 
 .centrador{
-  display:flex;
+  display:flex; 
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: wrap; 
+}
+.centradorRow{
+  display: flex; 
+  
+  justify-content: space-between;
+  width: 80%;
 }
 
-.wrapbusqueda {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-auto-rows: 5; 
+.wrapbusqueda { /*hay dos displays*/
+  /* display: grid; */
+  /* grid-template-columns: repeat(5, 1fr); */
+  /* grid-row: 5; */
   columns: 5;
-  grid-gap: 10px; 
-  justify-content: center;
+  
+  /* justify-content: center;
   top:0;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
 }
 
 .wrapbusqueda-impar {
@@ -41,6 +47,26 @@
   margin-top: 14rem;
 }
 
+@media (max-width: 600px) {
+  .wrapbusqueda{
+    /* grid-template-columns: 1fr; */
+    columns: 1;
+    /* max-width: 2px;
+    max-height: auto; */
+  }
+  .Recomendados{
+    max-width: 10rem
+    
+  }
+  .Seguidos{
+    max-width: 10rem
+  }
+  .card{
+    max-width: 200px;
+  }
+  }
+
+/*  */
 .card {
   display: flex;
   flex-direction: column;
@@ -143,7 +169,7 @@ li a:hover {
 }
 
 .Recomendados {
-  display: block;
+  /* display: block; */
   transform-origin: top left;
   transform: rotate(90deg) translate(0,-100%);
   white-space: nowrap;
@@ -151,7 +177,7 @@ li a:hover {
   font-weight: 400;
   font-size: 10px;  
   background-color: rgba(56, 117, 109);
-  width: 15%;
+  width: 17rem;
   left: 0;
   border-top-right-radius: 21px;
   border-top-left-radius: 21px;
@@ -167,13 +193,14 @@ li a:hover {
   font-weight: 400;
   font-size: 10px; 
   background-color: #255952;
-  width: 15%;
+  width: 17rem;
   left: 0;
   border-top-right-radius: 21px;
   border-top-left-radius: 21px;
   position: fixed;
   margin-top: 17.8rem;
 }
+
 
 .wrapper1 {
   display: table;
