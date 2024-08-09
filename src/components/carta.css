@@ -38,6 +38,12 @@
     width: 150%;
     height: auto;
   }
+  @media (max-width: 600px) {
+    .remerita{
+      max-width: 140%;
+      max-height: auto;
+    }
+    }
   
   .description {
     margin-top: 10px;

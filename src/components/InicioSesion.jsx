@@ -4,7 +4,7 @@ import axios from "axios";
 import config from "../config";
 import "./InicioSesion.css";
 
-const InicioSesion = ({closeModal}) => {
+const InicioSesion = ({ closeModal }) => {
   const [showPopup, setShowPopup] = useState(true);
   const [showLoginInputs, setShowLoginInputs] = useState(false);
   const [username, setUsername] = useState("");
@@ -13,7 +13,7 @@ const InicioSesion = ({closeModal}) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
+
     try {
       const response = await axios.post(config.url + "user/login/", {
         username: username,
@@ -23,19 +23,17 @@ const InicioSesion = ({closeModal}) => {
         localStorage.setItem("token", response.data.token);
         closePopup();
         window.location.reload();
-
       } else {
         // Manejar error
-        
       }
     } catch (e) {
-      if(e.response && e.response.status === 404){
-        window.confirm("Error, inicio de sesion fallido, no existe el usuario o la contraseña es incorrecta");
-      }
-      else{
+      if (e.response && e.response.status === 404) {
+        window.confirm(
+          "Error, inicio de sesion fallido, no existe el usuario o la contraseña es incorrecta"
+        );
+      } else {
         console.error(e);
       }
-      
     }
   };
 
@@ -60,29 +58,42 @@ const InicioSesion = ({closeModal}) => {
               <form onSubmit={handleLogin}>
                 <div className="inicioHeader">Iniciar sesión</div>
                 <div className="form-group">
-                  <label htmlFor="username">Correo electrónico o nombre de usuario</label>
+                  <div className="centradorRow">
+                  <label htmlFor="username">
+                    Correo electrónico o nombre de usuario
+                  </label>
+                  </div>
+                  
                   <input
                     type="text"
                     id="username"
+                    placeholder="example@ie.com"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
                   />
                 </div>
                 <div className="form-group">
+                <div className="centradorRow">
                   <label htmlFor="password">Contraseña</label>
+                  </div>
                   <input
                     type="password"
                     id="password"
-                    value={password}
+                    value={password}  
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                   <div className="centradorRow">
                   <a href="#" className="inicio-sesion-forgot-password">
                     ¿Olvidaste tu contraseña?
                   </a>
+                  </div>
                 </div>
-                <button type="submit" className="inicio-sesion-btn inicio-sesion-btn-login">
+                <button
+                  type="submit"
+                  className="inicio-sesion-btn inicio-sesion-btn-login"
+                >
                   Iniciar sesión
                 </button>
                 <p className="inicio-sesion-terms">
@@ -92,9 +103,9 @@ const InicioSesion = ({closeModal}) => {
                 </p>
                 <hr className="inicio-sesion-divider" />
                 <div className="centrador">
-                <p className="inicio-sesion-register">
-                  ¿No tienes una cuenta? <a href="#">Regístrate</a>
-                </p>
+                  <p className="inicio-sesion-register">
+                    ¿No tienes una cuenta? <a href="#">Regístrate</a>
+                  </p>
                 </div>
               </form>
             ) : (
@@ -104,12 +115,17 @@ const InicioSesion = ({closeModal}) => {
                   className="inicio-sesion-btn inicio-sesion-btn-email"
                   onClick={loadLogInInputs}
                 >
-                  <span className="inicio-sesion-icon">@</span> Usar correo electrónico
+                  <span className="inicio-sesion-icon">@</span> Usar correo
+                  electrónico
                 </button>
                 <button className="inicio-sesion-btn inicio-sesion-btn-google">
-                  <span className="inicio-sesion-icon">G</span> Continuar con Google
+                  <span className="inicio-sesion-icon">G</span> Continuar con
+                  Google
                 </button>
-                <button className="inicio-sesion-btn inicio-sesion-btn-guest" onClick={closePopup}>
+                <button
+                  className="inicio-sesion-btn inicio-sesion-btn-guest"
+                  onClick={closePopup}
+                >
                   Continuar como Invitado
                 </button>
                 <p className="inicio-sesion-terms">
@@ -128,7 +144,6 @@ const InicioSesion = ({closeModal}) => {
       )}
     </>
   );
-  
 };
 
 export default InicioSesion;

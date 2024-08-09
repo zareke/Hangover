@@ -6,7 +6,9 @@ return (
       
       <img src="" alt="logo" />
         <p>{props.content}</p>
-      
+      <p>hola
+        informacion
+      </p>
         <footer className="App-footer">
         <p>Footer content</p>
         </footer>

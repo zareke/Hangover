@@ -5,6 +5,12 @@ import "./navbar.css"
 import axios from 'axios';
 import config from '../config';
 import { AuthContext } from '../AuthContext'; // Importar el contexto de autenticación
+import bag from '../vendor/imgs/bagicon.png'
+import home from '../vendor/imgs/homeicon.png'
+import info from '../vendor/imgs/infoicon.png'
+import library from '../vendor/imgs/libraryicon.png'
+import newdesign from '../vendor/imgs/newicon.png'
+import profile from '../vendor/imgs/profileicon.png'
 
 let openModal, closeModal;
 //hacemos una copia de hangover y ahi modificamos todo react-native o usamos todo lo original? y supongo que pushearemos otra branch buen
@@ -57,38 +63,6 @@ const Navbar = () => {
   };
 
   
-  useEffect(() => {
-    console.log("holaaaaa");
-
-    // Selecciona el elemento a observar
-    const element = document.querySelector('.verticalNav');
-
-    if (element) {
-      // Función que se llama cuando se detectan cambios
-      const handleMutation = () => {
-        const isDisplayNone = window.getComputedStyle(element).display === 'none';
-        console.log("holaaax2");
-        setIsMenuOpen(!isDisplayNone);
-      };
-
-      // Crea un nuevo observer
-      const observer = new MutationObserver(() => {
-        handleMutation();
-      });
-
-      // Configura el observer para observar cambios en los atributos del elemento
-      observer.observe(element, { attributes: true });
-
-      // Llama a handleMutation para establecer el estado inicial
-      handleMutation();
-
-      // Limpia el observer cuando el componente se desmonta
-      return () => {
-        observer.disconnect();
-      };
-    }
-  }, []);
-
   return (
     <div>
       <header className="header">
@@ -97,18 +71,19 @@ const Navbar = () => {
           <ul>
             <li><button className="hamburger" onClick={toggleMenu}>
             &#9776; {/* Hamburger icon */}
-            </button></li>
-            <li><Link to="/">Explorar</Link></li>
-            <li><Link to="/informacion">Información</Link></li>
-            <li><a href="#NewDesign">Nuevo diseño</a></li>
-            <li><a href="#Perfil">Perfil</a></li>
-            <li><a href="#Bolsa">Bolsa</a></li>
-            <li>
+            </button></li> 
+            <li><Link className='navbarBurgerElement' to="/"><img className='iconNavImage' src={home} alt="" /><span className='nombrelink'>Explorar </span> <span class="flecha">&#128898;</span></Link></li>
+            <li><Link className='navbarBurgerElement' to="/informacion"><img className='iconNavImage' src={info} alt="" /><span className='nombrelink'>Información</span> <span class="flecha">&#128898;</span></Link></li>
+            <li><a className='navbarBurgerElement' href="#NewDesign"><img className='iconNavImage' src={newdesign} alt="" /><span className='nombrelink'>Nuevo diseño</span> <span class="flecha">&#128898;</span></a></li>
+ {/**check if logged in */} <li><Link className='navbarBurgerElement' to="/user/own"><img className='iconNavImage' src={profile} alt="" /><span className='nombrelink'>Perfil</span> <span class="flecha">&#128898;</span></Link></li>
+            <li><Link className='navbarBurgerElement' to="/bolsa"><img className='iconNavImage' src={bag} alt="" /> <span className='nombrelink'>Bolsa</span> <span class="flecha">&#128898;</span></Link></li>
+            <li> 
               {isLoggedIn ? (
-                <Link to="/Biblioteca">Biblioteca</Link>
+                
+                <Link className='navbarBurgerElement' to="/Biblioteca"><img className='iconNavImage' src={library} alt="" /> <span className='nombrelink'>Biblioteca</span></Link>
               ) : (
-                <a onClick={openModal}>Biblioteca</a>
-              )}
+                <a className='navbarBurgerElement' onClick={openModal}><img className='iconNavImage' src={library} alt="" /> <span className='nombrelink'>Biblioteca</span></a>
+              )}<span class="flecha">&#128898;</span>
             </li>
             <li>
               {isLoggedIn ? (
@@ -143,7 +118,7 @@ const Navbar = () => {
             <li><a href="#NewDesign">Nuevo diseño</a></li>
             <li><a href="#Perfil">Perfil</a></li>
             <li><a href="#Bolsa">Bolsa</a></li>
-            <li>
+            <li> 
               {isLoggedIn ? (
                 <Link to="/Biblioteca">Biblioteca</Link>
               ) : (

@@ -9,6 +9,9 @@ import InicioSesion from "./components/InicioSesion.jsx";
 import Biblioteca from "./components/Biblioteca.jsx";
 import Informacion from "./components/Informacion.jsx"
 import Profile from "./components/Profile.jsx"
+import Bolsa from "./components/Bolsa.jsx"
+import OwnProfile from "./components/ownProfile.jsx"
+
 import { AuthProvider } from "./AuthContext";
 
 function App() {
@@ -25,9 +28,12 @@ function App() {
                     <Route exact path=":postId" element={<PostDetail />} />
                 </Route>
                 <Route exact path="user">
+                    <Route exact path="own" element={<OwnProfile/>}/>
                     <Route exact path=":userId" element={<Profile/>}/>
                 </Route>
+                <Route exact path="bolsa" element={<Bolsa/>}></Route>
                 <Route exact path="/biblioteca" element={<Biblioteca />} />
+                
             </Routes>   
         </Router>
     </AuthProvider>

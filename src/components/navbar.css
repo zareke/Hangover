@@ -24,6 +24,18 @@
     display: flex;
     flex-direction: column;
   }
+  .iconNavImage{
+    width: 5vw;
+    height: 5vw;
+    margin: 0.6vw;
+  }
+  .verticalNav li{
+    display: flex;
+  }
+  .navbarBurgerElement{
+    display: flex;
+
+  }
   
   .nav {
     display: flex; /* Show nav items in a row by default */
