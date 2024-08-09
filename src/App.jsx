@@ -13,6 +13,7 @@ import Chat from "./components/Chat.jsx"
 import { AuthProvider } from "./AuthContext";
 
 function App() {
+
   return (
     <AuthProvider>
         <Router>

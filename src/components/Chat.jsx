@@ -5,6 +5,7 @@ import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import styled from 'styled-components';
 import config from '../config';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   max-width: 800px;
@@ -109,13 +110,27 @@ const Chat = () => {
   const socket = useRef(null);
   const messageInputRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const { ownId, userId} = useParams();
-  console.log(typeof +ownId)
+  const { ownId, userId } = useParams();
+  const realOwnToken = localStorage.getItem("token");
+  console.log(realOwnToken)
   const users = [+ownId, +userId];
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    socket.current = io(config.url);
+    socket.current = io(config.url, {
+      query: { token: realOwnToken }
+    });
     socket.current.emit('set users', { users: users });
+
+    socket.current.on('error', (error) => {
+      console.error('Error del servidor:', error.message);
+      setError(error.message); // Maneja el error en el cliente
+      socket.current.disconnect(); // Opcional: desconecta el socket si es necesario
+        // Redirigir a la página de inicio
+        navigate('/'); // Ajusta la ruta según tu configuración
+    });
+
     socket.current.on('chat message', (content, id, sender_user, date_sent, userConnected) => {
       const message = {
         content,
