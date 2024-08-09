@@ -58,9 +58,9 @@ const InicioSesion = ({closeModal}) => {
             </button>
             {showLoginInputs ? (
               <form onSubmit={handleLogin}>
-                <h2>Iniciar sesión</h2>
+                <div className="inicioHeader">Iniciar sesión</div>
                 <div className="form-group">
-                  <label htmlFor="username">Username</label>
+                  <label htmlFor="username">Correo electrónico o nombre de usuario</label>
                   <input
                     type="text"
                     id="username"
@@ -70,7 +70,7 @@ const InicioSesion = ({closeModal}) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="password">Password</label>
+                  <label htmlFor="password">Contraseña</label>
                   <input
                     type="password"
                     id="password"
@@ -78,26 +78,38 @@ const InicioSesion = ({closeModal}) => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                  <a href="#" className="inicio-sesion-forgot-password">
+                    ¿Olvidaste tu contraseña?
+                  </a>
                 </div>
-                <button type="submit" className="inicio-sesion-login-btn">
-                  Login
+                <button type="submit" className="inicio-sesion-btn inicio-sesion-btn-login">
+                  Iniciar sesión
                 </button>
+                <p className="inicio-sesion-terms">
+                  Al seguir usando una cuenta en <b>Argentina</b> aceptas los{" "}
+                  <a href="#">Términos de uso</a> y confirmas que has leído la{" "}
+                  <a href="#">Política de privacidad</a>
+                </p>
+                <hr className="inicio-sesion-divider" />
+                <div className="centrador">
+                <p className="inicio-sesion-register">
+                  ¿No tienes una cuenta? <a href="#">Regístrate</a>
+                </p>
+                </div>
               </form>
             ) : (
               <>
-                <h2>Iniciar sesión</h2>
+                <div className="inicioHeader">Iniciar sesión</div>
                 <button
-                  className="inicio-sesion-login-btn inicio-sesion-email-btn"
+                  className="inicio-sesion-btn inicio-sesion-btn-email"
                   onClick={loadLogInInputs}
                 >
-                  <span className="inicio-sesion-icon">@</span> Usar correo
-                  electrónico
+                  <span className="inicio-sesion-icon">@</span> Usar correo electrónico
                 </button>
-                <button className="inicio-sesion-login-btn inicio-sesion-google-btn">
-                  <span className="inicio-sesion-icon">G</span> Continuar con
-                  Google
+                <button className="inicio-sesion-btn inicio-sesion-btn-google">
+                  <span className="inicio-sesion-icon">G</span> Continuar con Google
                 </button>
-                <button className="inicio-sesion-guest-btn" onClick={closePopup}>
+                <button className="inicio-sesion-btn inicio-sesion-btn-guest" onClick={closePopup}>
                   Continuar como Invitado
                 </button>
                 <p className="inicio-sesion-terms">
@@ -116,6 +128,7 @@ const InicioSesion = ({closeModal}) => {
       )}
     </>
   );
+  
 };
 
 export default InicioSesion;

@@ -1,0 +1,85 @@
+.hamburger {
+    display: none; /* Hide the hamburger button by default */
+    font-size: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white; /* Change to match your theme */
+  }
+  .verticalNav{
+    display: flex; /* Show nav items when the menu is open */
+    flex-direction: column; /* Stack nav items vertically */
+    position: fixed; /* Change from absolute to fixed */
+    top: 0; /* Align to the top of the viewport */
+    left: 0; /* Align to the left of the viewport */
+    width: 100%; /* Take the full width of the viewport */
+    height: 100vh; /* Take the full height of the viewport */
+    background-color: rgba(56, 117, 109, 0.95); /* Background color */
+    z-index: 1000; /* Ensure the menu is above other content */
+    padding: 1rem; /* Optional padding for the menu */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+    
+  }
+  .verticalNav ul{
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .nav {
+    display: flex; /* Show nav items in a row by default */
+  }
+  
+  
+  @media (max-width: 1234px) { /* Adjust the max-width as needed */
+    .hamburger {
+      display: block; /* Show hamburger button on smaller screens */
+    }
+  
+    .botonesNavbar {
+      display: none; /* Hide nav items by default on small screens */
+    }
+  
+    .nav.open .botonesNavbar {
+      display: flex; /* Show nav items when the menu is open */
+    }
+  
+    .botonesNavbar li {
+      margin: 1rem 0; /* Add margin for vertical stacking */
+      text-align: center; /* Center text for mobile layout */
+    }
+  
+    .busqueda {
+      width: 100%; /* Make search bar responsive */
+      margin-bottom: 1rem; /* Space below the search input */
+    }
+  
+    .busqueda input[type="search"] {
+      max-width: none; /* Remove max-width for smaller screens */
+      width: 80%; /* Adjust width for better mobile view */
+    }
+  }
+  #titleMain {
+    display: block;
+  }
+  
+
+  @media (max-width: 1305px){
+    #titleMain {
+        display: none;
+    }
+  }
+
+  @media (min-width: 1234px){
+    .hamburger{
+        display: none;
+    }
+
+    .verticalNav{
+        
+        display: none;
+    }
+  }
+
+  header {
+    position: fixed;
+  }
