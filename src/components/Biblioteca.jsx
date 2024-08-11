@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import './Biblioteca.css'; 
 import axios from 'axios';
 import config from '../config';
-import Carta from './carta.jsx'
-import saveicon from '../vendor/imgs/saveicon.png'
-import likeicon from '../vendor/imgs/likeicon.png'
+import Carta from './carta.jsx';
+import bagicon from '../vendor/imgs/bagicon.png';
 
 const LibraryPage = () => {
   const [items, setItems] = useState({ saved: [], liked: [] });
   const [activeTab, setActiveTab] = useState('liked');
+  const [activeFilter, setActiveFilter] = useState('liked'); // Nuevo estado para manejar el filtro activo
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -20,7 +20,7 @@ const LibraryPage = () => {
         const response = await axios.get(config.url + 'user/library', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log("api data ", response)
+        console.log("api data ", response);
         
         if (response.data && typeof response.data === 'object') {
           if (Array.isArray(response.data.saved) && Array.isArray(response.data.liked)) {
@@ -44,11 +44,12 @@ const LibraryPage = () => {
 
   const setItemsGuardados = () => {
     setActiveTab('saved');
-    
+    setActiveFilter('saved'); // Actualiza el filtro activo
   };
 
   const setItemsLikeados = () => {
     setActiveTab('liked');
+    setActiveFilter('liked'); // Actualiza el filtro activo
   };
 
   const handleViewDesign = (postId) => {
@@ -62,38 +63,44 @@ const LibraryPage = () => {
   }
 
   return (
+    <div className="fondo">
     <div className="library-container">
-
       <div className='contaiAyCasiEhTePensasteQueLoIbaADecirFzJajajajajaNadaMeDetendra'>
-      <div className="filtros">
-      <h2 className='libraryTitle'>Mi biblioteca</h2>
-      <div className='filtericons'>
-        <button onClick={setItemsGuardados} className={activeTab === 'saved' ? 'active' : ''}>
-          <img class="iconLibrary" src={saveicon} alt="" />
-        </button>
-
-        <button onClick={setItemsLikeados} className={activeTab === 'liked' ? 'active' : ''}>
-          <img class="iconLibrary" src={likeicon} alt="" />
-        </button>
-      </div>
-      </div>
+        <div className="filtros">
+          <h2 className='libraryTitle'>Mi biblioteca</h2>
+          <div className='filtericons'>
+            <div className={`filter-container ${activeFilter === 'saved' ? 'active' : ''}`}>
+              <button onClick={setItemsGuardados} className={activeTab === 'saved' ? 'active' : ''}>
+                <img className="iconLibrary" src={bagicon} alt="ss" />
+              </button>
+            </div>
+            <div className={`filter-container ${activeFilter === 'liked' ? 'active' : ''}`}>
+              <button onClick={setItemsLikeados} className={activeTab === 'liked' ? 'active' : ''}>
+                <img className="iconLibrary" src={bagicon} alt="ss" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="cuadrado">
-          <div className="library-grid" key={activeTab}>
+        <div className="library-grid" key={activeTab}>
           {displayedItems.map((item, index) => (
-            <div key={`${activeTab}-${item.id}-${index}`} className="library-item">
-              {console.log(item,"HOLA")}
-              {/* <img src={item.front_image} alt={`Design ${item.id}`} /> */
-               <Carta className={`cardGroup${index}`} post_id={item.id} cloth={item.front_image} /* profile_photo={item.post.creator_user.profile_photo} username={item.post.creator_user.username} user_id={item.post.creator_user.id} cloth={item.post.front_image} *//>
-              }
-              <div className="item-actions">
-                <button className="edit-btn" onClick={() => handleViewDesign(item.id)}>Ver Diseño</button>
-              </div>
+            <div 
+              key={`${activeTab}-${item.id}-${index}`} 
+              className="library-item" 
+              onClick={() => handleViewDesign(item.id)}
+            >
+              <Carta 
+                className={`cardGroup${index}`} 
+                post_id={item.id} 
+                cloth={item.front_image} 
+              />
             </div>
           ))}
         </div>
-        </div>
+      </div>
+    </div>
     </div>
   );
 };
