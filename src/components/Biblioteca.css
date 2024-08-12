@@ -32,21 +32,21 @@
 
 .library-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
 }
 
 .library-item {
-  background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  padding: 10px;
   text-align: center;
+  width: 100%;
+  height: 100%; /* Asegura que todos los elementos tengan la misma altura */
 }
 
 .library-item img {
-  width: 100%;
+  width: 70%;
   height: auto;
 }
 
@@ -77,8 +77,8 @@
 
 .cuadrado {
   background-color: rgba(42, 96, 89, 0.875);
-  padding: 7vh 3vw 7vh 3vw;
   border-radius: 0px 30px 30px 30px;
+
 }
 
 .filtros {

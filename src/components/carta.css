@@ -70,11 +70,11 @@
     color: rgb(255, 255, 255);
     font-weight: 400;
     font-size: 1rem; /* Aumenta el tamaño de la fuente */
-    padding: .4rem 1rem 1.6rem; /* Aumenta el relleno */
+    padding: .4rem 1rem ; /* Aumenta el relleno */
     background-color: rgba(56, 117, 109);
     border-radius: 0.9rem;
     width: 90%;
-    height: 1.7vw; /* Aumenta la altura */
+    text-decoration: none;
     text-shadow: 0px 4px 18px #2c3442;
     z-index: 2;
   }

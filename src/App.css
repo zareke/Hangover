@@ -18,7 +18,10 @@
   justify-content: space-between;
   width: 80%;
 }
-
+#root{
+display: flex;
+flex-direction: column;
+}
 .wrapbusqueda { /*hay dos displays*/
   /* display: grid; */
   /* grid-template-columns: repeat(5, 1fr); */
@@ -80,13 +83,17 @@
   background-color: #ffffff;
   border: 3.0px solid rgba(56, 117, 109);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
 }
 
 .card:hover {
   transform: scale(0.97);
 }
-
+.headerCointain{
+  height: auto;
+}
 .header {
+  
   background-color: rgba(56, 117, 109);
   color: white;
   display: flex;
@@ -101,6 +108,7 @@
   z-index: 5;
   flex-wrap: wrap; /* Allow wrapping for smaller screens */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle drop shadow */
+  margin-bottom: 5vh;
 
 }
 
@@ -109,9 +117,15 @@ ul {
   list-style-type: none;
   padding: 0;
 }
-
+body{
+  margin-top:11vh;
+}
 li {
   margin-right: 20px;
+}
+a {
+  text-decoration: none;
+  color: inherit; /* Optional: to inherit the text color */
 }
 
 li.busqueda {

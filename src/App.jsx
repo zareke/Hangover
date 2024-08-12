@@ -21,7 +21,7 @@ function App() {
         <Router>
             <Navbar />
             <Routes>
-                <Route exact path ="/informacion" element={<Informacion/>}/>
+                <Route exact path ="/informacion/:tema" element={<Informacion/>}/>
                 <Route exact path="/" element={<Explorar />} />
                 <Route exact path="/login" element={<InicioSesion />} />
                 <Route exact path="post">

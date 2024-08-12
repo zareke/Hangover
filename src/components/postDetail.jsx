@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef, useContext, useLayoutEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import styles from "./postdetail.module.css";
 import Button from "./Button";
 import config from "../config";
+import { Link } from "react-router-dom";
 import Like from "../components/Like.jsx";
 import { AuthContext } from "../AuthContext";
 import { guardarHandler, eliminarGuardadoHandler } from "../universalhandlers.js";
@@ -25,6 +26,10 @@ const PostDetail = () => {
 
   const scrollToBottom = () => {
     commentsEndRef.current?.scrollIntoView();
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo(0, 0);
   };
 
   const checkLogin = () => {
@@ -72,7 +77,7 @@ const PostDetail = () => {
       newComment();
     }
   };
- 
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -95,7 +100,7 @@ const PostDetail = () => {
           postInfo[0].front_image //seria postinfo mepa fijense la req
         );
         setLoading(false);
-        setIsChecked(response.data[2])
+        setIsChecked(response.data[2]);
       } catch (error) {
         console.error("Error fetching post:", error);
         setError("Error fetching data");
@@ -105,6 +110,12 @@ const PostDetail = () => {
     fetchPost();
   }, [postId]);
 
+  useLayoutEffect(() => {
+    if (!loading && !error) {
+      scrollToTop(); // Scroll to the top when data is loaded
+    }
+  }, [loading, error]);
+
   useEffect(() => {
     scrollToBottom();
   }, [comments]);
@@ -112,13 +123,15 @@ const PostDetail = () => {
   if (loading) return <div>Instalando virus...</div>; //Loading...
   if (error) return <div>Error: {error}</div>;
   if (!post) return <div>No post found</div>;
-const changeLikeState = async () =>{
-  if(isChecked){
-dislikePost()
-  }else{
-    likePost()
-  }
-}
+
+  const changeLikeState = async () => {
+    if (isChecked) {
+      dislikePost();
+    } else {
+      likePost();
+    }
+  };
+
   const likePost = async () => {
     if (isLoggedIn) {
       try {
@@ -143,6 +156,7 @@ dislikePost()
       openModalNavBar();
     }
   };
+
   const dislikePost = async () => {
     if (isLoggedIn) {
       try {
@@ -169,6 +183,7 @@ dislikePost()
       openModalNavBar();
     }
   };
+
   return (
     <div className={styles.container}>
       <div className={styles.contentWrapper}>
@@ -225,17 +240,20 @@ dislikePost()
             </div>
           </div>
           <p className={styles.description}>{post.description}</p>
-          <div className={styles.creator}>
-            <img
-              src="https://randomuser.me/api/portraits/men/8.jpg"
-              alt="Profile"
-              className={styles.creatorImage}
-            />
-            <div className={styles.creatorInfo}>
-              <h3>{post.creatoruser.username}</h3>
-              <p>{post.creatoruser.follower_number} seguidores</p>
+          <Link to={"/user/" + post.creatoruser.id}>
+            {/*LA IMAGEN NO ES DE LA BD*/}
+            <div className={styles.creator}>
+              <img
+                src="https://randomuser.me/api/portraits/men/8.jpg"
+                alt="Profile"
+                className={styles.creatorImage}
+              />
+              <div className={styles.creatorInfo}>
+                <h3>{post.creatoruser.username}</h3>
+                <p>{post.creatoruser.follower_number} seguidores</p>
+              </div>
             </div>
-          </div>
+          </Link>
           <div className={styles.commentsSection}>
             <h3 onClick={() => setCommentsVisible(!commentsVisible)}>
               Comentarios {commentsVisible ? "▲" : "▼"}
@@ -270,8 +288,11 @@ dislikePost()
                   <div className={styles.detayes}>
                     <p className={styles.commentCount}>3 comentarios</p>
                     <div>
-                     
-                       <Like likePostFunc={changeLikeState} isAlredyChecked={isChecked} styles={styles.corason}></Like>
+                      <Like
+                        likePostFunc={changeLikeState}
+                        isAlredyChecked={isChecked}
+                        styles={styles.corason}
+                      ></Like>
                     </div>
                   </div>
                   <div className={styles.newComment}>

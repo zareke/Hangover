@@ -19,6 +19,7 @@ const Navbar = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [infoPopupVisible,setInfoPopupVisible]=useState(false)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -45,6 +46,13 @@ const Navbar = () => {
   closeModal = () => {
     setModalVisible(false);
   };
+
+  const openInfoThingy = () =>{
+    setInfoPopupVisible(true)
+  }
+  const closeInfo = ()=>{
+    setInfoPopupVisible(false)
+  }
   
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen); // Toggle the menu open/close
@@ -64,7 +72,7 @@ const Navbar = () => {
 
   
   return (
-    <div>
+    <div class="headerCointain">
       <header className="header">
         <h1 id="titleMain"><Link to="/">hgvr</Link></h1>
         {isMenuOpen ? <nav class="verticalNav">
@@ -114,7 +122,14 @@ const Navbar = () => {
                 </form>
               </div>
             </li>
-            <li><Link to="/informacion">Información</Link></li>
+            <li><div onMouseEnter={openInfoThingy} onMouseLeave={closeInfo}> {
+             infoPopupVisible  && (<div className='infoPopup'>
+              <Link to="/informacion/legal"> ifnormacion legal</Link>
+            <Link to="/informacion/privacidad"> informaacion de privacidad</Link>
+            <Link to="/informacion/contacto"> contacto</Link>
+           </div>)
+           } Información</div>
+            </li>
             <li><a href="#NewDesign">Nuevo diseño</a></li>
             <li><a href="#Perfil">Perfil</a></li>
             <li><a href="#Bolsa">Bolsa</a></li>
@@ -145,6 +160,7 @@ const Navbar = () => {
           <InicioSesion closeModal={closeModal} />
         </div>
       )}
+
       
     </div>
   );

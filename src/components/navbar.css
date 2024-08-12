@@ -95,3 +95,12 @@
   header {
     position: fixed;
   }
+
+  .infoPopup{
+    position: absolute;
+    background-color: aliceblue;
+  }
+.infoPopup a{
+  color: black;
+
+}

@@ -38,7 +38,6 @@ const LibraryPage = () => {
         console.error('Error fetching items', error);
       }
     };
-
     fetchItems();
   }, []);
 
@@ -82,21 +81,24 @@ const LibraryPage = () => {
           </div>
         </div>
       </div>
-
       <div className="cuadrado">
         <div className="library-grid" key={activeTab}>
           {displayedItems.map((item, index) => (
+             
             <div 
               key={`${activeTab}-${item.id}-${index}`} 
               className="library-item" 
-              onClick={() => handleViewDesign(item.id)}
+             
             >
               <Carta 
-                className={`cardGroup${index}`} 
+              
                 post_id={item.id} 
                 cloth={item.front_image} 
+                profile_photo={item.profile_photo}
+                
               />
             </div>
+            
           ))}
         </div>
       </div>
