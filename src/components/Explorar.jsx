@@ -119,7 +119,7 @@ const Explorar = () => {
                         to={`/post/${post.id}`}
                         ref={isLastPost ? lastPostElementRef : null}
                       >
-                    <Carta className={`cardGroup${groupIndex}`} post_id={post.id} profile_photo={post.post.creator_user.profile_photo} username={post.post.creator_user.username} user_id={post.post.creator_user.id} cloth={post.post.front_image} >
+                    <Carta putLike={true}className={`cardGroup${groupIndex}`} post_id={post.id} profile_photo={post.post.creator_user.profile_photo} username={post.post.creator_user.username} user_id={post.post.creator_user.id} cloth={post.post.front_image} >
                         
                     </Carta>
                     </Link>

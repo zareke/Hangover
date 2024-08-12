@@ -72,10 +72,10 @@ const Navbar = () => {
 
   
   return (
-    <div class="headerCointain">
+    <div className="headerCointain">
       <header className="header">
         <h1 id="titleMain"><Link to="/">hgvr</Link></h1>
-        {isMenuOpen ? <nav class="verticalNav">
+        {isMenuOpen ? <nav className="verticalNav">
           <ul>
             <li><button className="hamburger" onClick={toggleMenu}>
             &#9776; {/* Hamburger icon */}
@@ -91,7 +91,7 @@ const Navbar = () => {
                 <Link className='navbarBurgerElement' to="/Biblioteca"><img className='iconNavImage' src={library} alt="" /> <span className='nombrelink'>Biblioteca</span></Link>
               ) : (
                 <a className='navbarBurgerElement' onClick={openModal}><img className='iconNavImage' src={library} alt="" /> <span className='nombrelink'>Biblioteca</span></a>
-              )}<span class="flecha">&#128898;</span>
+              )}<span className="flecha">&#128898;</span>
             </li>
             <li>
               {isLoggedIn ? (

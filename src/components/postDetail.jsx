@@ -38,6 +38,31 @@ const PostDetail = () => {
     }
   };
 
+  function getRelativeTime(timestamp) {
+    const now = new Date();
+    const commentDate = new Date(timestamp);
+    const diffInSeconds = Math.floor((now - commentDate) / 1000);
+
+    const timeUnits = [
+        { unit: 'año', seconds: 60 * 60 * 24 * 365 },
+        { unit: 'mes', seconds: 60 * 60 * 24 * 30 },
+        { unit: 'semana', seconds: 60 * 60 * 24 * 7 },
+        { unit: 'día', seconds: 60 * 60 * 24 },
+        { unit: 'hora', seconds: 60 * 60 },
+        { unit: 'minuto', seconds: 60 },
+    ];
+
+    for (let { unit, seconds } of timeUnits) {
+        const amount = Math.floor(diffInSeconds / seconds);
+        if (amount >= 1) {
+            return `${amount} ${unit}${amount > 1 ? 's' : ''}`;
+        }
+    }
+
+    return 'justo ahora';
+}
+
+
   const newComment = async () => {
     const content = newCommentContent;
     try {
@@ -91,6 +116,7 @@ const PostDetail = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
+        console.log("userdata",response)
         const postInfo = response.data[0];
         const commentsInfo = response.data[1];
         setSaved(response.data[3]);
@@ -108,6 +134,7 @@ const PostDetail = () => {
       }
     };
     fetchPost();
+    
   }, [postId]);
 
   useLayoutEffect(() => {
@@ -241,10 +268,9 @@ const PostDetail = () => {
           </div>
           <p className={styles.description}>{post.description}</p>
           <Link to={"/user/" + post.creatoruser.id}>
-            {/*LA IMAGEN NO ES DE LA BD*/}
             <div className={styles.creator}>
               <img
-                src="https://randomuser.me/api/portraits/men/8.jpg"
+                src={post.creatoruser.profile_photo}
                 alt="Profile"
                 className={styles.creatorImage}
               />
@@ -268,12 +294,12 @@ const PostDetail = () => {
                         className={styles.commentItem}
                       >
                         <img
-                          src="https://randomuser.me/api/portraits/men/8.jpg"
+                          src={commentData.comment.profile_photo}
                           alt="Commenter"
                           className={styles.commenterImage}
                         />
                         <div>
-                          <strong>{commentData.comment.username} 1sem.</strong>
+                          <strong>{commentData.comment.username} {getRelativeTime(commentData.comment.date)}</strong>
                           <p>{commentData.comment.content}</p>
                         </div>
                         <button className={styles.replyButton}>

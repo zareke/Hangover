@@ -36,7 +36,7 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
-      <header className="profile-header">
+      <div className="profile-header">
         <img src={userData.user_data.profile_photo} alt={userData.user_data.username} className="profile-pic" />
         <div className="profile-info">
           <h1>{userData.user_data.first_name}</h1>
@@ -53,12 +53,12 @@ const Profile = () => {
           <Button text="Mensaje" />
           <Button text="Dar Insignia" />
         </div>
-      </header>
+      </div>
       <section className="profile-content">
         {userData.posts !== null ? userData.posts.map(item => (
           <div key={item.id} className="item-card">
             
-            <img src={item.image} alt={item.title} />
+            <img className="profile-post" src={item.image} alt={item.title} />
             <p>{item.title}</p>
             {/*falta guardar */}
           </div>
