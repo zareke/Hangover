@@ -28,7 +28,7 @@ const Navbar = () => {
         const response = await axios.get(config.url + 'user', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setUser(response.data); // Suponiendo que los datos del usuario están en response.data
+        setUser(response.data[0]); 
       } catch (error) {
         console.error('Error fetching user:', error);
       }
@@ -81,9 +81,9 @@ const Navbar = () => {
             &#9776; {/* Hamburger icon */}
             </button></li> 
             <li><Link className='navbarBurgerElement' to="/"><img className='iconNavImage' src={home} alt="" /><span className='nombrelink'>Explorar </span> <span class="flecha">&#128898;</span></Link></li>
-            <li><Link className='navbarBurgerElement' to="/informacion"><img className='iconNavImage' src={info} alt="" /><span className='nombrelink'>Información</span> <span class="flecha">&#128898;</span></Link></li>
+            <li><Link className='navbarBurgerElement' to="/informacion/legal"><img className='iconNavImage' src={info} alt="" /><span className='nombrelink'>Información</span> <span class="flecha">&#128898;</span></Link></li>
             <li><a className='navbarBurgerElement' href="#NewDesign"><img className='iconNavImage' src={newdesign} alt="" /><span className='nombrelink'>Nuevo diseño</span> <span class="flecha">&#128898;</span></a></li>
- {/**check if logged in */} <li><Link className='navbarBurgerElement' to="/user/own"><img className='iconNavImage' src={profile} alt="" /><span className='nombrelink'>Perfil</span> <span class="flecha">&#128898;</span></Link></li>
+ {/**check if logged in */} <li><Link className='navbarBurgerElement' to={"/user/"+user.id}><img className='iconNavImage' src={profile} alt="" /><span className='nombrelink'>Perfil</span> <span class="flecha">&#128898;</span></Link></li>
             <li><Link className='navbarBurgerElement' to="/bolsa"><img className='iconNavImage' src={bag} alt="" /> <span className='nombrelink'>Bolsa</span> <span class="flecha">&#128898;</span></Link></li>
             <li> 
               {isLoggedIn ? (
@@ -96,10 +96,10 @@ const Navbar = () => {
             <li>
               {isLoggedIn ? (
                 <>
-                  {user ? <a href="#Perfil">{user.id}</a> : null}
+                  {user ? <Link to={"/user/"+user.id}>{user.username}</Link> : null}
                   <button onClick={LogOut}>Cerrar sesión</button>
-                </>
-              ) : (
+                </> 
+              ) : ( 
                 <a onClick={openModal}>Iniciar sesión</a>
               )}
             </li>
@@ -124,14 +124,15 @@ const Navbar = () => {
             </li>
             <li><div onMouseEnter={openInfoThingy} onMouseLeave={closeInfo}> {
              infoPopupVisible  && (<div className='infoPopup'>
-              <Link to="/informacion/legal"> ifnormacion legal</Link>
-            <Link to="/informacion/privacidad"> informaacion de privacidad</Link>
-            <Link to="/informacion/contacto"> contacto</Link>
+              <div className="compactedInfo">
+            <Link to="/informacion/legal">Información legal</Link>
+            <Link to="/informacion/privacidad">Información de privacidad</Link>
+            <Link to="/informacion/contacto"> Contáctanos</Link>
+            </div>
            </div>)
-           } Información</div>
+           } <a>Información</a></div>
             </li>
             <li><a href="#NewDesign">Nuevo diseño</a></li>
-            <li><a href="#Perfil">Perfil</a></li>
             <li><a href="#Bolsa">Bolsa</a></li>
             <li> 
               {isLoggedIn ? (
@@ -143,7 +144,7 @@ const Navbar = () => {
             <li>
               {isLoggedIn ? (
                 <>
-                  {user ? <a href="#Perfil">{user.id}</a> : null}
+                  {user ? <Link to={"/user/"+user.id}>{user.username}</Link> : null}
                   <button onClick={LogOut}>Cerrar sesión</button>
                 </>
               ) : (

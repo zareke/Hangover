@@ -1,7 +1,6 @@
 .profile-container {
     padding: 20px;
     text-align: center;
-    background: url('path_to_background_image') no-repeat center center fixed; 
     background-size: cover;
     color: white;
   }
