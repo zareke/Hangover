@@ -60,10 +60,14 @@ const PostDetail = () => {
     }
 
     return 'justo ahora';
-}
-
+  }
 
   const newComment = async () => {
+    if (!commentsVisible) {
+      console.log("Los comentarios están desactivados para este post.");
+      return;
+    }
+
     const content = newCommentContent;
     try {
       const token = localStorage.getItem("token");
@@ -87,6 +91,8 @@ const PostDetail = () => {
             comment_id: newComment.comment_id,
             username: "YourUsername",
             content: newCommentContent,
+            profile_photo: "URL_TO_YOUR_PROFILE_PHOTO",
+            date: new Date().toISOString(),
           },
         },
       ]);
@@ -116,17 +122,15 @@ const PostDetail = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("userdata",response)
-        const postInfo = response.data[0];
-        const commentsInfo = response.data[1];
-        setSaved(response.data[3]);
-        setPost(postInfo[0]);
-        setComments(commentsInfo.collection);
-        setSelectedImage(
-          postInfo[0].front_image //seria postinfo mepa fijense la req
-        );
+        console.log("userdata", response);
+        const { post, comments, liked, saved, canComment } = response.data;
+        setSaved(saved);
+        setPost(post[0]);
+        setComments(canComment ? comments.collection : []);
+        setSelectedImage(post[0].front_image);
         setLoading(false);
-        setIsChecked(response.data[2]);
+        setIsChecked(liked);
+        setCommentsVisible(canComment);
       } catch (error) {
         console.error("Error fetching post:", error);
         setError("Error fetching data");
@@ -134,12 +138,11 @@ const PostDetail = () => {
       }
     };
     fetchPost();
-    
   }, [postId]);
 
   useLayoutEffect(() => {
     if (!loading && !error) {
-      scrollToTop(); // Scroll to the top when data is loaded
+      scrollToTop();
     }
   }, [loading, error]);
 
@@ -147,7 +150,7 @@ const PostDetail = () => {
     scrollToBottom();
   }, [comments]);
 
-  if (loading) return <div>Instalando virus...</div>; //Loading...
+  if (loading) return <div>Instalando virus...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!post) return <div>No post found</div>;
 
@@ -284,7 +287,7 @@ const PostDetail = () => {
             <h3 onClick={() => setCommentsVisible(!commentsVisible)}>
               Comentarios {commentsVisible ? "▲" : "▼"}
             </h3>
-            {commentsVisible && (
+            {commentsVisible ? (
               <>
                 <div className={styles.scrollableComments}>
                   <ul className={styles.comments}>
@@ -312,13 +315,13 @@ const PostDetail = () => {
                 </div>
                 <div className={styles.commentTextArea}>
                   <div className={styles.detayes}>
-                    <p className={styles.commentCount}>3 comentarios</p>
+                    <p className={styles.commentCount}>{comments.length} comentarios</p>
                     <div>
                       <Like
                         likePostFunc={changeLikeState}
                         isAlredyChecked={isChecked}
                         styles={styles.corason}
-                      ></Like>
+                      />
                     </div>
                   </div>
                   <div className={styles.newComment}>
@@ -344,6 +347,8 @@ const PostDetail = () => {
                   </div>
                 </div>
               </>
+            ) : (
+              <p>Los comentarios están desactivados para este post.</p>
             )}
           </div>
         </div>
@@ -352,4 +357,4 @@ const PostDetail = () => {
   );
 };
 
-export default PostDetail;
+export default PostDetail; 
