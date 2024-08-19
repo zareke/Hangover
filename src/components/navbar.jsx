@@ -144,7 +144,8 @@ const Navbar = () => {
             <li>
               {isLoggedIn ? (
                 <>
-                  {user ? <Link to={"/user/"+user.id}>{user.username}</Link> : null}
+                  {user ? <Link to={"/user/"+user.id}>{user.username}</Link> : null} 
+                  {/* yo le pondria que en lugar de decir el nombre de usuario mostrara su fotito */}
                   <button onClick={LogOut}>Cerrar sesión</button>
                 </>
               ) : (

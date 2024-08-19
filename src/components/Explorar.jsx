@@ -16,24 +16,18 @@ const Explorar = () => {
     if(hasMore){
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`${config.url}post`, { //trae todos los posts sin importar visibilidad creo
+        const response = await axios.get(`${config.url}post`, {
           params: {
             limit: 10,
             page: page,
           },
           headers: { Authorization: `Bearer ${token}` },
-          
         });
-        // Filtrar nuevos posts para evitar duplicados
         const newPosts = response.data.collection.filter(newPost => {
-          // Verificar si el nuevo post no está presente en posts
           return !posts.some(existingPost => existingPost.id === newPost.id);
         });
 
-
-
-        setPosts([...posts, ...newPosts]); // Agregar solo nuevos posts
-        
+        setPosts([...posts, ...newPosts]);
         setHasMore(response.data.pagination.nextPage !== false);
         setPage(page + 1);
       } catch (error) {
@@ -41,7 +35,6 @@ const Explorar = () => {
         console.error("Error fetching posts:", error);
       }
     }
-    
   }, [posts]);
 
   useEffect(() => {
@@ -107,6 +100,11 @@ const Explorar = () => {
         </button>
       </div>
 
+      {/* Nuevo div para el cuadrado verde */}
+      <div className={`menu-desplegable ${isActive ? "active" : ""}`}>
+        <p>Hola</p>
+      </div>
+
       <div className="centrador">
         <div className="wrapbusqueda"> 
           {dividedPosts.map((group, groupIndex) => (
@@ -114,15 +112,21 @@ const Explorar = () => {
               {group.map((post, index) => {
                 const isLastPost = index === group.length - 1;
                 return (
-                      <Link
-                        key={post.id}
-                        to={`/post/${post.id}`}
-                        ref={isLastPost ? lastPostElementRef : null}
-                      >
-                    <Carta putLike={true}className={`cardGroup${groupIndex}`} post_id={post.id} profile_photo={post.post.creator_user.profile_photo} username={post.post.creator_user.username} user_id={post.post.creator_user.id} cloth={post.post.front_image} >
-                        
-                    </Carta>
-                    </Link>
+                  <Link
+                    key={post.id}
+                    to={`/post/${post.id}`}
+                    ref={isLastPost ? lastPostElementRef : null}
+                  >
+                    <Carta 
+                      putLike={true}
+                      className={`cardGroup${groupIndex}`} 
+                      post_id={post.id} 
+                      profile_photo={post.post.creator_user.profile_photo} 
+                      username={post.post.creator_user.username} 
+                      user_id={post.post.creator_user.id} 
+                      cloth={post.post.front_image} 
+                    />
+                  </Link>
                 );
               })}
             </div>

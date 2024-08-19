@@ -1,8 +1,6 @@
 @font-face {
   font-family: 'HangoverFont';
   src: local('HangoverFont'), url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap') format('woff');
-  /* other formats include: 'woff2', 'truetype, 'opentype',
-                            'embedded-opentype', and 'svg' */
 }
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
 
@@ -14,25 +12,15 @@
 }
 .centradorRow{
   display: flex; 
-  
   justify-content: space-between;
   width: 80%;
 }
 #root{
-display: flex;
-flex-direction: column;
-}
-.wrapbusqueda { /*hay dos displays*/
-  /* display: grid; */
-  /* grid-template-columns: repeat(5, 1fr); */
-  /* grid-row: 5; */
-  columns: 5;
-  
-  /* justify-content: center;
-  top:0;
   display: flex;
-  align-items: center;
-  justify-content: center; */
+  flex-direction: column;
+}
+.wrapbusqueda {
+  columns: 5;
 }
 
 .wrapbusqueda-impar {
@@ -52,14 +40,10 @@ flex-direction: column;
 
 @media (max-width: 600px) {
   .wrapbusqueda{
-    /* grid-template-columns: 1fr; */
     columns: 1;
-    /* max-width: 2px;
-    max-height: auto; */
   }
   .Recomendados{
     max-width: 10rem
-    
   }
   .Seguidos{
     max-width: 10rem
@@ -67,9 +51,8 @@ flex-direction: column;
   .card{
     max-width: 200px;
   }
-  }
+}
 
-/*  */
 .card {
   display: flex;
   flex-direction: column;
@@ -83,7 +66,6 @@ flex-direction: column;
   background-color: #ffffff;
   border: 3.0px solid rgba(56, 117, 109);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  
 }
 
 .card:hover {
@@ -93,7 +75,6 @@ flex-direction: column;
   height: auto;
 }
 .header {
-  
   background-color: rgba(56, 117, 109);
   color: white;
   display: flex;
@@ -105,11 +86,10 @@ flex-direction: column;
   right: 0;
   left: 0;
   top: 0;
-  z-index: 5;
-  flex-wrap: wrap; /* Allow wrapping for smaller screens */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle drop shadow */
+  z-index: 1000;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 5vh;
-
 }
 
 ul {
@@ -125,7 +105,7 @@ li {
 }
 a {
   text-decoration: none;
-  color: inherit; /* Optional: to inherit the text color */
+  color: inherit;
 }
 
 li.busqueda {
@@ -134,7 +114,7 @@ li.busqueda {
 
 .busqueda input[type="search"] {
   border-radius: 9rem;
-  width: 100%; /* Make the search input responsive */
+  width: 100%;
   max-width: 300px;
 }
 
@@ -153,22 +133,21 @@ li a:hover {
   display: flex;
   list-style-type: none;
   padding: 0;
-  flex-wrap: wrap; /* Allow wrapping for smaller screens */
-  justify-content: center; /* Center items when wrapped */
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .botonesNavbar li {
-  margin: 1rem 1rem; /* Adjust margins for better spacing when wrapped */
+  margin: 1rem 1rem;
 }
 
 .botonesNavbar a {
   color: rgb(255, 255, 255);
   font-family: 'Quicksand', sans-serif;
   font-size: 15px;
-
 }
 .botonesNavbar a:hover{
-cursor: pointer;
+  cursor: pointer;
 }
 
 * {
@@ -184,12 +163,12 @@ cursor: pointer;
 .infoPopup{
   transform: translateY(1.2rem) translateX(-1rem);
   border-radius: 1.2rem ;    
-
 }
 .menuhamburguesa {
   position: fixed;
-  top: 20vh; 
-  right: 2vw; 
+  top: 26vh;
+  right: 2vw;
+  z-index: 1001;
 }
 
 .Botones {
@@ -197,7 +176,6 @@ cursor: pointer;
 }
 
 .Recomendados {
-  /* display: block; */
   transform-origin: top left;
   transform: rotate(90deg) translate(0,-100%);
   white-space: nowrap;
@@ -228,7 +206,6 @@ cursor: pointer;
   position: fixed;
   margin-top: 17.8rem;
 }
-
 
 .wrapper1 {
   display: table;
@@ -261,4 +238,78 @@ cursor: pointer;
   .busqueda input[type="search"] {
     max-width: none;
   }
+}
+
+/* Nuevos estilos para el menú desplegable */
+
+.menu-desplegable {
+  position: fixed;
+  top: 60px; /* Ajusta este valor según la altura de tu navbar */
+  right: -300px;
+  width: 300px;
+  height: calc(100vh - 60px); /* Resta la altura del navbar */
+  background-color: rgb(42, 96, 89);
+    transition: right 0.3s ease-in-out;
+  z-index: 999; /* Asegúrate de que esté por debajo del navbar */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-desplegable.active {
+  right: 0;
+}
+
+.menu-desplegable p {
+  color: white;
+  font-size: 24px;
+}
+
+.menu__icon {
+  width: 30px;
+  height: 25px;
+  position: relative;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.menu__icon span {
+  display: block;
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background: #38756d;
+  border-radius: 9px;
+  opacity: 1;
+  left: 0;
+  transform: rotate(0deg);
+  transition: .25s ease-in-out;
+}
+
+.menu__icon span:nth-child(1) {
+  top: 0px;
+}
+
+.menu__icon span:nth-child(2) {
+  top: 10px;
+}
+
+.menu__icon span:nth-child(3) {
+  top: 20px;
+}
+
+.menu__icon.active span:nth-child(1) {
+  top: 10px;
+  transform: rotate(135deg);
+}
+
+.menu__icon.active span:nth-child(2) {
+  opacity: 0;
+  left: -60px;
+}
+
+.menu__icon.active span:nth-child(3) {
+  top: 10px;
+  transform: rotate(-135deg);
 }
