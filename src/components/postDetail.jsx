@@ -21,6 +21,7 @@ const PostDetail = () => {
   const [selectedImage, setSelectedImage] = useState("");
   const [isChecked, setIsChecked] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [commentsAllowed, setCommentsAllowed] = useState(true);
 
   const { isLoggedIn, openModalNavBar } = useContext(AuthContext);
 
@@ -63,7 +64,7 @@ const PostDetail = () => {
   }
 
   const newComment = async () => {
-    if (!commentsVisible) {
+    if (!commentsAllowed) {
       console.log("Los comentarios están desactivados para este post.");
       return;
     }
@@ -130,7 +131,8 @@ const PostDetail = () => {
         setSelectedImage(post[0].front_image);
         setLoading(false);
         setIsChecked(liked);
-        setCommentsVisible(canComment);
+        setCommentsAllowed(post[0].allow_comments);
+        setCommentsVisible(canComment && post[0].allow_comments);
       } catch (error) {
         console.error("Error fetching post:", error);
         setError("Error fetching data");
@@ -287,66 +289,70 @@ const PostDetail = () => {
             <h3 onClick={() => setCommentsVisible(!commentsVisible)}>
               Comentarios {commentsVisible ? "▲" : "▼"}
             </h3>
-            {commentsVisible ? (
-              <>
-                <div className={styles.scrollableComments}>
-                  <ul className={styles.comments}>
-                    {comments.map((commentData) => (
-                      <li
-                        key={commentData.comment.comment_id}
-                        className={styles.commentItem}
-                      >
-                        <img
-                          src={commentData.comment.profile_photo}
-                          alt="Commenter"
-                          className={styles.commenterImage}
+            {commentsAllowed ? (
+              commentsVisible ? (
+                <>
+                  <div className={styles.scrollableComments}>
+                    <ul className={styles.comments}>
+                      {comments.map((commentData) => (
+                        <li
+                          key={commentData.comment.comment_id}
+                          className={styles.commentItem}
+                        >
+                          <img
+                            src={commentData.comment.profile_photo}
+                            alt="Commenter"
+                            className={styles.commenterImage}
+                          />
+                          <div>
+                            <strong>{commentData.comment.username} {getRelativeTime(commentData.comment.date)}</strong>
+                            <p>{commentData.comment.content}</p>
+                          </div>
+                          <button className={styles.replyButton}>
+                            Responder
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                    <div ref={commentsEndRef}></div>
+                  </div>
+                  <div className={styles.commentTextArea}>
+                    <div className={styles.detayes}>
+                      <p className={styles.commentCount}>{comments.length} comentarios</p>
+                      <div>
+                        <Like
+                          likePostFunc={changeLikeState}
+                          isAlredyChecked={isChecked}
+                          styles={styles.corason}
                         />
-                        <div>
-                          <strong>{commentData.comment.username} {getRelativeTime(commentData.comment.date)}</strong>
-                          <p>{commentData.comment.content}</p>
-                        </div>
-                        <button className={styles.replyButton}>
-                          Responder
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                  <div ref={commentsEndRef}></div>
-                </div>
-                <div className={styles.commentTextArea}>
-                  <div className={styles.detayes}>
-                    <p className={styles.commentCount}>{comments.length} comentarios</p>
-                    <div>
-                      <Like
-                        likePostFunc={changeLikeState}
-                        isAlredyChecked={isChecked}
-                        styles={styles.corason}
-                      />
+                      </div>
                     </div>
-                  </div>
-                  <div className={styles.newComment}>
-                    <img
-                      src="https://randomuser.me/api/portraits/men/8.jpg"
-                      alt="Profile"
-                      className={styles.creatorImage}
-                    />
-                    <div className={styles.newCommentText}>
-                      <textarea
-                        onClick={checkLogin}
-                        value={newCommentContent}
-                        onChange={(e) => setNewCommentContent(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Comenta aqui..."
-                      />
+                    <div className={styles.newComment}>
                       <img
-                        onClick={newComment}
-                        src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fsend-icon-2048x2020-jrvk5f1r.png&f=1&nofb=1&ipt=3c95031d77c15aa2faeb240e0df0b253cb279f3552087fad48513c0f1ffa0dde&ipo=images"
-                        alt="Send"
+                        src="https://randomuser.me/api/portraits/men/8.jpg"
+                        alt="Profile"
+                        className={styles.creatorImage}
                       />
+                      <div className={styles.newCommentText}>
+                        <textarea
+                          onClick={checkLogin}
+                          value={newCommentContent}
+                          onChange={(e) => setNewCommentContent(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          placeholder="Comenta aqui..."
+                        />
+                        <img
+                          onClick={newComment}
+                          src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fsend-icon-2048x2020-jrvk5f1r.png&f=1&nofb=1&ipt=3c95031d77c15aa2faeb240e0df0b253cb279f3552087fad48513c0f1ffa0dde&ipo=images"
+                          alt="Send"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </>
+                </>
+              ) : (
+                <p>Haz clic en "Comentarios ▼" para ver los comentarios.</p>
+              )
             ) : (
               <p>Los comentarios están desactivados para este post.</p>
             )}
@@ -357,4 +363,4 @@ const PostDetail = () => {
   );
 };
 
-export default PostDetail; 
+export default PostDetail;
