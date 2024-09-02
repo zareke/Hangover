@@ -87,21 +87,21 @@ const LibraryPage = () => {
           <div className="library-grid" key={activeTab}>
             {displayedItems.map((item, index) => (
               <div 
-                key={`${activeTab}-${item.id}-${index}`} 
+                key={`${activeTab}-${item.postid}-${index}`} 
                 className="library-item" 
-                onClick={() => handleViewDesign(item.id)}
+                onClick={() => handleViewDesign(item.postid)}
               >
               <Carta 
   className={`cardGroup${index}`} 
-  post_id={item.id} 
+  post_id={item.postid} 
   cloth={item.front_image} 
   profile_photo={item.profile_photo}
-  username={item.username} 
-  user_id={item.user_id}
-  onClickFunction={() => handleViewDesign(item.id)}
+  username={item.username}    
+  user_id={item.creator_id}
+  onClickFunction={() => handleViewDesign(item.postid)}
   putLike={false} // Ajusta esto según sea necesario
 />
-
+{console.log(item," SI")}
               </div>
             ))}
           </div>

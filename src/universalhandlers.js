@@ -35,7 +35,7 @@ export const eliminarGuardadoHandler = async (postId, setSaved) => {
   }
 };
 
-export const followHandler = async (userId,setFollow,isLoggedIn,openModalNavBar) => {
+export const followHandler = async (userId,setFollow,isLoggedIn,openModalNavBar, setUserData) => {
   if (isLoggedIn) {
     try {
       const token = localStorage.getItem("token");
@@ -44,6 +44,18 @@ export const followHandler = async (userId,setFollow,isLoggedIn,openModalNavBar)
       });
       if (response.status === 201) {
         setFollow(true);
+        setUserData((prevState) => {
+          if (prevState) {
+            return {
+              ...prevState,
+              user_data: {
+                ...prevState.user_data,
+                follower_number: prevState.user_data.follower_number + 1,
+              },
+            };
+          }
+          return prevState;
+        });
       }
     } catch (error) {
       console.error("Error al guardar:", error);
@@ -52,7 +64,7 @@ export const followHandler = async (userId,setFollow,isLoggedIn,openModalNavBar)
     openModalNavBar();
   }
 }
-export const unFollowHandler = async (userId,setFollow) => {
+export const unFollowHandler = async (userId,setFollow,setUserData) => {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.delete(`${config.url}user/follow/${userId}`, {
@@ -61,6 +73,19 @@ export const unFollowHandler = async (userId,setFollow) => {
 
     if (response.status === 200) {
       setFollow(false);
+      setUserData((prevState) => {
+        if (prevState) {
+          return {
+            ...prevState,
+            user_data: {
+              ...prevState.user_data,
+              follower_number: prevState.user_data.follower_number - 1,
+            },
+          };
+        }
+        return prevState;
+      });
+    
     }
   } catch (error) {
     console.error("Error al eliminar seguido:", error);

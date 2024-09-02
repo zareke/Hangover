@@ -354,7 +354,23 @@ const PostDetail = () => {
                 <p>Haz clic en "Comentarios ▼" para ver los comentarios.</p>
               )
             ) : (
-              <p>Los comentarios están desactivados para este post.</p>
+              
+              
+                    <>
+                    <p>Los comentarios para este post están desactivados :(</p>
+                    <div className={styles.commentTextArea}>
+                    <div className={styles.detayes}>
+                      <div>
+                        <Like
+                          likePostFunc={changeLikeState}
+                          isAlredyChecked={isChecked}
+                          styles={styles.corason}
+                        />
+                      </div>
+                    </div>
+                    </div>
+                    </>
+                     
             )}
           </div>
         </div>

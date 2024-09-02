@@ -10,6 +10,7 @@ import Biblioteca from "./components/Biblioteca.jsx";
 import Informacion from "./components/Informacion.jsx"
 import Profile from "./components/Profile.jsx"
 import Bolsa from "./components/Bolsa.jsx"
+import Search from "./components/Search.jsx";
 
 import { AuthProvider } from "./AuthContext";
 
@@ -31,6 +32,9 @@ function App() {
                 </Route>
                 <Route exact path="bolsa" element={<Bolsa/>}></Route>
                 <Route exact path="/biblioteca" element={<Biblioteca />} />
+                <Route exact path="/search">
+                     <Route exact path=":search" element={<Search/>}/> 
+                </Route>
                 
             </Routes>   
         </Router>

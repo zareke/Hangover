@@ -11,15 +11,20 @@ import info from '../vendor/imgs/infoicon.png'
 import library from '../vendor/imgs/libraryicon.png'
 import newdesign from '../vendor/imgs/newicon.png'
 import profile from '../vendor/imgs/profileicon.png'
+import { handleSearch } from '../universalhandlers';
+import { useNavigate } from "react-router-dom";
 
 let openModal, closeModal;
 //hacemos una copia de hangover y ahi modificamos todo react-native o usamos todo lo original? y supongo que pushearemos otra branch buen
 const Navbar = () => {
+  const navigate = useNavigate();
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext); // Obtener estado de inicio de sesión desde el contexto
   const [modalVisible, setModalVisible] = useState(false);
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [infoPopupVisible,setInfoPopupVisible]=useState(false)
+  const [infoPopupVisible,setInfoPopupVisible]=useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -70,6 +75,13 @@ const Navbar = () => {
     window.location.reload(); // Recargar la página para limpiar el estado
   };
 
+  const handleSubmitSearch = (e) => {
+    e.preventDefault(); // Previene el comportamiento por defecto del formulario
+    if (searchQuery) {
+      navigate(`/search/${searchQuery}`); // Realiza la redirección
+    }
+  };
+
   
   return (
     <div className="headerCointain">
@@ -117,9 +129,10 @@ const Navbar = () => {
           <li><Link to="/">Explorar</Link></li>
             <li>
               <div className="busqueda">
-                <form>
-                  <input type="search" id="gsearch" name="gsearch" style={{ width: '300px' }} />
-                </form>
+                <form onSubmit={handleSubmitSearch}>
+                  <input onChange={(e) => {setSearchQuery(e.target.value);}} type="search" id="gsearch" name="gsearch" style={{ width: '300px' }} />
+                  <button type="submit">Buscar</button>
+                </form> 
               </div>
             </li>
             <li><div onMouseEnter={openInfoThingy} onMouseLeave={closeInfo}> {

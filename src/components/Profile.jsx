@@ -143,14 +143,14 @@ const Profile = () => {
             <>
               {follows ? (
                 <Button
-                  onClick={() => unFollowHandler(userId, setFollows)}
+                  onClick={() => unFollowHandler(userId, setFollows,setUserData)}
                   text="Dejar de seguir"
                 />
               ) : (
                 <Button
                   text="Seguir"
                   onClick={() =>
-                    followHandler(userId, setFollows, isLoggedIn, openModalNavBar)
+                    followHandler(userId, setFollows, isLoggedIn, openModalNavBar, setUserData)
                   }
                 />
               )}
