@@ -1,0 +1,152 @@
+/* Existing CSS */
+:root{
+    --pattern-color: #000;
+}
+.designer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .controls {
+    margin-bottom: 20px;
+  }
+  
+  .preview {
+    position: relative;
+  }
+  
+  .shirt {
+    position: relative;
+    width: 300px;
+    height: 333px;
+  }
+  
+  .shirt-image {
+    width: 300px;
+    height: auto;
+    position: absolute;
+    z-index: 14;
+    pointer-events: none;
+  }
+  
+  .color-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    width: 300px;
+    height: 333px;
+    z-index: 0;
+  }
+  
+  .pattern-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    width: 300px;
+    height: 333px;
+    z-index: 2;
+  }
+  
+  .pattern-overlay.stripes {
+    background: repeating-linear-gradient(
+      45deg,
+      var(--pattern-color),
+      var(--pattern-color) 10px,
+      transparent 10px,
+      transparent 20px
+    );
+  }
+  
+  .pattern-overlay.dots {
+    background: radial-gradient(var(--pattern-color) 10%, transparent 10%);
+    background-size: 20px 20px;
+  }
+  
+  .pattern-overlay.diagonal-stripes {
+    background: repeating-linear-gradient(
+      135deg,
+      var(--pattern-color),
+      var(--pattern-color) 10px,
+      transparent 10px,
+      transparent 20px
+    );
+  }
+  
+  .pattern-overlay.grid {
+    background: linear-gradient(var(--pattern-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--pattern-color) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .pattern-overlay.zigzag {
+    background: linear-gradient(
+      135deg,
+      var(--pattern-color) 25%,
+      transparent 25%
+    ),
+    linear-gradient(225deg, var(--pattern-color) 25%, transparent 25%);
+    background-size: 20px 20px;
+  }
+  
+  .text-overlay {
+    font-size: larger;
+    position: absolute;
+    cursor: move;
+    z-index: 12;
+  }
+  
+  /* New CSS for Shapes */
+  .shape-overlay {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    z-index: 11;
+  }
+  
+  .shape-overlay.square {
+    background-color: red;
+  }
+  
+  .shape-overlay.circle {
+    background-color: blue;
+    border-radius: 50%;
+  }
+  
+  .shape-overlay.rectangle {
+    background-color: green;
+    width: 100px;
+  }
+  
+  .shape-overlay.triangle {
+    width: 0;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom: 50px solid yellow;
+  }
+  
+  .shape-overlay.diamond {
+    width: 0;
+    height: 0;
+    border: 25px solid transparent;
+    border-bottom: 50px solid purple;
+    position: relative;
+  }
+  
+  .shape-overlay.diamond:after {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 50px;
+    width: 0;
+    height: 0;
+    border: 25px solid transparent;
+    border-top: 50px solid purple;
+  }
