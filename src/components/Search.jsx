@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo, memo } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import config from "../config";
+import { Link } from "react-router-dom";
+import Carta from "./carta";
 
 const Search = () => {
   const [results, setResults] = useState([]);
@@ -15,58 +17,51 @@ const Search = () => {
 
   // Función para obtener resultados de búsqueda
   const fetchResults = useCallback(async (page) => {
-    if (!hasMore) return; // Evitar llamadas si no hay más resultados
 
-    try {
-      const response = await axios.get(`${config.url}post/search/${search}`, {
-        params: {
-          limit: 20,
-          page: page,
-        },
-      });
+    if(hasMore){ // Evitar llamadas si no hay más resultados
 
-      console.log("API Response:", response.data);
+      try {
+        const response = await axios.get(`${config.url}post/search/${search}`, {
+          params: {
+            limit: 5,
+            page: page,
+          },
+        });
 
-      // Filtrar resultados duplicados
-      const newResults = response.data.collection.filter(newResult => {
-        return !results.some(existingResult => existingResult.id === newResult.id);
-      });
-      console.log(newResults);
+        console.log("API Response:", response.data);
 
-      setResults([...results, ...newResults]);
-      setHasMore(response.data.pagination.nextPage !== false);
-    } catch (error) {
-      setError("Error fetching search results");
-      console.error("Error fetching search results:", error);
-    }
-  }, [search, results, hasMore]);
+        // Filtrar resultados duplicados
+        const newResults = response.data.collection.filter(newResult => {
+          return !results.some(existingResult => existingResult.id === newResult.id);
+        });
+        console.log(newResults);
 
-  // Efecto para obtener los resultados iniciales al cambiar la búsqueda
-  useEffect(() => {
-    setResults([]); // Limpiar los resultados cuando cambia la búsqueda
-    setPage(1); // Reiniciar la página a 1
-    setHasMore(true); // Asegurarse de que hay más resultados disponibles
-    fetchResults(1); // Obtener los primeros resultados
-  }, [search]); // Dependencias limitadas
-
-  // Efecto para manejar el observador de intersección
-  useEffect(() => {
-    const handleScroll = (entries) => {
-      if (entries[0].isIntersecting && hasMore) {
-        fetchResults(page);
+        setResults([...results, ...newResults]);
+        setHasMore(response.data.pagination.nextPage !== false);
+        setPage(page + 1);
+      } catch (error) {
+        setError("Error fetching search results");
+        console.error("Error fetching search results:", error);
       }
-    };
+    }
+  }, [results]);
 
-    const observerInstance = new IntersectionObserver(handleScroll, { threshold: 1.0 });
+  useEffect(() => {
+    fetchResults(1);
+  }, []);
 
-    // Seleccionar el último elemento para el observador
-    const lastResultElement = document.querySelector('[data-last-result]');
-    if (lastResultElement) observerInstance.observe(lastResultElement);
-    console.log(lastResultElement);
-    return () => {
-      if (lastResultElement) observerInstance.unobserve(lastResultElement);
-    };
-  }, [fetchResults]); // Dependencias limitadas
+  const lastPostElementRef = useCallback(
+    (node) => {
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          fetchResults(page);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [fetchResults, hasMore, page]
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -75,42 +70,55 @@ const Search = () => {
     }
   };
 
+  const dividedPosts = useMemo(() => {
+    return results.reduce((acc, post, index) => {
+      const groupIndex = index % 4;
+      acc[groupIndex].push(post);
+      return acc;
+    }, [[], [], [], []]);
+  }, [results]);
+
   if (error) {
     return <div>{error}</div>;
   }
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={newSearchQuery}
-          onChange={(e) => setNewSearchQuery(e.target.value)}
-          placeholder="Search..."
-        />
-        <button type="submit">Search</button>
-      </form>
-
-      <div>
-        {results.length > 0 ? (
-          results.map((result, index) => {
-            const isLastResult = index === results.length - 1;
+    <div className="centrador">
+      <div className="wrapbusqueda">
+        {results.length > 0 ? ( dividedPosts.map((group, groupIndex) => (
+          <div key={groupIndex} className={`wrapbusqueda-group${groupIndex}`}>
+          {group.map((post, index) => {
+            const isLastPost = index === group.length - 1;
+            console.log("aaaaaaaaaaaa",post)
             return (
-              <div
-                key={result.id}
-                data-last-result={isLastResult ? true : false} // Añadir atributo para seleccionar el último elemento
-              >
-                <h3>{result.title}</h3>
-                <p>{result.description}</p>
-              </div>
+              
+              <Link
+              key={post.post_id || post.id} // Prueba ambas keys
+              to={`/post/${post.post_id || post.id}`}
+              ref={isLastPost ? lastPostElementRef : null}
+            >
+              <Carta 
+                putLike={true}
+                className={`cardGroup${groupIndex}`} 
+                post_id={post.post_id || post.id} 
+                profile_photo={post.post.creator_user.profile_photo} 
+                username={post.post.creator_user.username} 
+                user_id={post.post.creator_user.id} 
+                cloth={post.post.front_image} 
+              />
+            </Link>
+
             );
-          })
-        ) : (
+          })}
+        </div>
+        )) ) : (
           <p>No results found.</p>
-        )}
+        ) }
       </div>
+    </div>
     </>
   );
 };
 
-export default Search;
+export default memo(Search);
