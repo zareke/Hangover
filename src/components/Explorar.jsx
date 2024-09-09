@@ -26,7 +26,6 @@ const Explorar = () => {
         const newPosts = response.data.collection.filter(newPost => {
           return !posts.some(existingPost => existingPost.id === newPost.id);
         });
-
         setPosts([...posts, ...newPosts]);
         setHasMore(response.data.pagination.nextPage !== false);
         setPage(page + 1);
@@ -69,7 +68,7 @@ const Explorar = () => {
   if (error) {
     return <div>{error}</div>;
   }
-
+  console.log(dividedPosts);
   return (
     <div>
       <div className="botones">

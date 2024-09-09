@@ -1,10 +1,16 @@
-import React, { useState, useRef } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import { Rnd } from 'react-rnd';
 import './designer.css';
 import shirt from '../vendor/imgs/shirtpng.png';
+import html2canvas from 'html2canvas';
+import { AuthContext } from '../AuthContext';
+import axios from 'axios';
+import config from '../config';
 
-const Designer = () => {
-  const [color, setColor] = useState('#ffffff');
+const Designer = ({id: id}) => {
+  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
+  const shirtRef = useRef(null);
+  const [color, setColor] = useState('rgb(255,255,255)');
   const [pattern, setPattern] = useState('none');
   const [texts, setTexts] = useState([]);
   const [shapes, setShapes] = useState([]);
@@ -15,6 +21,23 @@ const Designer = () => {
   const [drawingColor, setDrawingColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(5);
   const inputFile = useRef(null);
+
+  if(id !== undefined){
+    shirt = getShirt();
+  }
+
+    const getShirt = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await axios.get(`${config.url}/design/get`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        return response.data.image;
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
 
   const handleColorChange = (e) => setColor(e.target.value);
   const handlePatternChange = (e) => setPattern(e.target.value);
@@ -41,7 +64,18 @@ const Designer = () => {
     setTexts(texts.map((text) => (text.id === id ? { ...text, width, height, fontSize: `${newFontSize}px` } : text)));
   };
 
+  const handleFontColorChange = (id, color) => {
+    setTexts(texts.map((text) => (text.id === id ? { ...text, color } : text)));
+  };
+
   const handleFontSizeChange = (id, fontSize) => {
+    const newFontSize = parseInt(fontSize, 10);
+    if (newFontSize > 100) {
+      fontSize = "60px";
+    } else {
+      fontSize = `${newFontSize}px`;
+    }
+  
     setTexts(texts.map((text) => (text.id === id ? { ...text, fontSize } : text)));
   };
 
@@ -83,15 +117,17 @@ const Designer = () => {
 
   const handleDrawStart = (event) => {
     setIsDrawing(true);
-    setDrawingCoords({ x: event.clientX, y: event.clientY });
+    const rect = event.currentTarget.getBoundingClientRect();
+    setDrawingCoords({ x: event.clientX - rect.left, y: event.clientY - rect.top });
   };
-
+  
   const handleDrawMove = (event) => {
     if (isDrawing) {
-      setDrawingCoords({ x: event.clientX, y: event.clientY });
+      const rect = event.currentTarget.getBoundingClientRect();
+      setDrawingCoords({ x: event.clientX - rect.left, y: event.clientY - rect.top });
       setDrawingLines([
         ...drawingLines,
-        { x1: drawingCoords.x, y1: drawingCoords.y, x2: event.clientX, y2: event.clientY, color: drawingColor, width: brushSize },
+        { x1: drawingCoords.x, y1: drawingCoords.y, x2: event.clientX - rect.left, y2: event.clientY - rect.top, color: drawingColor, width: brushSize },
       ]);
     }
   };
@@ -103,6 +139,51 @@ const Designer = () => {
   const handleBrushSizeChange = (e) => {
     setBrushSize(parseInt(e.target.value));
   };
+
+  const handleCapture = async () => {
+    console.log("holaaaa")
+    if (shirtRef.current) {
+      const canvas = await html2canvas(shirtRef.current);
+      const dataUrl = canvas.toDataURL('image/png');
+      
+      // Luego, podrías subir esta URL o hacer lo que necesites con ella.
+      saveImage(dataUrl);
+    }
+  };
+
+  const saveImage = (dataUrl) => {
+    // Aquí podrías usar una API para subir la imagen o guardarla en algún lugar
+    // Por ahora, solo imprimimos el dataUrl.
+    console.log(dataUrl);
+    
+    // Crear un enlace para descargar la imagen
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = 'captured-image.png';
+
+    link.addEventListener('click', () => {
+      console.log('El enlace fue presionado.');
+      saveShirt(dataUrl);
+    });
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const saveShirt = async (dataUrl) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${config.url}/design/save`, {
+        headers: { Authorization: `Bearer ${token}` },
+        body: {newUrl: dataUrl}
+      });
+
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
+
 
   return (
     <div className="designer">
@@ -132,6 +213,14 @@ const Designer = () => {
           <div key={text.id}>
             <input type="text" value={text.text} onChange={(e) => handleTextChange(text.id, e.target.value)} />
             <button onClick={() => removeTextInput(text.id)}>-</button>
+            <label>
+              Font Color:
+              <input
+                type="color"
+                value={text.color}
+                onChange={(e) => handleFontColorChange(text.id, e.target.value)}
+              />
+            </label>
             <label>
               Font Size:
               <input
@@ -201,26 +290,23 @@ const Designer = () => {
         onMouseUp={handleDrawEnd}
         onMouseLeave={handleDrawEnd}
       >
-        <div draggable="false"  className="shirt">
+        <div  className="shirt" ref={shirtRef}>
         {drawingLines.map((line, index) => (
          
-            <div 
-              key={index}
-              className="drawing-line"
-              style={{
-                position: 'absolute',
-                left: line.x1,
-                top: line.y1,
-                width: Math.sqrt(Math.pow(line.x2 - line.x1, 2) + Math.pow(line.y2 - line.y1, 2)),
-                height: `${line.width}px`,
-                backgroundColor: line.color,
-                transform: `rotate(${Math.atan2(line.y2 - line.y1, line.x2 - line.x1)}rad)`,
-                transformOrigin: 'left center',
-                
-              }}
-            />
+         <div
+         key={index}
+         className="drawing-line"
+         style={{
+           left: line.x1 - line.width / 2,
+           top: line.y1 - line.width / 2,
+           width: `${line.width}px`,
+           height: `${line.width}px`,
+           backgroundColor: line.color,
+           borderRadius: '50%',
+         }}
+       />
           ))}
-          <img src={shirt}  alt="Shirt" draggable="false" className="shirt-image" />
+          <img src={shirt}  alt="Shirt" className="shirt-image" />
           {images.map((image, index) => (
             <div key={index} className="uploaded-image-container">
               <img src={image.src} alt={`Uploaded ${index}`} className="uploaded-image" />
@@ -254,7 +340,7 @@ const Designer = () => {
             >
               <div
                 className="text-overlay"
-                style={{ fontSize: text.fontSize, fontFamily: text.fontFamily, width: '100%', height: '100%' }}
+                style={{ fontSize: text.fontSize, fontFamily: text.fontFamily, width: '100%', height: '100%', color: text.color }}
               >
                 {text.text}
               </div>
@@ -291,7 +377,9 @@ const Designer = () => {
           ))}
          
         </div>
+        
       </div>
+      <button onClick={handleCapture}>Capturar y Guardar Imagen</button>
     </div>
   );
 };
