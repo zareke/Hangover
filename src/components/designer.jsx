@@ -7,7 +7,7 @@ import { AuthContext } from '../AuthContext';
 import axios from 'axios';
 import config from '../config';
 
-const Designer = ({id: id}) => {
+const Designer = ({designId}) => {
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
   const shirtRef = useRef(null);
   const [color, setColor] = useState('rgb(255,255,255)');
@@ -22,22 +22,21 @@ const Designer = ({id: id}) => {
   const [brushSize, setBrushSize] = useState(5);
   const inputFile = useRef(null);
 
-  if(id !== undefined){
+  if (designId !== undefined) {
     shirt = getShirt();
   }
 
-    const getShirt = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const response = await axios.get(`${config.url}/design/get`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        
-        return response.data.image;
-      } catch (error) {
-        console.error('Error fetching user:', error);
-      }
-    };
+  const getShirt = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${config.url}design/get/${designId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data.image;
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
 
   const handleColorChange = (e) => setColor(e.target.value);
   const handlePatternChange = (e) => setPattern(e.target.value);
@@ -75,7 +74,6 @@ const Designer = ({id: id}) => {
     } else {
       fontSize = `${newFontSize}px`;
     }
-  
     setTexts(texts.map((text) => (text.id === id ? { ...text, fontSize } : text)));
   };
 
@@ -91,7 +89,6 @@ const Designer = ({id: id}) => {
     const file = event.target.files[0];
     const reader = new FileReader();
     reader.onloadend = () => {
-      console.log(`File name: ${file.name}`);
       setImage([...images, { src: reader.result, name: file.name }]);
     };
     reader.readAsDataURL(file);
@@ -120,15 +117,19 @@ const Designer = ({id: id}) => {
     const rect = event.currentTarget.getBoundingClientRect();
     setDrawingCoords({ x: event.clientX - rect.left, y: event.clientY - rect.top });
   };
-  
+
   const handleDrawMove = (event) => {
     if (isDrawing) {
       const rect = event.currentTarget.getBoundingClientRect();
-      setDrawingCoords({ x: event.clientX - rect.left, y: event.clientY - rect.top });
-      setDrawingLines([
-        ...drawingLines,
-        { x1: drawingCoords.x, y1: drawingCoords.y, x2: event.clientX - rect.left, y2: event.clientY - rect.top, color: drawingColor, width: brushSize },
+      const newCoords = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+      
+      // Interpolation between the previous and the new coordinates
+      setDrawingLines((prevLines) => [
+        ...prevLines,
+        ...interpolateLine(drawingCoords, newCoords, brushSize, drawingColor),
       ]);
+      
+      setDrawingCoords(newCoords);
     }
   };
 
@@ -141,26 +142,17 @@ const Designer = ({id: id}) => {
   };
 
   const handleCapture = async () => {
-    console.log("holaaaa")
     if (shirtRef.current) {
       const canvas = await html2canvas(shirtRef.current);
       const dataUrl = canvas.toDataURL('image/png');
-      
-      // Luego, podrías subir esta URL o hacer lo que necesites con ella.
       saveImage(dataUrl);
     }
   };
 
   const saveImage = (dataUrl) => {
-    // Aquí podrías usar una API para subir la imagen o guardarla en algún lugar
-    // Por ahora, solo imprimimos el dataUrl.
-    console.log(dataUrl);
-    
-    // Crear un enlace para descargar la imagen
     const link = document.createElement('a');
     link.href = dataUrl;
-    link.download = 'captured-image.png';
-
+    
     link.addEventListener('click', () => {
       console.log('El enlace fue presionado.');
       saveShirt(dataUrl);
@@ -172,18 +164,27 @@ const Designer = ({id: id}) => {
   };
 
   const saveShirt = async (dataUrl) => {
+    console.log(dataUrl);
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`${config.url}/design/save`, {
+      await axios.post(`${config.url}design/save`, { designId: designId, image: dataUrl }, {
         headers: { Authorization: `Bearer ${token}` },
-        body: {newUrl: dataUrl}
       });
-
     } catch (error) {
-      console.error('Error fetching user:', error);
+      console.error('Error saving shirt:', error);
     }
   };
 
+  const interpolateLine = (start, end, size, color) => {
+    const points = [];
+    const numPoints = Math.max(Math.abs(end.x - start.x), Math.abs(end.y - start.y)) / (size/6);
+    for (let i = 0; i < numPoints; i++) {
+      const x = start.x + (end.x - start.x) * (i / numPoints);
+      const y = start.y + (end.y - start.y) * (i / numPoints);
+      points.push({ x, y, size, color });
+    }
+    return points;
+  };
 
   return (
     <div className="designer">
@@ -290,35 +291,34 @@ const Designer = ({id: id}) => {
         onMouseUp={handleDrawEnd}
         onMouseLeave={handleDrawEnd}
       >
-        <div  className="shirt" ref={shirtRef}>
-        {drawingLines.map((line, index) => (
-         
-         <div
-         key={index}
-         className="drawing-line"
-         style={{
-           left: line.x1 - line.width / 2,
-           top: line.y1 - line.width / 2,
-           width: `${line.width}px`,
-           height: `${line.width}px`,
-           backgroundColor: line.color,
-           borderRadius: '50%',
-         }}
-       />
+        <div className="shirt" ref={shirtRef}>
+          {drawingLines.map((line, index) => (
+            <div
+              key={index}
+              className="drawing-line"
+              style={{
+                left: line.x - line.size / 2,
+                top: line.y - line.size / 2,
+                width: `${line.size}px`,
+                height: `${line.size}px`,
+                backgroundColor: line.color,
+                borderRadius: '50%',
+                position: 'absolute',
+              }}
+            />
           ))}
-          <img src={shirt}  alt="Shirt" className="shirt-image" />
+          <img src={shirt} alt="Shirt" className="shirt-image" />
           {images.map((image, index) => (
             <div key={index} className="uploaded-image-container">
               <img src={image.src} alt={`Uploaded ${index}`} className="uploaded-image" />
               <p>{image.name}</p>
             </div>
           ))}
-           
           <div className="color-overlay" style={{ backgroundColor: color }}></div>
           <div className={`pattern-overlay ${pattern}`}></div>
           {texts.map((text) => (
             <Rnd
-              key={text.id}
+              key={text.id} 
               size={{ width: text.width, height: text.height }}
               position={{ x: text.x, y: text.y }}
               bounds=".shirt"
@@ -375,9 +375,7 @@ const Designer = ({id: id}) => {
               ></div>
             </Rnd>
           ))}
-         
         </div>
-        
       </div>
       <button onClick={handleCapture}>Capturar y Guardar Imagen</button>
     </div>

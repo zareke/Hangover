@@ -1,4 +1,8 @@
 /* Existing CSS */
+
+
+
+
 :root{
   --pattern-color: #000000;
 }
@@ -45,7 +49,7 @@ z-index: 63;
   width: 300px;
   height: auto;
   position: absolute;
-  z-index: 14;
+  z-index: 14000;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
