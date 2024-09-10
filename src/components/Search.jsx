@@ -72,12 +72,11 @@ const Search = () => {
   if (error) {
     return <div>{error}</div>;
   }
-  console.log(dividedPosts);
   return (
     <>
     <div className="centrador">
       <div className="wrapbusqueda">
-        {( dividedPosts.map((group, groupIndex) => (
+        {results.length > 0 ? ( dividedPosts.map((group, groupIndex) => (
           <div key={groupIndex} className={`wrapbusqueda-group${groupIndex}`}>
           {group.map((post, index) => {
             const isLastPost = index === group.length - 1;
@@ -102,7 +101,9 @@ const Search = () => {
             );
           })}
         </div>
-        )) ) }
+        )) ) : (
+          <p>No results found</p>
+        )}
       </div>
     </div>
     </>

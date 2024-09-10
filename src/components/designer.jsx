@@ -6,6 +6,7 @@ import html2canvas from 'html2canvas';
 import { AuthContext } from '../AuthContext';
 import axios from 'axios';
 import config from '../config';
+import LZString from 'lz-string';
 
 const Designer = ({designId}) => {
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
@@ -144,36 +145,54 @@ const Designer = ({designId}) => {
   const handleCapture = async () => {
     if (shirtRef.current) {
       const canvas = await html2canvas(shirtRef.current);
-      const dataUrl = canvas.toDataURL('image/png');
-      saveImage(dataUrl);
+      canvas.toBlob(async (blob) => {
+        try {
+          const formData = new FormData();
+          formData.append('image', blob, 'shirt-design.jpg');
+  
+          // Envia el Blob al servidor
+          const response = await axios.post(`${config.url}image/upload`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+  
+          // Obtén la URL corta del servidor
+          const shortUrl = response.data.shortUrl;
+          saveImage(shortUrl);  // Llama a saveImage con la URL corta
+        } catch (error) {
+          console.error('Error al subir la imagen:', error);
+        }
+      }, 'image/jpeg', 0.7);
     }
   };
-
-  const saveImage = (dataUrl) => {
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    
-    link.addEventListener('click', () => {
-      console.log('El enlace fue presionado.');
-      saveShirt(dataUrl);
-    });
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  
+  
+  
+  const saveImage = (shortUrl) => {
+    // Aquí no es necesario crear un enlace ni hacer clic, simplemente llama a saveShirt
+    saveShirt(shortUrl);
   };
+  
+  
+  
 
-  const saveShirt = async (dataUrl) => {
-    console.log(dataUrl);
+  const saveShirt = async (shortUrl) => {
+    console.log(shortUrl);
     const token = localStorage.getItem('token');
     try {
-      await axios.post(`${config.url}design/save`, { designId: designId, image: dataUrl }, {
-        headers: { Authorization: `Bearer ${token}` },
+      await axios.post(`${config.url}design/save`, { designId: designId, image: shortUrl }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
+      console.log('Imagen guardada con URL corta.');
     } catch (error) {
-      console.error('Error saving shirt:', error);
+      console.error('Error al guardar la imagen:', error);
     }
   };
+  
+  
 
   const interpolateLine = (start, end, size, color) => {
     const points = [];

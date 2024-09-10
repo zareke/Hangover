@@ -24,7 +24,10 @@ const LibraryPage = () => {
         console.log("api data ", response);
 
         if (response.data && typeof response.data === 'object') {
-          if (Array.isArray(response.data.saved) && Array.isArray(response.data.liked)) {
+          const { saved, liked, borradores } = response.data;
+          if (Array.isArray(response.data.saved) && Array.isArray(response.data.liked) && Array.isArray(response.data.borradores)) {
+            const draftItemsWithBlobUrls = await processBlobs(borradores);
+            response.data.borradores = draftItemsWithBlobUrls;
             setItems(response.data);
           } else {
             setError("API response format is incorrect");
@@ -42,6 +45,15 @@ const LibraryPage = () => {
     fetchItems();
   }, []);
 
+  const processBlobs = async (items) => {
+    return Promise.all(items.map(async (item) => {
+      const blobResponse = await fetch(item.image);  // Asumiendo que `front_image` es una URL de Blob
+      const blob = await blobResponse.blob();
+      const url = URL.createObjectURL(blob);
+      return { ...item, image: url };
+    }));
+  };
+
   const setItemsGuardados = () => {
     setActiveTab('saved');
     setActiveFilter('saved');
@@ -50,6 +62,11 @@ const LibraryPage = () => {
   const setItemsLikeados = () => {
     setActiveTab('liked');
     setActiveFilter('liked');
+  };
+
+  const setItemsBorradores = () => {
+    setActiveTab('borradores');
+    setActiveFilter('borradores');
   };
 
   const handleViewDesign = (postId) => {
@@ -62,7 +79,7 @@ const LibraryPage = () => {
   if (error) {
     return <div className="error-message">{error}</div>;
   }
-
+  console.log(displayedItems)
   return (
     <div className="fondo">
       <div className="library-container">
@@ -70,6 +87,11 @@ const LibraryPage = () => {
           <div className="filtros">
             <h2 className='libraryTitle'>Mi biblioteca</h2>
             <div className='filtericons'>
+              <div onClick={setItemsBorradores} className={`filter-container ${activeFilter === 'borradores' ? 'active' : ''}`}>
+                  
+                  <img className="iconLibrary" src={savedIcon} alt="ss" />
+                
+              </div>
               <div onClick={setItemsGuardados} className={`filter-container ${activeFilter === 'saved' ? 'active' : ''}`}>
                 
                   <img className="iconLibrary" src={savedIcon} alt="ss" />
@@ -84,28 +106,36 @@ const LibraryPage = () => {
           </div>
         </div>
         <div className="cuadrado">
-          <div className="library-grid" key={activeTab}>
-            {displayedItems.map((item, index) => (
-              <div 
-                key={`${activeTab}-${item.postid}-${index}`} 
-                className="library-item" 
-                onClick={() => handleViewDesign(item.postid)}
-              >
-              <Carta 
-  className={`cardGroup${index}`} 
-  post_id={item.postid} 
-  cloth={item.front_image} 
-  profile_photo={item.profile_photo}
-  username={item.username}    
-  user_id={item.creator_id}
-  onClickFunction={() => handleViewDesign(item.postid)}
-  putLike={false} // Ajusta esto según sea necesario
-/>
-{console.log(item," SI")}
-              </div>
-            ))}
-          </div>
+  <div className="library-grid" key={activeTab}>
+    {activeFilter !== 'borradores' ? (
+      displayedItems.map((item, index) => (
+        <div 
+          key={`${activeTab}-${item.postid}-${index}`} 
+          className="library-item" 
+          onClick={() => handleViewDesign(item.postid)}
+        >
+          <Carta 
+            className={`cardGroup${index}`} 
+            post_id={item.postid} 
+            cloth={item.front_image} 
+            profile_photo={item.profile_photo}
+            username={item.username}    
+            user_id={item.creator_id}
+            onClickFunction={() => handleViewDesign(item.postid)}
+            putLike={false} // Ajusta esto según sea necesario
+          />
         </div>
+      ))
+    ) : (
+      
+      displayedItems.map((item, index) => (
+        <div key={`${item.image}-${index}`} className="library-item">
+              <img src={item.image} alt={`Draft ${index}`} />
+            </div>
+      ))
+    )}
+  </div>
+</div>
       </div>
     </div>
   );
