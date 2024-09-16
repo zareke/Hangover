@@ -4,6 +4,7 @@ import './Biblioteca.css';
 import axios from 'axios';
 import config from '../config';
 import Carta from './carta.jsx';
+import { Link } from 'react-router-dom';
 import likedIcon from '../vendor/imgs/heart.svg'
 import savedIcon from '../vendor/imgs/bookmark.svg'
 
@@ -114,6 +115,7 @@ const LibraryPage = () => {
           className="library-item" 
           onClick={() => handleViewDesign(item.postid)}
         >
+          
           <Carta 
             className={`cardGroup${index}`} 
             post_id={item.postid} 
@@ -124,14 +126,16 @@ const LibraryPage = () => {
             onClickFunction={() => handleViewDesign(item.postid)}
             putLike={false} // Ajusta esto según sea necesario
           />
+          
         </div>
       ))
     ) : (
-      
       displayedItems.map((item, index) => (
+        <Link to="/designer" state={{ designId: item.id }}>
         <div key={`${item.image}-${index}`} className="library-item">
               <img src={item.image} alt={`Draft ${index}`} />
             </div>
+          </Link>
       ))
     )}
   </div>

@@ -6,8 +6,11 @@ import html2canvas from 'html2canvas';
 import { AuthContext } from '../AuthContext';
 import axios from 'axios';
 import config from '../config';
+import { useLocation } from 'react-router-dom';
 
-const Designer = ({designId}) => {
+const Designer = () => {
+  const location = useLocation();
+  const { designId } = location.state || {};
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
   const shirtRef = useRef(null);
   const [color, setColor] = useState('rgb(255,255,255)');
@@ -21,24 +24,36 @@ const Designer = ({designId}) => {
   const [drawingColor, setDrawingColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(5);
   const [canDraw, setCanDraw] = useState(false);
-  const inputFile = useRef(null);
-
-  if (designId !== undefined) {
-    shirt = getShirt();
-  }
+  const inputFile = useRef(null);   
 
   const getShirt = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`${config.url}design/get`, {
+
+      const response = await axios.get(`${config.url}design/get/${designId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      return response.data.image;
+      console.log("response",response);
+      const data = JSON.parse(response.data.design_data);
+      setColor(data.color);
+      setPattern(data.pattern);
+      setTexts(data.text);
+      setShapes(data.shapes);
+      setImage(data.image);
+      setDrawingLines(data.drawingLines);
+      
     } catch (error) {
       console.error('Error fetching user:', error);
     }
   };
+
+  useEffect(() => {
+    if (designId) {
+      getShirt();
+    }
+  }, [designId]);
+  
 
   const handleColorChange = (e) => setColor(e.target.value);
   const handlePatternChange = (e) => setPattern(e.target.value);
@@ -105,16 +120,23 @@ const Designer = ({designId}) => {
   };
 
   const handleShapeDragStop = (id, x, y) => {
-    setShapes(shapes.map((shape) => (shape.id === id ? { ...shape, x, y } : shape)));
+    setShapes((prevShapes) =>
+      prevShapes.map((shape) =>
+        shape.id === id ? { ...shape, x, y } : shape
+      )
+    );
   };
 
   const handleShapeResizeStop = (id, width, height) => {
     console.log('Resizing shape:', id, 'New width:', width, 'New height:', height);
   
-    setShapes(prevShapes => {
-      console.log(...height);
-    });
+    setShapes((prevShapes) =>
+      prevShapes.map((shape) =>
+        shape.id === id ? { ...shape, width, height } : shape
+      )
+    );
   };
+
   
     
   
@@ -130,7 +152,6 @@ const Designer = ({designId}) => {
       const rect = event.currentTarget.getBoundingClientRect();
       const newCoords = { x: event.clientX - rect.left, y: event.clientY - rect.top };
       
-      // Interpolation between the previous and the new coordinates
       setDrawingLines((prevLines) => [
         ...prevLines,
         ...interpolateLine(drawingCoords, newCoords, brushSize, drawingColor),
@@ -174,18 +195,28 @@ const Designer = ({designId}) => {
   }
   
   const saveShirt = async (dataUrl) => {
-    console.log("Guardando camiseta con URL:", dataUrl);
+
+    const designData = {
+      color,        // Color de fondo
+      pattern,      // Patrón seleccionado
+      texts,        // Textos con posición, tamaño, color, fuente, etc.
+      shapes,       // Formas con posición, tamaño, tipo, etc.
+      images,       // Imágenes subidas
+      drawingLines, // Líneas dibujadas con pincel
+    };
+    const designJSON = JSON.stringify(designData);
+    console.log(designJSON);
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.post(`${config.url}design/save`, { designId: designId, image: dataUrl }, {
+      const response = await axios.post(`${config.url}design/save`, { designId: designId, image: dataUrl, designData: designJSON }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('Camiseta guardada:', response.data);
     } catch (error) {
       console.error('Error al guardar la camiseta:', error);
     }
+
   };
-  
 
   const interpolateLine = (start, end, size, color) => {
     const points = [];

@@ -94,7 +94,7 @@ const Navbar = () => {
             </button></li> 
             <li><Link className='navbarBurgerElement' to="/"><img className='iconNavImage' src={home} alt="" /><span className='nombrelink'>Explorar </span> <span class="flecha">&#128898;</span></Link></li>
             <li><Link className='navbarBurgerElement' to="/informacion/legal"><img className='iconNavImage' src={info} alt="" /><span className='nombrelink'>Información</span> <span class="flecha">&#128898;</span></Link></li>
-            <li><a className='navbarBurgerElement' href="#NewDesign"><img className='iconNavImage' src={newdesign} alt="" /><span className='nombrelink'>Nuevo diseño</span> <span class="flecha">&#128898;</span></a></li>
+            
  {/**check if logged in */} <li><Link className='navbarBurgerElement' to={"/user/"+user.id}><img className='iconNavImage' src={profile} alt="" /><span className='nombrelink'>Perfil</span> <span class="flecha">&#128898;</span></Link></li>
             <li><Link className='navbarBurgerElement' to="/bolsa"><img className='iconNavImage' src={bag} alt="" /> <span className='nombrelink'>Bolsa</span> <span class="flecha">&#128898;</span></Link></li>
             <li> 
@@ -145,7 +145,6 @@ const Navbar = () => {
            </div>)
            } <a>Información</a></div>
             </li>
-            <li><a href="#NewDesign">Nuevo diseño</a></li>
             <li><a href="#Bolsa">Bolsa</a></li>
             <li><Link className='navbarBurgerElement' to="/designer"><span className='nombrelink'>Designer</span> <span class="flecha">&#128898;</span></Link></li>
             <li> 
