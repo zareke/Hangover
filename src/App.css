@@ -22,6 +22,9 @@
 .wrapbusqueda {
   columns: 5;
 }
+body{
+  margin-top: 11vh;
+}
 
 .wrapbusqueda-impar {
   display: block;
@@ -35,7 +38,6 @@
   grid-auto-rows: 5;
   grid-gap: 1px;
   justify-content: center;
-  margin-top: 14rem;
 }
 
 @media (max-width: 600px) {
@@ -96,9 +98,6 @@ ul {
   display: flex;
   list-style-type: none;
   padding: 0;
-}
-body{
-  margin-top:11vh;
 }
 li {
   margin-right: 20px;

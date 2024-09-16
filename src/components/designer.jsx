@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
 import './designer.css';
 import shirt from '../vendor/imgs/shirtpng.png';
@@ -6,7 +6,6 @@ import html2canvas from 'html2canvas';
 import { AuthContext } from '../AuthContext';
 import axios from 'axios';
 import config from '../config';
-import LZString from 'lz-string';
 
 const Designer = ({designId}) => {
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
@@ -21,6 +20,7 @@ const Designer = ({designId}) => {
   const [drawingLines, setDrawingLines] = useState([]);
   const [drawingColor, setDrawingColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(5);
+  const [canDraw, setCanDraw] = useState(false);
   const inputFile = useRef(null);
 
   if (designId !== undefined) {
@@ -30,9 +30,10 @@ const Designer = ({designId}) => {
   const getShirt = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`${config.url}design/get/${designId}`, {
+      const response = await axios.get(`${config.url}design/get`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       return response.data.image;
     } catch (error) {
       console.error('Error fetching user:', error);
@@ -107,11 +108,16 @@ const Designer = ({designId}) => {
     setShapes(shapes.map((shape) => (shape.id === id ? { ...shape, x, y } : shape)));
   };
 
-  const handleShapeResizeStop = (id, width1, height1) => {
-    setShapes((prevShapes) =>
-      prevShapes.map((shape) => (shape.id === id ? { ...shape, width: width1, height: height1 } : shape))
-    );
+  const handleShapeResizeStop = (id, width, height) => {
+    console.log('Resizing shape:', id, 'New width:', width, 'New height:', height);
+  
+    setShapes(prevShapes => {
+      console.log(...height);
+    });
   };
+  
+    
+  
 
   const handleDrawStart = (event) => {
     setIsDrawing(true);
@@ -120,7 +126,7 @@ const Designer = ({designId}) => {
   };
 
   const handleDrawMove = (event) => {
-    if (isDrawing) {
+    if (isDrawing && canDraw) {
       const rect = event.currentTarget.getBoundingClientRect();
       const newCoords = { x: event.clientX - rect.left, y: event.clientY - rect.top };
       
@@ -143,55 +149,42 @@ const Designer = ({designId}) => {
   };
 
   const handleCapture = async () => {
+    console.log("holaaaa");
     if (shirtRef.current) {
       const canvas = await html2canvas(shirtRef.current);
-      canvas.toBlob(async (blob) => {
-        try {
-          const formData = new FormData();
-          formData.append('image', blob, 'shirt-design.jpg');
-  
-          // Envia el Blob al servidor
-          const response = await axios.post(`${config.url}image/upload`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-  
-          // Obtén la URL corta del servidor
-          const shortUrl = response.data.shortUrl;
-          saveImage(shortUrl);  // Llama a saveImage con la URL corta
-        } catch (error) {
-          console.error('Error al subir la imagen:', error);
-        }
-      }, 'image/jpeg', 0.7);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8); // El segundo parámetro es la calidad (0.0 a 1.0)
+      
+      // Luego, podrías subir esta URL o hacer lo que necesites con ella.
+      saveImage(dataUrl);
     }
   };
-  
-  
-  
-  const saveImage = (shortUrl) => {
-    // Aquí no es necesario crear un enlace ni hacer clic, simplemente llama a saveShirt
-    saveShirt(shortUrl);
-  };
-  
-  
-  
 
-  const saveShirt = async (shortUrl) => {
-    console.log(shortUrl);
+  const saveImage = (dataUrl) => {
+    const link = document.createElement('a');
+    link.href = dataUrl;
+  
+    link.addEventListener('click', (e) => {
+      e.preventDefault(); // Evita la descarga
+      console.log('El enlace fue presionado, guardando en la base de datos.');
+      saveShirt(dataUrl); // Llama a la función para guardar en la BD
+    });
+  
+    // Simula el click, pero no descarga el archivo
+    link.click();
+  }
+  
+  const saveShirt = async (dataUrl) => {
+    console.log("Guardando camiseta con URL:", dataUrl);
     const token = localStorage.getItem('token');
     try {
-      await axios.post(`${config.url}design/save`, { designId: designId, image: shortUrl }, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      const response = await axios.post(`${config.url}design/save`, { designId: designId, image: dataUrl }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      console.log('Imagen guardada con URL corta.');
+      console.log('Camiseta guardada:', response.data);
     } catch (error) {
-      console.error('Error al guardar la imagen:', error);
+      console.error('Error al guardar la camiseta:', error);
     }
   };
-  
   
 
   const interpolateLine = (start, end, size, color) => {
@@ -287,9 +280,14 @@ const Designer = ({designId}) => {
             <p>{im.name}</p>
           </div>
         ))}
+
+<button onClick={() => setCanDraw(!canDraw)}>🧹</button>
+
+
         <label>
           Drawing Color:
           <input type="color" value={drawingColor} onChange={(e) => setDrawingColor(e.target.value)} />
+          
         </label>
         <label>
           Brush Size:
@@ -341,6 +339,7 @@ const Designer = ({designId}) => {
               size={{ width: text.width, height: text.height }}
               position={{ x: text.x, y: text.y }}
               bounds=".shirt"
+              onDragStart={() => setCanDraw(false)}
               onDragStop={(e, d) => handleTextDragStop(text.id, d.x, d.y)}
               onResizeStop={(e, direction, ref, delta, position) => {
                 handleTextResizeStop(text.id, parseInt(ref.style.width, 10), parseInt(ref.style.height, 10));
@@ -366,34 +365,37 @@ const Designer = ({designId}) => {
             </Rnd>
           ))}
           {shapes.map((shape) => (
-            <Rnd
-              className="rnd"
-              key={shape.id}
-              size={{ width: shape.width, height: shape.height }}
-              position={{ x: shape.x, y: shape.y }}
-              bounds=".shirt"
-              onDragStop={(e, d) => handleShapeDragStop(shape.id, d.x, d.y)}
-              onResizeStop={(e, direction, ref, delta, position) => {
-                handleShapeResizeStop(shape.id, parseInt(ref.style.width, 10), parseInt(ref.style.height, 10));
-                handleShapeDragStop(shape.id, position.x, position.y);
-              }}
-              enableResizing={{
-                top: true,
-                right: true,
-                bottom: true,
-                left: true,
-                topRight: true,
-                bottomRight: true,
-                bottomLeft: true,
-                topLeft: true,
-              }}
-            >
-              <div
-                className={`shape-overlay ${shape.shape}`}
-                style={{ width: `${shape.width}px`, height: `${shape.height}px` }}
-              ></div>
-            </Rnd>
-          ))}
+          <Rnd
+            className="rnd"
+            key={shape.id}
+            size={{ width: shape.width, height: shape.height }}
+            position={{ x: shape.x, y: shape.y }}
+            bounds=".shirt"
+            onDragStart={() => setCanDraw(false)}
+            onDragStop={(e, d) => handleShapeDragStop(shape.id, d.x, d.y)}
+            onResizeStop={(e, direction, ref, delta, position) => {
+              const newWidth = ref.offsetWidth;
+              const newHeight = ref.offsetHeight;
+              handleShapeResizeStop(shape.id, newWidth, newHeight);
+              handleShapeDragStop(shape.id, position.x, position.y);
+            }}
+            enableResizing={{
+              top: true,
+              right: true,
+              bottom: true,
+              left: true,
+              topRight: true,
+              bottomRight: true,
+              bottomLeft: true,
+              topLeft: true,
+            }}
+          >
+            <div
+              className={`shape-overlay ${shape.shape}`}
+              style={{ width: '100%', height: '100%' }}
+            ></div>
+          </Rnd>
+        ))}
         </div>
       </div>
       <button onClick={handleCapture}>Capturar y Guardar Imagen</button>
