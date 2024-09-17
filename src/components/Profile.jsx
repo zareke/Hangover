@@ -10,6 +10,7 @@ import { guardarHandler, eliminarGuardadoHandler, followHandler, unFollowHandler
 
 const Profile = () => {
   const { userId } = useParams();
+  const [ownUserId, setOwnUserId] = useState(null);
   const [userData, setUserData] = useState(null); // Initialize with null
   const { isLoggedIn, openModalNavBar } = useContext(AuthContext); 
   const [follows, setFollows] = useState(false);
@@ -26,10 +27,20 @@ const Profile = () => {
     const fetchUserData = async () => {
       try {
         const token2 = localStorage.getItem("token");
-        const checkisloggedinuser = await axios.get(`${config.url}user/`, {
-          headers: { Authorization: `Bearer ${token2}` },
-        });
-        setIsOwnProfile(checkisloggedinuser.data[0].id == userId);
+        if(isLoggedIn){
+          const checkisloggedinuser = await axios.get(`${config.url}user/`, {
+            headers: { Authorization: `Bearer ${token2}` },
+          });
+          console.log(checkisloggedinuser.data[0]);
+          
+            setIsOwnProfile(checkisloggedinuser.data[0].id == userId);
+
+            if(checkisloggedinuser.data[0].id !== null){
+              setOwnUserId(checkisloggedinuser.data[0].id);
+            }
+            
+        }
+        
 
         const response = await axios.get(`${config.url}user/profile/${userId}`, {
           headers: { Authorization: `Bearer ${token2}` },
@@ -155,14 +166,14 @@ const Profile = () => {
                   }
                 />
               )}
-              <Link to={`/privateChat/${userData.own_id}/${userData.user_data.id}`} onClick={(e) => {
+              <Link to={`/privateChat/${ownUserId}/${userData.user_data.id}`} onClick={(e) => {
               if (!isLoggedIn) {
                 e.preventDefault();
                 openModalNavBar();
               }
             }}>
             <Button text="Mensaje"/>
-          </Link>
+            </Link>
               <Button text="Dar Insignia" />
             </>
           )}

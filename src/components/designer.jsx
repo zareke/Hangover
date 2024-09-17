@@ -193,9 +193,10 @@ const Designer = () => {
     // Simula el click, pero no descarga el archivo
     link.click();
   }
-  
-  const saveShirt = async (dataUrl) => {
 
+
+  const saveShirt = async (dataUrl) => {
+    
     const designData = {
       color,        // Color de fondo
       pattern,      // Patrón seleccionado
