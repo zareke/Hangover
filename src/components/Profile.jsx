@@ -5,6 +5,7 @@ import Button from "./Button";
 import config from "../config";
 import { AuthContext } from "../AuthContext";
 import "./Profile.css";
+import { Link } from "react-router-dom";
 import { guardarHandler, eliminarGuardadoHandler, followHandler, unFollowHandler } from "../universalhandlers";
 
 const Profile = () => {
@@ -154,7 +155,14 @@ const Profile = () => {
                   }
                 />
               )}
-              <Button text="Mensaje" />
+              <Link to={`/privateChat/${userData.own_id}/${userData.user_data.id}`} onClick={(e) => {
+              if (!isLoggedIn) {
+                e.preventDefault();
+                openModalNavBar();
+              }
+            }}>
+            <Button text="Mensaje"/>
+          </Link>
               <Button text="Dar Insignia" />
             </>
           )}
