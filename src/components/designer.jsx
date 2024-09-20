@@ -34,14 +34,17 @@ const Designer = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("response",response);
-      const data = JSON.parse(response.data.design_data);
-      setColor(data.color);
-      setPattern(data.pattern);
-      setTexts(data.text);
-      setShapes(data.shapes);
-      setImage(data.image);
-      setDrawingLines(data.drawingLines);
+      
+      const data = JSON.parse(response.data);
+
+      console.log("response",data);
+
+      setColor(data.info.design_data.color || 'rgb(255,255,255)');
+      setPattern(data.info.design_data.pattern || 'none');
+      setTexts(Array.isArray(data.info.design_data.texts) ? data.info.design_data.texts : []);
+      setShapes(Array.isArray(data.info.design_data.shapes) ? data.info.design_data.shapes : []);
+      setImage(Array.isArray(data.info.design_data.image) ? data.info.design_data.image : []);
+      setDrawingLines(Array.isArray(data.info.design_data.drawingLines) ? data.info.design_data.drawingLines : []);
       
     } catch (error) {
       console.error('Error fetching user:', error);
@@ -60,7 +63,7 @@ const Designer = () => {
   const handlePatternColorChange = (e) => document.documentElement.style.setProperty('--pattern-color', e.target.value);
 
   const addTextInput = () => {
-    setTexts([...texts, { id: Date.now(), text: '', x: 50, y: 50, width: 100, height: 50, fontSize: '16px', fontFamily: 'Arial' }]);
+      setTexts([...texts, { id: Date.now(), text: '', x: 50, y: 50, width: 100, height: 50, fontSize: '16px', fontFamily: 'Arial' }]);
   };
 
   const removeTextInput = (id) => {
@@ -234,7 +237,7 @@ const Designer = () => {
     <div className="designer">
       <h2>Create a Design</h2>
       <div className="controls">
-        <label>
+      <label>
           Color:
           <input type="color" value={color} onChange={handleColorChange} />
         </label>
@@ -253,11 +256,11 @@ const Designer = () => {
           Pattern Color:
           <input type="color" onChange={handlePatternColorChange} />
         </label>
-        <button onClick={addTextInput}>+ Text</button>
-        {texts.map((text) => (
+        <button class="designer-button" onClick={addTextInput}>+ Text</button>
+        {texts && texts.map((text) => (
           <div key={text.id}>
             <input type="text" value={text.text} onChange={(e) => handleTextChange(text.id, e.target.value)} />
-            <button onClick={() => removeTextInput(text.id)}>-</button>
+            <button class="designer-button" onClick={() => removeTextInput(text.id)}>-</button>
             <label>
               Font Color:
               <input
@@ -289,8 +292,8 @@ const Designer = () => {
             </label>
           </div>
         ))}
-        <button onClick={addShape}>+ Shape</button>
-        {shapes.map((shape) => (
+        <button class="designer-button" onClick={addShape}>+ Shape</button>
+        {shapes && shapes.map((shape) => (
           <div key={shape.id}>
             <select
               value={shape.shape}
@@ -302,18 +305,18 @@ const Designer = () => {
               <option value="triangle">Triangle</option>
               <option value="diamond">Diamond</option>
             </select>
-            <button onClick={() => removeShape(shape.id)}>-</button>
+            <button class="designer-button" onClick={() => removeShape(shape.id)}>-</button>
           </div>
         ))}
         <input type="file" onChange={addImage} accept="image/*" id="file" ref={inputFile} />
-        {images.map((im, index) => (
+        {images && images.map((im, index) => (
           <div key={index} className="uploaded-image-container">
             <img src={im.src} alt={`Uploaded ${index}`} className="uploaded-image" />
             <p>{im.name}</p>
           </div>
         ))}
 
-<button onClick={() => setCanDraw(!canDraw)}>🧹</button>
+<button class="designer-button" onClick={() => setCanDraw(!canDraw)}>🧹</button>
 
 
         <label>
@@ -341,7 +344,7 @@ const Designer = () => {
         onMouseLeave={handleDrawEnd}
       >
         <div className="shirt" ref={shirtRef}>
-          {drawingLines.map((line, index) => (
+          {drawingLines && drawingLines.map((line, index) => (
             <div
               key={index}
               className="drawing-line"
@@ -357,7 +360,7 @@ const Designer = () => {
             />
           ))}
           <img src={shirt} alt="Shirt" className="shirt-image" />
-          {images.map((image, index) => (
+          {images && images.map((image, index) => (
             <div key={index} className="uploaded-image-container">
               <img src={image.src} alt={`Uploaded ${index}`} className="uploaded-image" />
               <p>{image.name}</p>
@@ -365,7 +368,7 @@ const Designer = () => {
           ))}
           <div className="color-overlay" style={{ backgroundColor: color }}></div>
           <div className={`pattern-overlay ${pattern}`}></div>
-          {texts.map((text) => (
+          {texts && texts.map((text) => (
             <Rnd
               key={text.id} 
               size={{ width: text.width, height: text.height }}
@@ -396,7 +399,7 @@ const Designer = () => {
               </div>
             </Rnd>
           ))}
-          {shapes.map((shape) => (
+          {shapes && shapes.map((shape) => (
           <Rnd
             className="rnd"
             key={shape.id}
@@ -430,7 +433,7 @@ const Designer = () => {
         ))}
         </div>
       </div>
-      <button onClick={handleCapture}>Capturar y Guardar Imagen</button>
+      <button class="designer-button" onClick={handleCapture}>Capturar y Guardar Imagen</button>
     </div>
   );
 };

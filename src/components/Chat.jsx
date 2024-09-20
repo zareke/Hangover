@@ -19,6 +19,7 @@ const Container = styled.div`
 
 const Messages = styled.div`
   max-height: 60vh;
+  min-height: 60vh;
   overflow-y: auto;
   padding-right: 20px;
   padding-bottom: 20px;
@@ -133,7 +134,8 @@ const Chat = () => {
     if (isLoading) return;
     setIsLoading(true);
     socket.current.emit('load messages', { users, page: pageNumber, limit: 20 });
-  }, [users, isLoading]);
+    console.log("hola");
+  }, []);
 
   useEffect(() => {
     socket.current = io(config.url, {
@@ -248,8 +250,12 @@ const Chat = () => {
     const now = new Date();
     const messageDate = new Date(date);
     const diffDays = Math.floor((now - messageDate) / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 7) {
+  
+    if (diffDays === 0) {
+      return 'Hoy';
+    } else if (diffDays === 1) {
+      return 'Ayer';
+    } else if (diffDays < 7) {
       return messageDate.toLocaleDateString('es-ES', { weekday: 'long' });
     } else {
       return messageDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });

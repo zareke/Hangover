@@ -1,87 +1,118 @@
-/* Existing CSS */
-
-
-
-
-:root{
-  --pattern-color: #000000;
+:root {
+  --primary-color: #4CAF50; /* Primary color for inputs, buttons */
+  --secondary-color: #f9f9f9; /* Background color for inputs */
+  --text-color: #333333; /* Text color for labels and inputs */
+  --button-bg: #4CAF50; /* Button background color */
+  --button-hover-bg: #45a049; /* Button hover color */
+  --button-text-color: white; /* Button text color */
+  --border-color: #dddddd; /* Border color for inputs */
+  --pattern-color: #000000; /* Default pattern color */
 }
+
 .designer {
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-family: 'Arial', sans-serif;
 }
 
-.controls {
+h2 {
+  color: var(--primary-color);
   margin-bottom: 20px;
 }
 
-.preview {
-  position: relative;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  pointer-events: none;
-}
-.uploaded-image-container{
-z-index: 63;
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 15px;
+  background-color: var(--secondary-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
-.uploaded-image{
+label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+input[type="color"],
+input[type="number"],
+select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  margin-top: 5px;
+}
+
+input[type="text"] {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  width: 100px;
+}
+
+/* Estilos generales del botón en el Designer */
+.designer-button {
+  background-color: #4CAF50; /* Cambia el color según tu preferencia */
+  border: none;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.designer-button:hover {
+  background-color: #45a049; /* Cambia el color en hover según tu preferencia */
+}
+
+
+input[type="range"] {
+  width: 100px;
+  margin: 10px 0;
+}
+
+.uploaded-image-container {
+  position: relative;
+  margin-top: 10px;
+}
+
+.uploaded-image {
   max-width: 300px;
   max-height: 333px;
   z-index: 15;
 }
+
 .shirt {
   position: relative;
   width: 300px;
   height: 333px;
-  pointer-events: all;
-
 }
 
-
-.designer{
-  
-}
 .shirt-image {
   width: 300px;
   height: auto;
   position: absolute;
   z-index: 14000;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    pointer-events: none;
-  }
-
-  .drawing-line {
-    position: absolute;
-    background-color: var(--drawing-color);
-    transform-origin: left center;
-    z-index: 2000;
-  }
-.color-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 1;
-  width: 300px;
-  height: 333px;
-  z-index: 0;
+  user-select: none;
+  pointer-events: none;
 }
 
+.color-overlay,
 .pattern-overlay {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 1;
   width: 300px;
   height: 333px;
   z-index: 0;
@@ -128,9 +159,16 @@ z-index: 63;
   background-size: 20px 20px;
 }
 
+.text-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+}
 
-
-/* New CSS for Shapes */
 .shape-overlay {
   position: absolute;
   z-index: 11;
@@ -148,48 +186,37 @@ z-index: 63;
 
 .shape-overlay.rectangle {
   background-color: green;
-  
 }
 
 .shape-overlay.triangle {
-  
   border-left: 25px solid transparent;
   border-right: 25px solid transparent;
   border-bottom: 50px solid yellow;
 }
 
 .shape-overlay.diamond {
-  
+  width: 0;
+  height: 0;
   border: 25px solid transparent;
-  border-bottom: 50px solid purple;
+  border-bottom-color: purple;
   position: relative;
-}
-
-.shape-overlay.diamond:after {
-  content: '';
-  position: absolute;
-  left: -25px;
-  top: 50px;
-  
-  border: 25px solid transparent;
-  border-top: 50px solid purple;
+  top: -25px;
 }
 
 .rnd {
-  display: inline-block;
-  position: absolute;
-  z-index: 11;
-  pointer-events: all;
+  border: 1px dashed var(--border-color);
 }
 
-.text-overlay {
-  font-size: larger;
-  cursor: move;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  z-index: 4;
+.drawing-line {
+  background-color: var(--drawing-color);
+  z-index: 2000;
+  position: absolute;
+  border-radius: 50%;
+}
+
+.preview {
+  position: relative;
+  user-select: none;
+  width: 300px;
+  height: 333px;
 }
