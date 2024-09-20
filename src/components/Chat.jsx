@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import io from 'socket.io-client';
 import { useParams } from 'react-router-dom';
 import data from '@emoji-mart/data'
@@ -8,7 +8,8 @@ import config from '../config';
 import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
-  max-width: 800px;
+  width: 40vw;
+  max-width: 1600px;
   margin: 0 auto;
   background-color: #fff;
   border-radius: 8px;
@@ -17,13 +18,14 @@ const Container = styled.div`
 `;
 
 const Messages = styled.div`
-  max-height: 600px;
+  max-height: 60vh;
   overflow-y: auto;
   padding-right: 20px;
+  padding-bottom: 20px;
 `;
 
-const Message = styled.div`
-  background-color: ${(props) => (props.isOwnMessage ? '#ccffcc' : 'grey')};
+const StyledMessage = styled.div`
+  background-color: ${(props) => (props.$isOwnMessage ? '#ccffcc' : 'grey')};
   padding: 8px;
   margin-bottom: 10px;
   border-radius: 5px;
@@ -35,7 +37,7 @@ const Message = styled.div`
   word-break: break-word;
   overflow: hidden;
   padding-right: 40px;
-  float: ${(props) => (props.isOwnMessage ? 'right' : 'left')};
+  float: ${(props) => (props.$isOwnMessage ? 'right' : 'left')};
 `;
 
 const MessageContent = styled.span`
@@ -103,55 +105,126 @@ const EmojiPickerContainer = styled.div`
   right: 20px;
 `;
 
+const DateDivider = styled.div`
+  text-align: center;
+  margin: 10px 0;
+  font-size: 14px;
+  color: #666;
+`;
+
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const socket = useRef(null);
   const messageInputRef = useRef(null);
-  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const { ownId, userId } = useParams();
   const realOwnToken = localStorage.getItem("token");
-  console.log(realOwnToken)
   const users = [+ownId, +userId];
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const lastMessageRef = useRef(null);
+
+  const loadMessages = useCallback((pageNumber) => {
+    if (isLoading) return;
+    setIsLoading(true);
+    socket.current.emit('load messages', { users, page: pageNumber, limit: 20 });
+  }, [users, isLoading]);
 
   useEffect(() => {
     socket.current = io(config.url, {
       query: { token: realOwnToken }
     });
-    socket.current.emit('set users', { users: users });
+    socket.current.emit('set users', { users });
 
     socket.current.on('error', (error) => {
       console.error('Error del servidor:', error.message);
-      setError(error.message); // Maneja el error en el cliente
-      socket.current.disconnect(); // Opcional: desconecta el socket si es necesario
-        // Redirigir a la página de inicio
-        navigate('/'); // Ajusta la ruta según tu configuración
+      setError(error.message);
+      socket.current.disconnect();
+      navigate('/');
     });
 
-    socket.current.on('chat message', (content, id, sender_user, date_sent, userConnected) => {
+    socket.current.on('chat message', (content, id, sender_user, date_sent) => {
       const message = {
         content,
         id,
         sender_user,
         date_sent,
-        userConnected,
       };
       setMessages((prevMessages) => [...prevMessages, message]);
-      scrollMessagesToBottom();
     });
 
-    socket.current.on('user connected', (data) => {
-      console.log('User connected:', data.userID);
+    socket.current.on('load messages', (loadedMessages, hasMoreMessages) => {
+      setMessages((prevMessages) => {
+        const newMessages = [...loadedMessages, ...prevMessages];
+        return newMessages.filter((message, index, self) =>
+          index === self.findIndex((t) => t.id === message.id)
+        );
+      });
+      setHasMore(hasMoreMessages);
+      setIsLoading(false);
     });
+
+    loadMessages(page);
 
     return () => {
       socket.current.disconnect();
     };
-    
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        messagesContainerRef.current &&
+        messagesContainerRef.current.scrollTop === 0 &&
+        hasMore &&
+        !isLoading
+      ) {
+        const currentScrollHeight = messagesContainerRef.current.scrollHeight;
+        setPage((prevPage) => prevPage + 1);
+        setTimeout(() => {
+          if (messagesContainerRef.current) {
+            const newScrollHeight = messagesContainerRef.current.scrollHeight;
+            messagesContainerRef.current.scrollTop = newScrollHeight - currentScrollHeight;
+          }
+        }, 100);
+      }
+    };
+
+    const messagesContainer = messagesContainerRef.current;
+    if (messagesContainer) {
+      messagesContainer.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (messagesContainer) {
+        messagesContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [hasMore, isLoading]);
+
+  useEffect(() => {
+    if (page > 1) {
+      loadMessages(page);
+    }
+  }, [page, loadMessages]);
+
+  const scrollToBottom = () => {
+    messagesContainerRef.current?.scrollTo({
+      top: messagesContainerRef.current.scrollHeight,
+      behavior: 'smooth'
+    });
+  };
+
+  useEffect(() => {
+    if (page === 1) {
+      scrollToBottom();
+    }
+  }, [messages, page]);
 
   const sendMessage = (e) => {
     e.preventDefault();
@@ -159,10 +232,6 @@ const Chat = () => {
       socket.current.emit('chat message', { mensaje: input });
       setInput('');
     }
-  };
-
-  const scrollMessagesToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const toggleEmojiPicker = () => {
@@ -175,21 +244,54 @@ const Chat = () => {
     messageInputRef.current.focus();
   };
 
+  const formatDate = (date) => {
+    const now = new Date();
+    const messageDate = new Date(date);
+    const diffDays = Math.floor((now - messageDate) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 7) {
+      return messageDate.toLocaleDateString('es-ES', { weekday: 'long' });
+    } else {
+      return messageDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+  };
+
+  const formatTime = (date) => {
+    return new Date(date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const groupMessagesByDate = (messages) => {
+    const groups = {};
+    messages.forEach(message => {
+      const date = formatDate(message.date_sent);
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(message);
+    });
+    return groups;
+  };
+
+  const groupedMessages = groupMessagesByDate(messages);
+
   return (
     <Container>
-      <Messages id="messages">
-        {console.log(messages)}
-        {messages.map((msg, index) => (
-          <Message
-            key={index}
-            isOwnMessage={msg.sender_user === msg.userConnected}
-            data-date={msg.date_sent}
-          >
-            <MessageContent>{msg.content}</MessageContent>
-            <MessageTime>{new Date(msg.date_sent).toLocaleTimeString()}</MessageTime>
-          </Message>
+      <Messages id="messages" ref={messagesContainerRef}>
+        {Object.entries(groupedMessages).map(([date, msgs], groupIndex) => (
+          <React.Fragment key={date}>
+            <DateDivider>{date}</DateDivider>
+            {msgs.map((msg, index) => (
+              <StyledMessage
+                key={msg.id}
+                $isOwnMessage={msg.sender_user === +ownId}
+                ref={groupIndex === 0 && index === 0 ? lastMessageRef : null}
+              >
+                <MessageContent>{msg.content}</MessageContent>
+                <MessageTime>{formatTime(msg.date_sent)}</MessageTime>
+              </StyledMessage>
+            ))}
+          </React.Fragment>
         ))}
-        <div ref={messagesEndRef}></div>
       </Messages>
 
       <ChatForm id="chatForm" onSubmit={sendMessage}>
@@ -209,19 +311,18 @@ const Chat = () => {
       </ChatForm>
 
       <EmojiPickerContainer visible={emojiPickerVisible}>
-          <Picker 
-                   data={data}
-                   onEmojiSelect={addEmoji}
-                   style={{
-                    position:"absolute",
-                    marginTop: "465px",
-                    marginLeft: -40,
-                    maxWidth: "320px",
-                    borderRadius: "20px",
-                  }}
-                  theme="dark"
-                  />
-            
+        <Picker 
+          data={data}
+          onEmojiSelect={addEmoji}
+          style={{
+            position:"absolute",
+            marginTop: "465px",
+            marginLeft: -40,
+            maxWidth: "320px",
+            borderRadius: "20px",
+          }}
+          theme="dark"
+        />
       </EmojiPickerContainer>
     </Container>
   );
