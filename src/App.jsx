@@ -13,8 +13,11 @@ import Bolsa from "./components/Bolsa.jsx"
 import Designer from "./components/designer.jsx";
 import Search from "./components/Search.jsx";
 import Chat from "./components/Chat.jsx";
+import Carrito from "./components/Carrito.jsx";
 
 import { AuthProvider } from "./AuthContext";
+
+    
 
 function App() {
 
@@ -39,6 +42,8 @@ function App() {
                      <Route exact path=":search" element={<Search/>}/> 
                 </Route>
                 <Route exact path="privateChat/:ownId/:userId" element={<Chat/>}></Route>
+                <Route exact path="/carrito" element={<Carrito/>}></Route>
+                
             </Routes>   
         </Router>
     </AuthProvider>

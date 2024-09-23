@@ -1,113 +1,114 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo, memo } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
-import config from "../config";
+import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Carta from "./carta";
+import config from "../config";
 
 const Search = () => {
   const [results, setResults] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
-  const [newSearchQuery, setNewSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
   const { search } = useParams();
-  const navigate = useNavigate();
   const observer = useRef();
+  const loadingRef = useRef(null);
 
-  // Función para obtener resultados de búsqueda
-  const fetchResults = useCallback(async (page) => {
-    
-    if(hasMore){ // Evitar llamadas si no hay más resultados
-      
-      try {
-        const response = await axios.get(`${config.url}post/search/${search}`, {
-          params: {
-            limit: 10,
-            page: page,
-          },
-        });
-        
-        console.log("API Response:", response.data);
-      
-        setResults([...results, ...response.data.collection]);
-        setHasMore(response.data.pagination.nextPage !== false);
-        setPage(page + 1);
-      } catch (error) {
-        setError("Error fetching search results");
-        console.error("Error fetching search results:", error);
-      }
+  const fetchResults = useCallback(async (pageNum, reset = false) => {
+    if (!hasMore || loading) return;
+    setLoading(true);
+    try {
+      console.log("fetchResults called", reset, pageNum);
+      const response = await axios.get(`${config.url}post/search/${search}`, {
+        params: { limit: 10, page: pageNum },
+      });
+
+      const newResults = response.data.collection;
+      setResults((prevResults) => (reset ? newResults : [...prevResults, ...newResults]));
+      setHasMore(response.data.pagination.nextPage !== false);
+      setPage((prevPage) => (reset ? 2 : prevPage + 1));
+    } catch (error) {
+      setError("Error fetching search results");
+      console.error("Error fetching search results:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [results]);
+  }, [search, hasMore, loading]);
 
   useEffect(() => {
-    fetchResults(1);
-  }, []);
+    setResults([]);
+    setPage(1);
+    setHasMore(true);
+    setError(null);
+    fetchResults(1, true);
+  }, [search]);
 
-  const lastPostElementRef = useCallback(
-    (node) => {
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
+  useEffect(() => {
+    const currentObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
           fetchResults(page);
         }
-      });
-      
-      if (node) observer.current.observe(node);
-      console.log(hasMore)
-    },
-    [fetchResults, hasMore, page]
-  );
+      },
+      { threshold: 1.0 }
+    );
 
+    if (loadingRef.current) {
+      currentObserver.observe(loadingRef.current);
+    }
 
+    return () => {
+      if (loadingRef.current) {
+        currentObserver.unobserve(loadingRef.current);
+      }
+    };
+  }, [fetchResults, hasMore, loading, page]);
 
-  const dividedPosts = useMemo(() => {
-    return results.reduce((acc, post, index) => {
-      const groupIndex = index % 4;
-      acc[groupIndex].push(post);
-      return acc;
-    }, [[], [], [], []]);
-  }, [results]);
+  const dividedPosts = results.reduce((acc, post, index) => {
+    const groupIndex = index % 4;
+    if (!acc[groupIndex]) acc[groupIndex] = [];
+    acc[groupIndex].push(post);
+    return acc;
+  }, []);
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="error-message">{error}</div>;
   }
+
   return (
-    <>
     <div className="centrador">
       <div className="wrapbusqueda">
-        {results.length > 0 ? ( dividedPosts.map((group, groupIndex) => (
-          <div key={groupIndex} className={`wrapbusqueda-group${groupIndex}`}>
-          {group.map((post, index) => {
-            const isLastPost = index === group.length - 1;
-            return (
-              
-              <Link
-            key={post.post_id || post.id} // Prueba ambas keys
-            to={`/post/${post.post_id || post.id}`}
-            ref={isLastPost ? lastPostElementRef : null}
-          >
-            <Carta 
-              putLike={true}
-              className={`cardGroup${groupIndex}`} 
-              post_id={post.post_id || post.id} 
-              profile_photo={post.post.creator_user.profile_photo} 
-              username={post.post.creator_user.username} 
-              user_id={post.post.creator_user.id} 
-              cloth={post.post.front_image} 
-            />
-          </Link>
-
-            );
-          })}
-        </div>
-        )) ) : (
-          <p>No results found</p>
+        {results.length > 0 ? (
+          dividedPosts.map((group, groupIndex) => (
+            <div key={groupIndex} className={`wrapbusqueda-group${groupIndex}`}>
+              {group.map((post) => (
+                <Link
+                  key={post.post_id || post.id}
+                  to={`/post/${post.post_id || post.id}`}
+                >
+                  <Carta 
+                    putLike={true}
+                    className={`cardGroup${groupIndex}`} 
+                    post_id={post.post_id || post.id} 
+                    profile_photo={post.post.creator_user.profile_photo} 
+                    username={post.post.creator_user.username} 
+                    user_id={post.post.creator_user.id} 
+                    cloth={post.post.front_image} 
+                  />
+                </Link>
+              ))}
+            </div>
+          ))
+        ) : (
+          <p className="no-results">No results found</p>
         )}
+        <div ref={loadingRef} className="loading-trigger">
+          {loading && <div className="loading-indicator">Loading...</div>}
+        </div>
       </div>
     </div>
-    </>
   );
 };
 
-export default memo(Search);
+export default Search;

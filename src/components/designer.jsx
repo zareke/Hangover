@@ -7,6 +7,7 @@ import { AuthContext } from '../AuthContext';
 import axios from 'axios';
 import config from '../config';
 import { useLocation } from 'react-router-dom';
+import DiseñadorCanvas from './DiseñadorCanvas'; //hay un error aca //arreglado
 
 const Designer = () => {
   const location = useLocation();
@@ -21,8 +22,6 @@ const Designer = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawingCoords, setDrawingCoords] = useState({ x: 0, y: 0 });
   const [drawingLines, setDrawingLines] = useState([]);
-  const [drawingColor, setDrawingColor] = useState('#000000');
-  const [brushSize, setBrushSize] = useState(5);
   const [canDraw, setCanDraw] = useState(false);
   const inputFile = useRef(null);   
 
@@ -154,11 +153,11 @@ const Designer = () => {
     if (isDrawing && canDraw) {
       const rect = event.currentTarget.getBoundingClientRect();
       const newCoords = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-      
+      /*
       setDrawingLines((prevLines) => [
         ...prevLines,
         ...interpolateLine(drawingCoords, newCoords, brushSize, drawingColor),
-      ]);
+      ]);*/
       
       setDrawingCoords(newCoords);
     }
@@ -168,9 +167,7 @@ const Designer = () => {
     setIsDrawing(false);
   };
 
-  const handleBrushSizeChange = (e) => {
-    setBrushSize(parseInt(e.target.value));
-  };
+ 
 
   const handleCapture = async () => {
     console.log("holaaaa");
@@ -235,7 +232,9 @@ const Designer = () => {
 
   return (
     <div className="designer">
+      <DiseñadorCanvas></DiseñadorCanvas>
       <h2>Create a Design</h2>
+
       <div className="controls">
       <label>
           Color:
@@ -316,25 +315,10 @@ const Designer = () => {
           </div>
         ))}
 
-<button class="designer-button" onClick={() => setCanDraw(!canDraw)}>🧹</button>
 
 
-        <label>
-          Drawing Color:
-          <input type="color" value={drawingColor} onChange={(e) => setDrawingColor(e.target.value)} />
-          
-        </label>
-        <label>
-          Brush Size:
-          <input
-            type="range"
-            min="1"
-            max="20"
-            value={brushSize}
-            onChange={handleBrushSizeChange}
-          />
-          {brushSize}px
-        </label>
+      
+        
       </div>
       <div
         className="preview"
