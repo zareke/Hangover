@@ -23,7 +23,49 @@ const PostDetail = () => {
   const [saved, setSaved] = useState(false);
   const [commentsAllowed, setCommentsAllowed] = useState(true);
 
+   // Nuevos estados para talle y cantidad
+   const [size, setSize] = useState(""); // Sin talle por defecto
+   const [quantity, setQuantity] = useState(1); // Cantidad por defecto en 1
+   const [errorMessage, setErrorMessage] = useState(""); // Para mensajes de error
+
   const { isLoggedIn, openModalNavBar } = useContext(AuthContext);
+
+  // Función para agregar al carrito
+    const agregarCarritoHandler = async () => {
+    if (!size) {
+      setErrorMessage("Debes seleccionar un talle antes de añadir al carrito.");
+      return; // Detener la ejecución si no hay talle seleccionado
+    }
+
+    setErrorMessage(""); // Limpiar mensaje de error si todo está bien
+
+    if (isLoggedIn) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.post(
+          `${config.url}purchase/save`,
+          {
+            idPost: postId,
+            total_price: post.price,
+            quantity: post.quantity,
+            size: post.size
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (response.status === 201) {
+          console.log("Add to shopping_cart successfully!");
+        } else {
+          console.error("Failed to add to shopping cart");
+        }
+      } catch (e) {
+        console.error("Error adding to shopping_cart", e);
+      }
+    } else {
+      openModalNavBar();
+    }
+  };
 
   const scrollToBottom = () => {
     commentsEndRef.current?.scrollIntoView();
@@ -268,7 +310,39 @@ const PostDetail = () => {
                   Guardar
                 </Button>
               )}
-              <Button>Añadir a la Bolsa</Button>
+
+              {/* Sección de talles y cantidad */}
+              <div className={styles.sizeAndQuantity}>
+                <label htmlFor="size">Talle:</label>
+                <select
+                  id="size"
+                  value={size}
+                  onChange={(e) => setSize(e.target.value)}
+                  className={styles.talleSelect}
+                >
+                  <option value="" disabled>Selecciona un talle</option>
+                  <option value="XS">XS</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                </select>
+
+                <label htmlFor="quantity">Cantidad:</label>
+                <input
+                  type="number"
+                  id="quantity"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  min="1"
+                  className={styles.quantityInput}
+                />
+              </div>
+
+              <Button onClick={agregarCarritoHandler}>
+                Añadir a la Bolsa
+              </Button>
+              {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>} {/* Mostrar mensaje de error */}
             </div>
           </div>
           <p className={styles.description}>{post.description}</p>

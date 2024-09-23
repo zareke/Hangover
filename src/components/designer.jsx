@@ -8,11 +8,12 @@ import axios from 'axios';
 import config from '../config';
 import { useLocation } from 'react-router-dom';
 import DiseñadorCanvas from './DiseñadorCanvas'; //hay un error aca //arreglado
+import { useNavigate } from 'react-router-dom';
 
 const Designer = () => {
   const location = useLocation();
   const { designId } = location.state || {};
-  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, setIsLoggedIn,strictCheckAuth } = useContext(AuthContext);
   const shirtRef = useRef(null);
   const [color, setColor] = useState('rgb(255,255,255)');
   const [pattern, setPattern] = useState('none');
@@ -24,6 +25,10 @@ const Designer = () => {
   const [drawingLines, setDrawingLines] = useState([]);
   const [canDraw, setCanDraw] = useState(false);
   const inputFile = useRef(null);   
+
+  const navigate = useNavigate();
+
+ 
 
   const getShirt = async () => {
     const token = localStorage.getItem('token');

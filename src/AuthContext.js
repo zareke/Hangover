@@ -1,10 +1,14 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { openModal } from './components/navbar';
+import axios from 'axios';
+import config from './config';
+
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -22,8 +26,27 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const strictCheckAuth = async (navigate) => {
+        const token = localStorage.getItem('token');
+        try{
+            const trueLoggedIn = await axios.get(config.url+"/user/checkToken",{
+            headers:{Authorization:`bearer ${token}`}
+            })
+            console.log("truelogin",trueLoggedIn)
+        
+
+            return true
+            
+        }
+        catch{
+            navigate("/")
+            return false
+        }
+
+    }
+
     return (
-        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, openModalNavBar }}>
+        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, openModalNavBar,strictCheckAuth }}>
             {children}
         </AuthContext.Provider>
     );

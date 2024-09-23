@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const BrushTool = ({ canvasRef, backgroundImage, drawImageOnTop, brushColor, brushSize }) => {
+const BrushTool = ({ canvasRef, backgroundImage, drawImageOnTop, brushColor, brushSize, setDrawings, getMousePos }) => {
   const [isDrawing, setIsDrawing] = useState(false);
-  const [drawings, setDrawings] = useState([]); // Para almacenar los trazos
+  const lastPoint = useRef(null);
+  const currentStroke = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -11,77 +12,71 @@ const BrushTool = ({ canvasRef, backgroundImage, drawImageOnTop, brushColor, bru
     if (!canvas || !context) return;
 
     context.lineCap = 'round';
+    context.lineJoin = 'round';
 
-    // Función para empezar a dibujar
     const startDrawing = (e) => {
+      const { x, y } = getMousePos(canvas, e);
       context.strokeStyle = brushColor;
       context.lineWidth = brushSize;
       context.beginPath();
-      context.moveTo(e.offsetX, e.offsetY);
+      context.moveTo(x, y);
       setIsDrawing(true);
+
+      currentStroke.current = {
+        color: brushColor,
+        size: brushSize,
+        points: [{x, y}]
+      };
+      lastPoint.current = { x, y };
     };
-    const redrawDrawings = (context) => {
-      drawings.forEach(({ x, y, color, size }, index) => {
-        context.strokeStyle = color;
-        context.lineWidth = size;
-    
-        if (index === 0) {
-          context.beginPath();
-          context.moveTo(x, y);
-        } else {
-          context.lineTo(x, y);
-          context.stroke();
-        }
-      });
-    };
-    
-    // Función para dibujar
+
     const draw = (e) => {
       if (!isDrawing) return;
-      
-      // Guardar la posición actual
-      const newX = e.offsetX;
-      const newY = e.offsetY;
-    
+
+      const { x: newX, y: newY } = getMousePos(canvas, e);
+      const { x: lastX, y: lastY } = lastPoint.current;
+
+      context.beginPath();
+      context.moveTo(lastX, lastY);
       context.lineTo(newX, newY);
       context.stroke();
-    
-      // Guardar el trazo en el array
-      setDrawings((prevDrawings) => [
-        ...prevDrawings,
-        { x: newX, y: newY, color: brushColor, size: brushSize }
-      ]);
-    
-      // Redibujar la imagen de fondo
+
+      currentStroke.current.points.push({x: newX, y: newY});
+      lastPoint.current = { x: newX, y: newY };
+
       if (backgroundImage) {
         drawImageOnTop(backgroundImage);
       }
     };
-    
 
-    // Función para dejar de dibujar
     const stopDrawing = () => {
       setIsDrawing(false);
+
+      if (currentStroke.current) {
+        setDrawings((prevDrawings) => [
+          ...prevDrawings,
+          currentStroke.current
+        ]);
+
+        currentStroke.current = null;
+        lastPoint.current = null;
+      }
     };
 
-    // Agregar listeners de eventos de mouse
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mousemove', draw);
     canvas.addEventListener('mouseup', stopDrawing);
     canvas.addEventListener('mouseleave', stopDrawing);
 
-    // Cleanup: remover listeners cuando se desmonte el componente
     return () => {
       canvas.removeEventListener('mousedown', startDrawing);
       canvas.removeEventListener('mousemove', draw);
       canvas.removeEventListener('mouseup', stopDrawing);
       canvas.removeEventListener('mouseleave', stopDrawing);
     };
-  }, [brushColor, brushSize, isDrawing, canvasRef, backgroundImage, drawImageOnTop]);
+  }, [brushColor, brushSize, isDrawing, canvasRef, backgroundImage, drawImageOnTop, setDrawings, getMousePos]);
 
-  return (
-   <></>
-  );
+  return <></>;
 };
 
 export default BrushTool;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Biblioteca.css'; 
 import axios from 'axios';
@@ -7,6 +7,7 @@ import Carta from './carta.jsx';
 import { Link } from 'react-router-dom';
 import likedIcon from '../vendor/imgs/heart.svg'
 import savedIcon from '../vendor/imgs/bookmark.svg'
+import { AuthContext } from '../AuthContext.js';
 
 const LibraryPage = () => {
   const [items, setItems] = useState({ saved: [], liked: [] });
@@ -14,8 +15,15 @@ const LibraryPage = () => {
   const [activeFilter, setActiveFilter] = useState('liked'); 
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const {strictCheckAuth} = useContext(AuthContext)
+  
 
   useEffect(() => {
+
+    if (strictCheckAuth(navigate)) {
+      
+    
+    
     const fetchItems = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -44,6 +52,7 @@ const LibraryPage = () => {
       }
     };
     fetchItems();
+    }
   }, []);
 
   const processBlobs = async (items) => {
