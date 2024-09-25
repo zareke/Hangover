@@ -47,8 +47,8 @@ const PostDetail = () => {
           {
             idPost: postId,
             total_price: post.price,
-            quantity: post.quantity,
-            size: post.size
+            quantity: quantity,
+            size: size
           },
           {
             headers: { Authorization: `Bearer ${token}` },

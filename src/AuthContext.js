@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
             
         }
         catch{
-            navigate("/")
+            //navigate("/")
             return false
         }
 

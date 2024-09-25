@@ -145,7 +145,7 @@ const Navbar = () => {
            </div>)
            } <a>Información</a></div>
             </li>
-            <li><a href="#Bolsa">Bolsa</a></li>
+            <li><Link to="/carrito">Carrito</Link></li>
             <li><Link className='navbarBurgerElement' to="/designer"><span className='nombrelink'>Designer</span> <span class="flecha">&#128898;</span></Link></li>
             <li> 
               {isLoggedIn ? (
