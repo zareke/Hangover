@@ -135,6 +135,7 @@ const Navbar = () => {
                 </form> 
               </div>
             </li>
+            <li><Link to="/chatsview">chats</Link></li>
             <li><div onMouseEnter={openInfoThingy} onMouseLeave={closeInfo}> {
              infoPopupVisible  && (<div className='infoPopup'>
               <div className="compactedInfo">

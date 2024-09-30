@@ -123,9 +123,9 @@ const Chat = () => {
   const socket = useRef(null);
   const messageInputRef = useRef(null);
   const messagesContainerRef = useRef(null);
-  const { ownId, userId } = useParams();
+  const { ownId, chatId } = useParams();
   const realOwnToken = localStorage.getItem("token");
-  const users = [+ownId, +userId];
+  const users = [+ownId, +chatId];
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const lastMessageRef = useRef(null);
@@ -133,7 +133,7 @@ const Chat = () => {
   const loadMessages = useCallback((pageNumber) => {
     if (isLoading) return;
     setIsLoading(true);
-    socket.current.emit('load messages', { users, page: pageNumber, limit: 20 });
+    socket.current.emit('load messages', { users: users[0], page: pageNumber, limit: 20 });
     console.log("hola");
   }, []);
 

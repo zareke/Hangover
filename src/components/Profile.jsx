@@ -6,16 +6,19 @@ import config from "../config";
 import { AuthContext } from "../AuthContext";
 import "./Profile.css";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { guardarHandler, eliminarGuardadoHandler, followHandler, unFollowHandler } from "../universalhandlers";
+
 
 const Profile = () => {
   const { userId } = useParams();
   const [ownUserId, setOwnUserId] = useState(null);
   const [userData, setUserData] = useState(null); // Initialize with null
-  const { isLoggedIn, openModalNavBar } = useContext(AuthContext); 
+  const { isLoggedIn, openModalNavBar,strictCheckAuth } = useContext(AuthContext); 
   const [follows, setFollows] = useState(false);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [editing, setEditing] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     first_name: "",
     last_name:"",
@@ -24,6 +27,12 @@ const Profile = () => {
   });
 
   useEffect(() => {
+    let authcheck;const checkauth = async () => {return strictCheckAuth(navigate)};checkauth()
+    
+  },[])
+  useEffect(() => {
+    
+
     const fetchUserData = async () => {
       try {
         const token2 = localStorage.getItem("token");
@@ -61,6 +70,7 @@ const Profile = () => {
     };
 
     fetchUserData();
+  
   }, [userId]);
 
   const handleInputChange = (e) => {
@@ -87,6 +97,23 @@ const Profile = () => {
     } catch (error) {
       console.error("Error saving user data", error);
     }
+  };
+
+  const loadChat = async () => {
+    try{
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${config.url}chat/get/${userId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      navigate(`/privateChat/${ownUserId}/${response.data}`);
+    }
+    catch(error){
+      console.error(error);
+    }
+    
   };
 
   if (!userData) return <div>Loading...</div>;
@@ -166,14 +193,15 @@ const Profile = () => {
                   }
                 />
               )}
-              <Link to={`/privateChat/${ownUserId}/${userData.user_data.id}`} onClick={(e) => {
+              <Button onClick={async (e) => {
               if (!isLoggedIn) {
                 e.preventDefault();
                 openModalNavBar();
               }
-            }}>
-            <Button text="Mensaje"/>
-            </Link>
+              else{
+                await loadChat();
+              }
+                }} text="Mensaje"/>
               <Button text="Dar Insignia" />
             </>
           )}

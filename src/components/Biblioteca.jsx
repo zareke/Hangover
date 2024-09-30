@@ -19,10 +19,8 @@ const LibraryPage = () => {
   
 
   useEffect(() => {
-
-    if (strictCheckAuth(navigate)) {
-      
-    
+    let authcheck;const checkauth = async () => {return strictCheckAuth(navigate)};checkauth()
+    if (authcheck) { //do everything else
     
     const fetchItems = async () => {
       try {

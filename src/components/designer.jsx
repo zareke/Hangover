@@ -61,6 +61,9 @@ const Designer = () => {
     }
   }, [designId]);
   
+  useEffect(() => {
+    let authcheck;const checkauth = async () => {return strictCheckAuth(navigate)};checkauth()
+  },[])
 
   const handleColorChange = (e) => setColor(e.target.value);
   const handlePatternChange = (e) => setPattern(e.target.value);

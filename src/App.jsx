@@ -14,6 +14,7 @@ import Designer from "./components/designer.jsx";
 import Search from "./components/Search.jsx";
 import Chat from "./components/Chat.jsx";
 import Carrito from "./components/Carrito.jsx";
+import ChatsView from "./components/ChatsView.jsx"
 
 import { AuthProvider } from "./AuthContext";
 
@@ -41,8 +42,9 @@ function App() {
                 <Route exact path="/search">
                      <Route exact path=":search" element={<Search/>}/> 
                 </Route>
-                <Route exact path="privateChat/:ownId/:userId" element={<Chat/>}></Route>
+                <Route exact path="privateChat/:ownId/:chatId" element={<Chat/>}></Route>
                 <Route exact path="/carrito" element={<Carrito/>}></Route>
+                <Route exact path="/chatsview" element={<ChatsView/>}></Route>
                 
             </Routes>   
         </Router>

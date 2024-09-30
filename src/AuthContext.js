@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     const strictCheckAuth = async (navigate) => {
         const token = localStorage.getItem('token');
         try{
-            const trueLoggedIn = await axios.get(config.url+"/user/checkToken",{
+            const trueLoggedIn = await axios.get(config.url+"user/checkToken",{
             headers:{Authorization:`bearer ${token}`}
             })
             console.log("truelogin",trueLoggedIn)
@@ -39,7 +39,8 @@ export const AuthProvider = ({ children }) => {
             
         }
         catch{
-            //navigate("/")
+            
+            navigate("/")
             return false
         }
 
