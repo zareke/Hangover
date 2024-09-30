@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef  } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import './ChatsView.css';
@@ -15,6 +15,8 @@ const ChatView = () => {
     const [selectedFriends, setSelectedFriends] = useState([]); // Estado para manejar los amigos seleccionados
     const [friendsLoading, setFriendsLoading] = useState(false);
     const [friendsError, setFriendsError] = useState(null);
+
+    const groupNameRef = useRef();
 
     useEffect(() => {
         const fetchRecentChats = async () => {
@@ -70,6 +72,32 @@ const ChatView = () => {
         setSelectedFriends(selectedFriends.filter(f => f.id !== friend.id));
     };
 
+    const createGroup = async () => {
+        const groupName = groupNameRef.current.value; // Obtener el nombre del grupo
+
+        if (!groupName || selectedFriends.length === 0) {
+            alert("Please provide a group name and select at least one friend.");
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('token');
+            await axios.post(
+                `${config.url}chat/create/group`,
+                {
+                    name: groupName,
+                    members: selectedFriends.map((friend) => friend.id), // IDs de amigos seleccionados
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            alert('Group created successfully!');
+            closeModal();
+        } catch (error) {
+            console.error('Error creating group:', error);
+            alert('Error creating group');
+        }
+    };
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -116,6 +144,15 @@ const ChatView = () => {
                             ))}
                         </div>
 
+                         {/* Campo de entrada para el nombre del grupo */}
+                         <div>
+                            <input
+                                type="text"
+                                placeholder="Nombre de grupo"
+                                ref={groupNameRef} // Referencia al input
+                            />
+                        </div>
+
                         {/* Cargar lista de amigos */}
                         {friendsLoading ? (
                             <div>Loading friends...</div>
@@ -131,7 +168,9 @@ const ChatView = () => {
                             </ul>
                         )}
 
+                        
                         <Button onClick={closeModal}>Close</Button>
+                        <Button onClick={createGroup}>Create</Button>
                     </div>
                 </div>
             )}

@@ -113,6 +113,7 @@ const DateDivider = styled.div`
   color: #666;
 `;
 
+
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -126,9 +127,12 @@ const Chat = () => {
   const { ownId, chatId } = useParams();
   const realOwnToken = localStorage.getItem("token");
   const users = [+ownId, +chatId];
+  const usersShowing = useState([]);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const lastMessageRef = useRef(null);
+  const [chatName, setChatName] = useState("");
+  const [chatMembers, setChatMembers] = useState([]);
 
   const loadMessages = useCallback((pageNumber) => {
     if (isLoading) return;
@@ -160,13 +164,15 @@ const Chat = () => {
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
-    socket.current.on('load messages', (loadedMessages, hasMoreMessages) => {
+    socket.current.on('load messages', (info, loadedMessages, hasMoreMessages) => {
       setMessages((prevMessages) => {
         const newMessages = [...loadedMessages, ...prevMessages];
         return newMessages.filter((message, index, self) =>
           index === self.findIndex((t) => t.id === message.id)
         );
       });
+      setChatName(info.chatName);
+      setChatMembers(info.userList);
       setHasMore(hasMoreMessages);
       setIsLoading(false);
     });
@@ -282,6 +288,7 @@ const Chat = () => {
 
   return (
     <Container>
+      {chatName !== null ? (<h1>{chatName}</h1>) : (<h1>{chatMembers[1]}</h1>)}
       <Messages id="messages" ref={messagesContainerRef}>
         {Object.entries(groupedMessages).map(([date, msgs], groupIndex) => (
           <React.Fragment key={date}>
@@ -292,6 +299,7 @@ const Chat = () => {
                 $isOwnMessage={msg.sender_user === +ownId}
                 ref={groupIndex === 0 && index === 0 ? lastMessageRef : null}
               >
+                {chatName !== null ? <span>{msg.username}</span> : null }
                 <MessageContent>{msg.content}</MessageContent>
                 <MessageTime>{formatTime(msg.date_sent)}</MessageTime>
               </StyledMessage>
