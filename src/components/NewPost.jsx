@@ -5,7 +5,7 @@ import config from '../config';
 
 const NewPost = () => {
     const [title, setTitle] = useState('');
-    const [content, setContent] = useState(''); 
+    const [description, setDescription] = useState(''); 
     const { designId } = useParams();
     const [errorMessage, setErrorMessage] = useState('');
     const [allowComments, setAllowComments] = useState(false);
@@ -23,10 +23,10 @@ const NewPost = () => {
                 `${config.url}post/`,
                 {
                     title: title,
-                    content: content,
+                    description: description,
                     designId: designId,
-                    allowComments: allowComments,
-                    isRemixable: isRemixable,
+                    allow_comments: allowComments,
+                    remixable: isRemixable,
                     visibility: visibility
                 },
                 {
@@ -63,8 +63,8 @@ const NewPost = () => {
                     <label htmlFor="content">Descripcoin:</label>
                     <textarea
                         id="content"
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
                     ></textarea>
                 </div>
                 <div>
