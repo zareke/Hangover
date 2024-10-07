@@ -13,6 +13,7 @@ import Bolsa from "./components/Bolsa.jsx"
 import Designer from "./components/designer.jsx";
 import Search from "./components/Search.jsx";
 import Chat from "./components/Chat.jsx";
+import NewPost from "./components/NewPost.jsx";
 import Carrito from "./components/Carrito.jsx";
 import ChatsView from "./components/ChatsView.jsx"
 
@@ -45,6 +46,7 @@ function App() {
                 <Route exact path="privateChat/:ownId/:chatId" element={<Chat/>}></Route>
                 <Route exact path="/carrito" element={<Carrito/>}></Route>
                 <Route exact path="/chatsview" element={<ChatsView/>}></Route>
+                <Route exact path="/newPost/:designId" element={<NewPost/>} />
                 
             </Routes>   
         </Router>

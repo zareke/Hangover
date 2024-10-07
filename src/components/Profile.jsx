@@ -8,6 +8,7 @@ import "./Profile.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { guardarHandler, eliminarGuardadoHandler, followHandler, unFollowHandler } from "../universalhandlers";
+import Carta from "./carta.jsx";
 
 
 const Profile = () => {
@@ -208,18 +209,26 @@ const Profile = () => {
         </div>
       </div>
       <section className="profile-content">
-        {userData.posts !== null
-          ? userData.posts.map((item) => (
-              <div key={item.id} className="item-card">
-                <img
+        <div className="columns">
+          {userData.posts !== null
+            ? userData.posts.map((item) => (
+              <Link
+              to={`/post/${item.id}`}
+              >
+                <Carta
+                  key={item.id}
+                  post_id={item.id}
+                  cloth={item.image}
+                  profile_photo={userData.user_data.profile_photo}
+                  username={userData.user_data.username}
+                  user_id={userData.user_data.id}
+                  putLike={true}
                   className="profile-post"
-                  src={item.image}
-                  alt={item.title}
                 />
-                <p>{item.title}</p>
-              </div>
+                </Link>
             ))
           : null}
+          </div>
       </section>
     </div>
   );

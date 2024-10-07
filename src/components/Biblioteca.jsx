@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import likedIcon from '../vendor/imgs/heart.svg'
 import savedIcon from '../vendor/imgs/bookmark.svg'
 import { AuthContext } from '../AuthContext.js';
+import Button from './Button.jsx';
 
 const LibraryPage = () => {
   const [items, setItems] = useState({ saved: [], liked: [] });
@@ -19,8 +20,9 @@ const LibraryPage = () => {
   
 
   useEffect(() => {
-    let authcheck;const checkauth = async () => {return strictCheckAuth(navigate)};checkauth()
-    if (authcheck) { //do everything else
+    //let authcheck;const checkauth = async () => {return strictCheckAuth(navigate)};checkauth()
+    
+    //if (authcheck) { //do everything else
     
     const fetchItems = async () => {
       try {
@@ -51,7 +53,8 @@ const LibraryPage = () => {
     };
     fetchItems();
     }
-  }, []);
+  //}
+  , []);
 
   const processBlobs = async (items) => {
     return Promise.all(items.map(async (item) => {
@@ -80,6 +83,8 @@ const LibraryPage = () => {
   const handleViewDesign = (postId) => {
     navigate(`/post/${postId}`);
   };
+
+ 
 
   // Validar que `displayedItems` sea un array antes de mapear
   const displayedItems = Array.isArray(items[activeTab]) ? items[activeTab] : [];
@@ -124,7 +129,7 @@ const LibraryPage = () => {
         >
           
           <Carta 
-            className={`cardGroup${index}`} 
+            className={`clickable cardGroup${index}`} 
             post_id={item.postid} 
             cloth={item.front_image} 
             profile_photo={item.profile_photo}
@@ -138,11 +143,14 @@ const LibraryPage = () => {
       ))
     ) : (
       displayedItems.map((item, index) => (
+        <div className="designItemWrapper">
         <Link to="/designer" state={{ designId: item.id }}>
-        <div key={`${item.image}-${index}`} className="library-item">
+            <div key={`${item.image}-${index}`} className="library-item">
               <img src={item.image} alt={`Draft ${index}`} />
             </div>
           </Link>
+          <Link to={'/NewPost/'+item.id}>publicar</Link>
+          </div>
       ))
     )}
   </div>

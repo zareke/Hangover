@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef, useEffect } from 'react';
+import React, { useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { Rnd } from 'react-rnd';
 import './designer.css';
 import shirt from '../vendor/imgs/shirtpng.png';
@@ -13,158 +13,155 @@ const Designer = () => {
   const { designId } = location.state || {};
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
   const shirtRef = useRef(null);
-  const [color, setColor] = useState('rgb(255,255,255)');
+  const [color, setColor] = useState('#FFFFFF');
   const [pattern, setPattern] = useState('none');
   const [texts, setTexts] = useState([]);
   const [shapes, setShapes] = useState([]);
-  const [images, setImage] = useState([]);
+  const [images, setImages] = useState([]);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [drawingCoords, setDrawingCoords] = useState({ x: 0, y: 0 });
-  const [drawingLines, setDrawingLines] = useState([]);
+  const [currentPath, setCurrentPath] = useState(null);
+  const [paths, setPaths] = useState([]);
   const [drawingColor, setDrawingColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(5);
   const [canDraw, setCanDraw] = useState(false);
   const inputFile = useRef(null);   
 
-  const getShirt = async () => {
+  const getShirt = useCallback(async () => {
     const token = localStorage.getItem('token');
     try {
-
       const response = await axios.get(`${config.url}design/get/${designId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       
       const data = JSON.parse(response.data);
 
-      console.log("response",data);
+      console.log("response", data);
 
       setColor(data.info.design_data.color || 'rgb(255,255,255)');
       setPattern(data.info.design_data.pattern || 'none');
       setTexts(Array.isArray(data.info.design_data.texts) ? data.info.design_data.texts : []);
       setShapes(Array.isArray(data.info.design_data.shapes) ? data.info.design_data.shapes : []);
-      setImage(Array.isArray(data.info.design_data.image) ? data.info.design_data.image : []);
-      setDrawingLines(Array.isArray(data.info.design_data.drawingLines) ? data.info.design_data.drawingLines : []);
+      setImages(Array.isArray(data.info.design_data.image) ? data.info.design_data.image : []);
+      setPaths(Array.isArray(data.info.design_data.paths) ? data.info.design_data.paths : []);
       
     } catch (error) {
       console.error('Error fetching user:', error);
     }
-  };
+  }, [designId]);
 
   useEffect(() => {
     if (designId) {
       getShirt();
     }
-  }, [designId]);
+  }, [designId, getShirt]);
   
-
   const handleColorChange = (e) => setColor(e.target.value);
   const handlePatternChange = (e) => setPattern(e.target.value);
   const handlePatternColorChange = (e) => document.documentElement.style.setProperty('--pattern-color', e.target.value);
 
   const addTextInput = () => {
-      setTexts([...texts, { id: Date.now(), text: '', x: 50, y: 50, width: 100, height: 50, fontSize: '16px', fontFamily: 'Arial' }]);
+    setTexts(prevTexts => [...prevTexts, { id: Date.now(), text: '', x: 50, y: 50, width: 100, height: 50, fontSize: '16px', fontFamily: 'Arial' }]);
   };
 
   const removeTextInput = (id) => {
-    setTexts(texts.filter((text) => text.id !== id));
+    setTexts(prevTexts => prevTexts.filter((text) => text.id !== id));
   };
 
   const handleTextChange = (id, newText) => {
-    setTexts(texts.map((text) => (text.id === id ? { ...text, text: newText } : text)));
+    setTexts(prevTexts => prevTexts.map((text) => (text.id === id ? { ...text, text: newText } : text)));
   };
 
   const handleTextDragStop = (id, x, y) => {
-    setTexts(texts.map((text) => (text.id === id ? { ...text, x, y } : text)));
+    setTexts(prevTexts => prevTexts.map((text) => (text.id === id ? { ...text, x, y } : text)));
   };
 
   const handleTextResizeStop = (id, width, height) => {
     const newFontSize = Math.min(width, height) / 5; // Adjust as needed
-    setTexts(texts.map((text) => (text.id === id ? { ...text, width, height, fontSize: `${newFontSize}px` } : text)));
+    setTexts(prevTexts => prevTexts.map((text) => (text.id === id ? { ...text, width, height, fontSize: `${newFontSize}px` } : text)));
   };
 
   const handleFontColorChange = (id, color) => {
-    setTexts(texts.map((text) => (text.id === id ? { ...text, color } : text)));
+    setTexts(prevTexts => prevTexts.map((text) => (text.id === id ? { ...text, color } : text)));
   };
 
   const handleFontSizeChange = (id, fontSize) => {
     const newFontSize = parseInt(fontSize, 10);
-    if (newFontSize > 100) {
-      fontSize = "60px";
-    } else {
-      fontSize = `${newFontSize}px`;
-    }
-    setTexts(texts.map((text) => (text.id === id ? { ...text, fontSize } : text)));
+    fontSize = newFontSize > 100 ? "60px" : `${newFontSize}px`;
+    setTexts(prevTexts => prevTexts.map((text) => (text.id === id ? { ...text, fontSize } : text)));
   };
 
   const handleFontFamilyChange = (id, family) => {
-    setTexts(texts.map((text) => (text.id === id ? { ...text, fontFamily: family } : text)));
+    setTexts(prevTexts => prevTexts.map((text) => (text.id === id ? { ...text, fontFamily: family } : text)));
   };
 
   const addShape = () => {
-    setShapes([...shapes, { id: Date.now(), shape: 'square', x: 50, y: 50, width: 50, height: 50 }]);
+    setShapes(prevShapes => [...prevShapes, { id: Date.now(), shape: 'square', x: 50, y: 50, width: 50, height: 50 }]);
   };
 
   const addImage = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
     reader.onloadend = () => {
-      setImage([...images, { src: reader.result, name: file.name }]);
+      setImages(prevImages => [...prevImages, { src: reader.result, name: file.name }]);
     };
     reader.readAsDataURL(file);
   };
 
   const removeShape = (id) => {
-    setShapes(shapes.filter((shape) => shape.id !== id));
+    setShapes(prevShapes => prevShapes.filter((shape) => shape.id !== id));
   };
 
   const handleShapeChange = (id, newShape) => {
-    setShapes(shapes.map((shape) => (shape.id === id ? { ...shape, shape: newShape } : shape)));
+    setShapes(prevShapes => prevShapes.map((shape) => (shape.id === id ? { ...shape, shape: newShape } : shape)));
   };
 
   const handleShapeDragStop = (id, x, y) => {
-    setShapes((prevShapes) =>
-      prevShapes.map((shape) =>
-        shape.id === id ? { ...shape, x, y } : shape
-      )
-    );
+    setShapes(prevShapes => prevShapes.map((shape) => shape.id === id ? { ...shape, x, y } : shape));
   };
 
   const handleShapeResizeStop = (id, width, height) => {
     console.log('Resizing shape:', id, 'New width:', width, 'New height:', height);
-  
-    setShapes((prevShapes) =>
-      prevShapes.map((shape) =>
-        shape.id === id ? { ...shape, width, height } : shape
-      )
-    );
+    setShapes(prevShapes => prevShapes.map((shape) => shape.id === id ? { ...shape, width, height } : shape));
   };
-
-  
-    
-  
 
   const handleDrawStart = (event) => {
+    if (!canDraw) return;
+    
     setIsDrawing(true);
     const rect = event.currentTarget.getBoundingClientRect();
-    setDrawingCoords({ x: event.clientX - rect.left, y: event.clientY - rect.top });
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    const newPath = {
+      points: [{x, y}],
+      color: drawingColor,
+      size: brushSize
+    };
+    
+    setCurrentPath(newPath);
   };
-
-  const handleDrawMove = (event) => {
-    if (isDrawing && canDraw) {
-      const rect = event.currentTarget.getBoundingClientRect();
-      const newCoords = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-      
-      setDrawingLines((prevLines) => [
-        ...prevLines,
-        ...interpolateLine(drawingCoords, newCoords, brushSize, drawingColor),
-      ]);
-      
-      setDrawingCoords(newCoords);
-    }
-  };
-
+  
+  const handleDrawMove = useCallback((event) => {
+    if (!isDrawing || !canDraw) return;
+    
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    setCurrentPath(prevPath => {
+      if (!prevPath) return null;
+      return {
+        ...prevPath,
+        points: [...prevPath.points, {x, y}]
+      };
+    });
+  }, [isDrawing, canDraw]);
+  
   const handleDrawEnd = () => {
+    if (!isDrawing || !currentPath) return;
+    
+    setPaths(prevPaths => [...prevPaths, currentPath]);
+    setCurrentPath(null);
     setIsDrawing(false);
   };
 
@@ -173,12 +170,10 @@ const Designer = () => {
   };
 
   const handleCapture = async () => {
-    console.log("holaaaa");
+    console.log("Capturing image...");
     if (shirtRef.current) {
       const canvas = await html2canvas(shirtRef.current);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.8); // El segundo parámetro es la calidad (0.0 a 1.0)
-      
-      // Luego, podrías subir esta URL o hacer lo que necesites con ella.
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
       saveImage(dataUrl);
     }
   };
@@ -188,25 +183,22 @@ const Designer = () => {
     link.href = dataUrl;
   
     link.addEventListener('click', (e) => {
-      e.preventDefault(); // Evita la descarga
-      console.log('El enlace fue presionado, guardando en la base de datos.');
-      saveShirt(dataUrl); // Llama a la función para guardar en la BD
+      e.preventDefault();
+      console.log('Link pressed, saving to database.');
+      saveShirt(dataUrl);
     });
   
-    // Simula el click, pero no descarga el archivo
     link.click();
   }
 
-
   const saveShirt = async (dataUrl) => {
-    
     const designData = {
-      color,        // Color de fondo
-      pattern,      // Patrón seleccionado
-      texts,        // Textos con posición, tamaño, color, fuente, etc.
-      shapes,       // Formas con posición, tamaño, tipo, etc.
-      images,       // Imágenes subidas
-      drawingLines, // Líneas dibujadas con pincel
+      color,
+      pattern,
+      texts,
+      shapes,
+      images,
+      paths, 
     };
     const designJSON = JSON.stringify(designData);
     console.log(designJSON);
@@ -215,29 +207,17 @@ const Designer = () => {
       const response = await axios.post(`${config.url}design/save`, { designId: designId, image: dataUrl, designData: designJSON }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      console.log('Camiseta guardada:', response.data);
+      console.log('Shirt saved:', response.data);
     } catch (error) {
-      console.error('Error al guardar la camiseta:', error);
+      console.error('Error saving shirt:', error);
     }
-
-  };
-
-  const interpolateLine = (start, end, size, color) => {
-    const points = [];
-    const numPoints = Math.max(Math.abs(end.x - start.x), Math.abs(end.y - start.y)) / (size/6);
-    for (let i = 0; i < numPoints; i++) {
-      const x = start.x + (end.x - start.x) * (i / numPoints);
-      const y = start.y + (end.y - start.y) * (i / numPoints);
-      points.push({ x, y, size, color });
-    }
-    return points;
   };
 
   return (
     <div className="designer">
       <h2>Create a Design</h2>
       <div className="controls">
-      <label>
+        <label>
           Color:
           <input type="color" value={color} onChange={handleColorChange} />
         </label>
@@ -256,11 +236,16 @@ const Designer = () => {
           Pattern Color:
           <input type="color" onChange={handlePatternColorChange} />
         </label>
-        <button class="designer-button" onClick={addTextInput}>+ Text</button>
+        <button className="designer-button" onClick={addTextInput}>+ Text</button>
         {texts && texts.map((text) => (
           <div key={text.id}>
-            <input type="text" value={text.text} onChange={(e) => handleTextChange(text.id, e.target.value)} />
-            <button class="designer-button" onClick={() => removeTextInput(text.id)}>-</button>
+            <input
+              type="text"
+              className="gamer"
+              value={text.text}
+              onChange={(e) => handleTextChange(text.id, e.target.value)}
+            />
+            <button className="designer-button" onClick={() => removeTextInput(text.id)}>-</button>
             <label>
               Font Color:
               <input
@@ -292,7 +277,7 @@ const Designer = () => {
             </label>
           </div>
         ))}
-        <button class="designer-button" onClick={addShape}>+ Shape</button>
+        <button className="designer-button" onClick={addShape}>+ Shape</button>
         {shapes && shapes.map((shape) => (
           <div key={shape.id}>
             <select
@@ -305,7 +290,7 @@ const Designer = () => {
               <option value="triangle">Triangle</option>
               <option value="diamond">Diamond</option>
             </select>
-            <button class="designer-button" onClick={() => removeShape(shape.id)}>-</button>
+            <button className="designer-button" onClick={() => removeShape(shape.id)}>-</button>
           </div>
         ))}
         <input type="file" onChange={addImage} accept="image/*" id="file" ref={inputFile} />
@@ -316,13 +301,16 @@ const Designer = () => {
           </div>
         ))}
 
-<button class="designer-button" onClick={() => setCanDraw(!canDraw)}>🧹</button>
-
+        <button 
+          className={`designer-button ${canDraw ? 'active' : ''}`} 
+          onClick={() => setCanDraw(!canDraw)}
+        >
+          {canDraw ? '✏️ Drawing Mode (On)' : '✏️ Drawing Mode (Off)'}
+        </button>
 
         <label>
           Drawing Color:
           <input type="color" value={drawingColor} onChange={(e) => setDrawingColor(e.target.value)} />
-          
         </label>
         <label>
           Brush Size:
@@ -344,21 +332,39 @@ const Designer = () => {
         onMouseLeave={handleDrawEnd}
       >
         <div className="shirt" ref={shirtRef}>
-          {drawingLines && drawingLines.map((line, index) => (
-            <div
-              key={index}
-              className="drawing-line"
-              style={{
-                left: line.x - line.size / 2,
-                top: line.y - line.size / 2,
-                width: `${line.size}px`,
-                height: `${line.size}px`,
-                backgroundColor: line.color,
-                borderRadius: '50%',
-                position: 'absolute',
-              }}
-            />
-          ))}
+          <svg 
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'none',
+              zIndex: 1000
+            }}
+          >
+            {paths.map((path, pathIndex) => (
+              <path
+                key={pathIndex}
+                d={`M ${path.points[0].x} ${path.points[0].y} ${path.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')}`}
+                stroke={path.color}
+                strokeWidth={path.size}
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            ))}
+            {currentPath && (
+              <path
+                d={`M ${currentPath.points[0].x} ${currentPath.points[0].y} ${currentPath.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')}`}
+                stroke={currentPath.color}
+                strokeWidth={currentPath.size}
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            )}
+          </svg>
           <img src={shirt} alt="Shirt" className="shirt-image" />
           {images && images.map((image, index) => (
             <div key={index} className="uploaded-image-container">
@@ -400,40 +406,40 @@ const Designer = () => {
             </Rnd>
           ))}
           {shapes && shapes.map((shape) => (
-          <Rnd
-            className="rnd"
-            key={shape.id}
-            size={{ width: shape.width, height: shape.height }}
-            position={{ x: shape.x, y: shape.y }}
-            bounds=".shirt"
-            onDragStart={() => setCanDraw(false)}
-            onDragStop={(e, d) => handleShapeDragStop(shape.id, d.x, d.y)}
-            onResizeStop={(e, direction, ref, delta, position) => {
-              const newWidth = ref.offsetWidth;
-              const newHeight = ref.offsetHeight;
-              handleShapeResizeStop(shape.id, newWidth, newHeight);
-              handleShapeDragStop(shape.id, position.x, position.y);
-            }}
-            enableResizing={{
-              top: true,
-              right: true,
-              bottom: true,
-              left: true,
-              topRight: true,
-              bottomRight: true,
-              bottomLeft: true,
-              topLeft: true,
-            }}
-          >
-            <div
-              className={`shape-overlay ${shape.shape}`}
-              style={{ width: '100%', height: '100%' }}
-            ></div>
-          </Rnd>
-        ))}
+            <Rnd
+              className="rnd"
+              key={shape.id}
+              size={{ width: shape.width, height: shape.height }}
+              position={{ x: shape.x, y: shape.y }}
+              bounds=".shirt"
+              onDragStart={() => setCanDraw(false)}
+              onDragStop={(e, d) => handleShapeDragStop(shape.id, d.x, d.y)}
+              onResizeStop={(e, direction, ref, delta, position) => {
+                const newWidth = ref.offsetWidth;
+                const newHeight = ref.offsetHeight;
+                handleShapeResizeStop(shape.id, newWidth, newHeight);
+                handleShapeDragStop(shape.id, position.x, position.y);
+              }}
+              enableResizing={{
+                top: true,
+                right: true,
+                bottom: true,
+                left: true,
+                topRight: true,
+                bottomRight: true,
+                bottomLeft: true,
+                topLeft: true,
+              }}
+            >
+              <div
+                className={`shape-overlay ${shape.shape}`}
+                style={{ width: '100%', height: '100%' }}
+              ></div>
+            </Rnd>
+          ))}
         </div>
       </div>
-      <button class="designer-button" onClick={handleCapture}>Capturar y Guardar Imagen</button>
+      <button className="designer-button" onClick={handleCapture}>Capture and Save Image</button>
     </div>
   );
 };

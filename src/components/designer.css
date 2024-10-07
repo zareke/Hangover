@@ -50,7 +50,7 @@ select {
   margin-top: 5px;
 }
 
-input[type="text"] {
+.gamer {
   padding: 10px;
   border-radius: 5px;
   border: 1px solid var(--border-color);

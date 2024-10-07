@@ -121,3 +121,7 @@
 .libraryTitle {
   font-size: 27px;
 }
+
+.clickable{
+  cursor:pointer;
+}

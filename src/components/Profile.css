@@ -57,3 +57,13 @@
     border-radius: 10px;
   }
   
+  .columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px; /* Adjust the gap as needed */
+  }
+  
+  .profile-post {
+    flex: 1 1 calc(33.333% - 16px); /* Adjust the percentage and gap as needed */
+    box-sizing: border-box;
+  }

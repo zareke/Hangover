@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import Like from "../components/Like.jsx";
 import { AuthContext } from "../AuthContext";
 import { guardarHandler, eliminarGuardadoHandler } from "../universalhandlers.js";
+import ShareButtons from "./botonCompartir.jsx";
+import { Helmet } from "react-helmet";
 
 const PostDetail = () => {
   const { postId } = useParams();
@@ -29,6 +31,7 @@ const PostDetail = () => {
    const [errorMessage, setErrorMessage] = useState(""); // Para mensajes de error
 
   const { isLoggedIn, openModalNavBar } = useContext(AuthContext);
+
 
   // Función para agregar al carrito
     const agregarCarritoHandler = async () => {
@@ -258,7 +261,36 @@ const PostDetail = () => {
     }
   };
 
+  // URL para compartir
+  const designUrl = `${window.location.origin}/post/${postId}`;
+  const previewImageUrl = post.front_image;
+  const previewTitle = post.title;
+  const previewDescription = post.description;
+  
   return (
+    <>
+     <Helmet>
+        <title>{post?.title}</title>
+        <meta name="description" content={post?.description} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:title" content={post?.title} />
+        <meta property="og:description" content={post?.description} />
+        <meta property="og:image" content={post?.front_image} />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={window.location.href} />
+        <meta property="twitter:title" content={post?.title} />
+        <meta property="twitter:description" content={post?.description} />
+        <meta property="twitter:image" content={post?.front_image} />
+
+        <meta property="og:site_name" content="Hangover" /> FZ mira el mensaje que te mande hola fz holaaaafz 
+        <meta property="og:locale" content="es_ES" />
+      </Helmet>
+      
     <div className={styles.container}>
       <div className={styles.contentWrapper}>
         <div className={styles.imageSection}>
@@ -283,7 +315,15 @@ const PostDetail = () => {
               alt="Front Image"
               className={styles.mainImage}
             />
+            
             <Button className={styles.remixButton}>Remix</Button>
+            <ShareButtons 
+                url={designUrl} 
+                message={`¡Mira este diseño que encontré: ${previewTitle}!`} 
+                image={previewImageUrl}
+                title={previewTitle}
+                description={previewDescription}
+              />
           </div>
         </div>
         <div className={styles.infoSection}>
@@ -449,7 +489,9 @@ const PostDetail = () => {
           </div>
         </div>
       </div>
+      
     </div>
+    </>
   );
 };
 
