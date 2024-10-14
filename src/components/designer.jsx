@@ -25,7 +25,7 @@ const Designer = () => {
   const [brushSize, setBrushSize] = useState(5);
   const [canDraw, setCanDraw] = useState(false);
   const inputFile = useRef(null);   
-
+  const [activeImageId, setActiveImageId] = useState(null);
   const getShirt = useCallback(async () => {
     const token = localStorage.getItem('token');
     try {
@@ -62,7 +62,15 @@ const Designer = () => {
   const addTextInput = () => {
     setTexts(prevTexts => [...prevTexts, { id: Date.now(), text: '', x: 50, y: 50, width: 100, height: 50, fontSize: '16px', fontFamily: 'Arial' }]);
   };
-
+  const handleImageDragStart = (id) => {
+    setActiveImageId(id);
+    setCanDraw(false);
+  };
+  
+  const handleImageResizeStart = (id) => {
+    setActiveImageId(id);
+    setCanDraw(false);
+  };
   const removeTextInput = (id) => {
     setTexts(prevTexts => prevTexts.filter((text) => text.id !== id));
   };
@@ -102,9 +110,43 @@ const Designer = () => {
     const file = event.target.files[0];
     const reader = new FileReader();
     reader.onloadend = () => {
-      setImages(prevImages => [...prevImages, { src: reader.result, name: file.name }]);
+      setImages(prevImages => [...prevImages, { 
+        id: Date.now(), 
+        src: reader.result, 
+        name: file.name, 
+        x: 50, 
+        y: 50, 
+        width: 100, 
+        height: 100 
+      }]);
     };
     reader.readAsDataURL(file);
+  };
+  const handleImageResizeStop = (id, ref, position) => {
+    setImages(prevImages => prevImages.map((image) => {
+      if (image.id === id) {
+        return {
+          ...image,
+          width: ref.offsetWidth,
+          height: ref.offsetHeight,
+          x: position.x,
+          y: position.y
+        };
+      }
+      return image;
+    }));
+    setActiveImageId(null);
+  };
+
+  const handleImageDragStop = (id, x, y) => {
+    setImages(prevImages => prevImages.map((image) => 
+      (image.id === id ? { ...image, x, y } : image)
+    ));
+    setActiveImageId(null);
+  };
+  
+  const removeImage = (id) => {
+    setImages(prevImages => prevImages.filter((image) => image.id !== id));
   };
 
   const removeShape = (id) => {
@@ -212,10 +254,11 @@ const Designer = () => {
       console.error('Error saving shirt:', error);
     }
   };
-
+  
   return (
     <div className="designer">
       <h2>Create a Design</h2>
+      
       <div className="controls">
         <label>
           Color:
@@ -277,6 +320,7 @@ const Designer = () => {
             </label>
           </div>
         ))}
+        
         <button className="designer-button" onClick={addShape}>+ Shape</button>
         {shapes && shapes.map((shape) => (
           <div key={shape.id}>
@@ -294,12 +338,14 @@ const Designer = () => {
           </div>
         ))}
         <input type="file" onChange={addImage} accept="image/*" id="file" ref={inputFile} />
-        {images && images.map((im, index) => (
-          <div key={index} className="uploaded-image-container">
-            <img src={im.src} alt={`Uploaded ${index}`} className="uploaded-image" />
-            <p>{im.name}</p>
-          </div>
-        ))}
+        {images && images.map((image) => (
+  <div key={image.id}>
+    <p>{image.name}</p>
+    <button className="designer-button" onClick={() => removeImage(image.id)}>
+      Remove Image
+    </button>
+  </div>
+))}
 
         <button 
           className={`designer-button ${canDraw ? 'active' : ''}`} 
@@ -332,6 +378,7 @@ const Designer = () => {
         onMouseLeave={handleDrawEnd}
       >
         <div className="shirt" ref={shirtRef}>
+          
           <svg 
             style={{
               position: 'absolute',
@@ -366,12 +413,6 @@ const Designer = () => {
             )}
           </svg>
           <img src={shirt} alt="Shirt" className="shirt-image" />
-          {images && images.map((image, index) => (
-            <div key={index} className="uploaded-image-container">
-              <img src={image.src} alt={`Uploaded ${index}`} className="uploaded-image" />
-              <p>{image.name}</p>
-            </div>
-          ))}
           <div className="color-overlay" style={{ backgroundColor: color }}></div>
           <div className={`pattern-overlay ${pattern}`}></div>
           {texts && texts.map((text) => (
@@ -437,6 +478,29 @@ const Designer = () => {
               ></div>
             </Rnd>
           ))}
+ {images && images.map((image) => (
+      <Rnd
+        key={image.id}
+        size={{ width: image.width, height: image.height }}
+        position={{ x: image.x, y: image.y }}
+        onDragStart={() => handleImageDragStart(image.id)}
+        onDragStop={(e, d) => handleImageDragStop(image.id, d.x, d.y)}
+        onResizeStart={() => handleImageResizeStart(image.id)}
+        onResizeStop={(e, direction, ref, delta, position) => {
+          handleImageResizeStop(image.id, ref, position);
+        }}
+        bounds=".shirt"
+        style={{
+          zIndex: activeImageId === image.id ? 1000 : 1,
+        }}
+      >
+        <img 
+          src={image.src} 
+          alt={image.name} 
+          style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+        />
+      </Rnd>
+    ))}
         </div>
       </div>
       <button className="designer-button" onClick={handleCapture}>Capture and Save Image</button>
