@@ -165,7 +165,9 @@ const Designer = () => {
     console.log('Resizing shape:', id, 'New width:', width, 'New height:', height);
     setShapes(prevShapes => prevShapes.map((shape) => shape.id === id ? { ...shape, width, height } : shape));
   };
-
+  
+  console.log("Holaa");
+  
   const handleDrawStart = (event) => {
     if (!canDraw) return;
     
