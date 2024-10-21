@@ -70,9 +70,6 @@ const PostDetail = () => {
     }
   };
 
-  const scrollToBottom = () => {
-    commentsEndRef.current?.scrollIntoView();
-  };
 
   const scrollToTop = () => {
     window.scrollTo(0, 0);
@@ -193,9 +190,6 @@ const PostDetail = () => {
     }
   }, [loading, error]);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [comments]);
 
   if (loading) return <div>Instalando virus...</div>;
   if (error) return <div>Error: {error}</div>;

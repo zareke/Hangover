@@ -48,20 +48,19 @@ const InicioSesion = ({ closeModal }) => {
 
   const   handleRegister = async (e) => {
     e.preventDefault();
-
     try {
       const response = await axios.post(config.url + "/user/register", {
-        username,
+        username: username,
         first_name: firstName,
         last_name: lastName,
-        email,
-        password,
+        email: email,
+        password: password,
         date_of_birth: dateOfBirth,
-        description,
-        profile_photo: profilePhoto,
-        role_id: roleId,
+        description: "",
+        profile_photo: "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg",
+        role_id: 0
       });
-
+     
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         closePopup();
@@ -115,20 +114,20 @@ const InicioSesion = ({ closeModal }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="firstName">Nombre</label>
+                  <label htmlFor="first_name">Nombre</label>
                   <input
                     type="text"
-                    id="firstName"
+                    id="first_name"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     required
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="lastName">Apellido</label>
+                  <label htmlFor="last_name">Apellido</label>
                   <input
                     type="text"
-                    id="lastName"
+                    id="last_name"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     required
@@ -155,36 +154,19 @@ const InicioSesion = ({ closeModal }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="dateOfBirth">Fecha de nacimiento</label>
+                  <label htmlFor="date_of_birth">Fecha de nacimiento</label>
                   <input
                     type="date"
-                    id="dateOfBirth"
+                    id="date_of_birth"
                     value={dateOfBirth}
                     onChange={(e) => setDateOfBirth(e.target.value)}
                     required
                   />
                 </div>
-                <div className="form-group">
-                  <label htmlFor="description">Descripción</label>
-                  <textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  ></textarea>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="profilePhoto">Foto de perfil (URL)</label>
-                  <input
-                    type="text"
-                    id="profilePhoto"
-                    value={profilePhoto}
-                    onChange={(e) => setProfilePhoto(e.target.value)}
-                  />
-                </div>
+                
                 <button
                   type="submit"
                   className="inicio-sesion-btn inicio-sesion-btn-register"
-                  onClick={handleRegister}
                 >
                   Registrarse
                 </button>

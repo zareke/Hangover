@@ -7,6 +7,7 @@ import Carta from './carta.jsx';
 import { Link } from 'react-router-dom';
 import likedIcon from '../vendor/imgs/heart.svg'
 import savedIcon from '../vendor/imgs/bookmark.svg'
+import designIcon from '../vendor/imgs/designicon.png'
 import { AuthContext } from '../AuthContext.js';
 import Button from './Button.jsx';
 
@@ -102,7 +103,7 @@ const LibraryPage = () => {
             <div className='filtericons'>
               <div onClick={setItemsBorradores} className={`filter-container ${activeFilter === 'borradores' ? 'active' : ''}`}>
                   
-                  <img className="iconLibrary" src={savedIcon} alt="ss" />
+                  <img className="iconLibrary" src={designIcon} alt="ss" />
                 
               </div>
               <div onClick={setItemsGuardados} className={`filter-container ${activeFilter === 'saved' ? 'active' : ''}`}>

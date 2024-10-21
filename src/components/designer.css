@@ -1,5 +1,5 @@
 :root {
-  --primary-color: #4CAF50; /* Primary color for inputs, buttons */
+  --primary-color: rgba(56, 117, 109, 1);
   --secondary-color: #f9f9f9; /* Background color for inputs */
   --text-color: #333333; /* Text color for labels and inputs */
   --button-bg: #4CAF50; /* Button background color */
@@ -30,6 +30,7 @@ h2 {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
+  align-items: center;
 }
 
 label {
@@ -50,30 +51,57 @@ select {
   margin-top: 5px;
 }
 
+.modal-overlay {
+  z-index: 14001;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.modal-actions {
+  margin-top: 20px;
+}
+
+button {
+  margin: 5px;
+}
+
+
 .gamer {
   padding: 10px;
   border-radius: 5px;
   border: 1px solid var(--border-color);
   width: 100px;
 }
-
 /* Estilos generales del botón en el Designer */
 .designer-button {
-  background-color: #4CAF50; /* Cambia el color según tu preferencia */
-  border: none;
+  background-color: rgba(56, 117, 109, 1);
   color: white;
-  padding: 10px 24px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-size: 14px;
   cursor: pointer;
-  border-radius: 12px;
+  display: inline-block; /* Make it an inline-block element */
+  position: relative;
+  overflow: hidden;
+  text-align: center; /* Center the text */
 }
 
 .designer-button:hover {
-  background-color: #45a049; /* Cambia el color en hover según tu preferencia */
+  background-color: rgb(63, 131, 122); /* Cambia el color en hover según tu preferencia */
 }
 
 
@@ -88,7 +116,6 @@ input[type="range"] {
 }
 
 .uploaded-image {
-  max-width: 300px;
   max-height: 333px;
   z-index: 15;
 }
@@ -107,6 +134,11 @@ input[type="range"] {
   user-select: none;
   pointer-events: none;
 }
+
+input[type="file"] {
+  display: none; /* Oculta el input */
+}
+
 
 .color-overlay,
 .pattern-overlay {

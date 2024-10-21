@@ -35,10 +35,12 @@ const Carrito = () => {
     }, []);
 
     useEffect(() => {
-        const totalPrice = carritoStuff.reduce((total, item) => {
-            return total + parseFloat(item.price) || 0; // Asegurarse de que sea un número
-        }, 0);
+       let totalPrice = 0;
+        carritoStuff.forEach(element => {
+            totalPrice += parseFloat(element.quantity * element.price);
+        });
         setTotalAmount(totalPrice);
+        
     }, [carritoStuff]);
 
     const handleCheckout = async () => {
@@ -54,13 +56,19 @@ const Carrito = () => {
     return (
         <>
             {error && <p>{error}</p>}
+            {console.log(carritoStuff)}
             {carritoStuff && carritoStuff.map((item, index) => (
                 <div key={index}>
-                    <img src={item.image} alt={`Product ${index}`} />
-                    <p>{item.price}</p>
+                    <h3>{index}</h3>
+                    <img src={item.front_image} alt={`Product ${index}`} width="100px" height="auto"/>
+                    <ul>
+                        <li>Precio unitario: {item.price}</li>
+                        <li>Cantidad: {item.quantity}</li>
+                        <li>Precio total: {item.price * item.quantity}</li>
+                    </ul>
                 </div>
             ))}
-            <p><b>{totalAmount}</b></p>
+            <h3>Precio total del carrito: {totalAmount}</h3>
             <button id="checkout" onClick={handleCheckout}>Pay</button>
         </>
     );

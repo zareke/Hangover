@@ -20,6 +20,10 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
     
   }
+  .pagelogo{
+    height: 20px;
+    width: auto;
+  }
   .verticalNav ul{
     display: flex;
     flex-direction: column;

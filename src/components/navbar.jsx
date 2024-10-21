@@ -13,6 +13,7 @@ import newdesign from '../vendor/imgs/newicon.png'
 import profile from '../vendor/imgs/profileicon.png'
 import { handleSearch } from '../universalhandlers';
 import { useNavigate } from "react-router-dom";
+import logo from "../vendor/imgs/logo.png"
 
 let openModal, closeModal;
 //hacemos una copia de hangover y ahi modificamos todo react-native o usamos todo lo original? y supongo que pushearemos otra branch buen
@@ -86,7 +87,7 @@ const Navbar = () => {
   return (
     <div className="headerCointain">
       <header className="header">
-        <h1 id="titleMain"><Link to="/">hgvr</Link></h1>
+        <Link to="/"><img className='pagelogo' src={logo} alt="Hangover Logo" /></Link> {/*el que haya hecho la navbar la hizo muy mal y esto se ve muy chico*/ }
         {isMenuOpen ? <nav className="verticalNav">
           <ul>
             <li><button className="hamburger" onClick={toggleMenu}>
