@@ -85,16 +85,16 @@ body{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-left: 100px;
-  padding-right: 100px;
+  padding-left: 50px;
+  padding-right: 50px;
   position: fixed;
   right: 0;
   left: 0;
   top: 0;
+  left:0;
   z-index: 1000;
-  flex-wrap: wrap;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 5vh;
+  flex-direction: row;
 }
 
 ul {
@@ -116,8 +116,13 @@ li.busqueda {
 
 .busqueda input[type="search"] {
   border-radius: 9rem;
-  width: 100%;
-  max-width: 300px;
+  box-shadow: rgba(0, 0, 0, 0.164) 0px 0px;
+  border: 0px solid #ccc; /* Borde */
+  border-radius: 10px; /* Bordes redondeados */
+  padding-left: 10px;
+}
+.busqueda input[type="search"]::-webkit-search-cancel-button{
+  display: none;
 }
 
 li a {
@@ -126,23 +131,50 @@ li a {
   font-weight: 200;
   font-size: 18px;
 }
-
+.busquedaIcono{
+  width: 1vw;
+  height: auto;
+}
 li a:hover {
   text-shadow: 0.001px 0 0 white;
 }
-
-.botonesNavbar {
+.navBotonesNavbar{
   display: flex;
-  list-style-type: none;
-  padding: 0;
-  flex-wrap: wrap;
+  align-items: center;
+  flex-direction: row;
   justify-content: center;
+  position:absolute;
+  width: 100%;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+.botonesNavbar {
+display: flex;
+flex-direction: row;
+align-items: center;
+justify-content: center;
+  
 }
 
 .botonesNavbar li {
   margin: 1rem 1rem;
 }
-
+.userThingsA{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  z-index:1000;
+  cursor:pointer;
+  gap:1rem;
+  
+}
+.userThingsDiv{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .botonesNavbar a {
   color: rgb(255, 255, 255);
   font-family: 'Quicksand', sans-serif;
@@ -159,7 +191,7 @@ li a:hover {
   background-color: #255952;
   display: flex;
   flex-direction: column;
-  border-radius: 1.1rem ;   
+  border-radius: 0.4rem ;   
   padding: 1rem;
 }
 .infoPopup{
@@ -176,7 +208,17 @@ li a:hover {
 .Botones {
   left: 0;
 }
-
+.busqueda {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.searchForm{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
 .Recomendados {
   transform-origin: top left;
   transform: rotate(90deg) translate(0,-100%);

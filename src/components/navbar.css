@@ -20,9 +20,27 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
     
   }
+.nuevoDiseño{
+  background-color: white;
+  border: 0px rgba(56, 117, 109, 0.95) solid;
+  border-radius: 10px;
+  color: rgba(56, 117, 109, 0.95) !important;
+  font-weight: normal;
+  padding: 0.1vw 1vw 0.1vw 1vw;
+}
+.textoNuevoDiseño{
+
+}
   .pagelogo{
-    height: 20px;
+    height: 3.6vw;
     width: auto;
+    position: absolute;
+    top:0;
+    margin-top:0.2vw;
+
+  }
+  .logoA{
+    z-index: 1000;
   }
   .verticalNav ul{
     display: flex;
@@ -38,19 +56,22 @@
   }
   .navbarBurgerElement{
     display: flex;
-
   }
   
   .nav {
     display: flex; /* Show nav items in a row by default */
   }
   
-  
+  .profPic{
+    width: 2vw;
+    border-radius: 100%;
+    height: auto;
+  }
   @media (max-width: 1234px) { /* Adjust the max-width as needed */
     .hamburger {
       display: block; /* Show hamburger button on smaller screens */
     }
-  
+
     .botonesNavbar {
       display: none; /* Hide nav items by default on small screens */
     }
@@ -66,13 +87,12 @@
   
     .busqueda {
       width: 100%; /* Make search bar responsive */
-      margin-bottom: 1rem; /* Space below the search input */
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   
-    .busqueda input[type="search"] {
-      max-width: none; /* Remove max-width for smaller screens */
-      width: 80%; /* Adjust width for better mobile view */
-    }
   }
   #titleMain {
     display: block;
@@ -98,6 +118,8 @@
 
   header {
     position: fixed;
+    height: 3vw;
+    display: flex;
   }
 
   .infoPopup{

@@ -15,11 +15,12 @@ const Profile = () => {
   const { userId } = useParams();
   const [ownUserId, setOwnUserId] = useState(null);
   const [userData, setUserData] = useState(null); // Initialize with null
-  const { isLoggedIn, openModalNavBar,strictCheckAuth } = useContext(AuthContext); 
+  const { isLoggedIn, openModalNavBar,strictCheckAuth, setIsLoggedIn } = useContext(AuthContext); 
   const [follows, setFollows] = useState(false);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name:"",
@@ -31,6 +32,13 @@ const Profile = () => {
     let authcheck;const checkauth = async () => {return strictCheckAuth(navigate)};checkauth()
     
   },[])
+  
+  const LogOut = () => {
+    localStorage.setItem('token', '');
+    setUser(null);
+    setIsLoggedIn(false); // Actualizar estado de inicio de sesión en el contexto
+    window.location.reload(); // Recargar la página para limpiar el estado
+  };
   useEffect(() => {
     
 
@@ -178,6 +186,7 @@ const Profile = () => {
             <>
               <Button text="Editar Perfil" onClick={() => setEditing(true)} />
               <Button text="Configuración" />
+              <Button text="Cerrar sesión" onClick={() => LogOut()}/>
             </>
           ) : (
             <>

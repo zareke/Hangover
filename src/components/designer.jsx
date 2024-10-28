@@ -6,6 +6,7 @@ import html2canvas from 'html2canvas';
 import { AuthContext } from '../AuthContext';
 import axios from 'axios';
 import config from '../config';
+import ContextMenu from './ContextMenu';
 import { redirect, useLocation, useNavigate } from 'react-router-dom';
 
 const Designer = () => {
@@ -29,6 +30,11 @@ const Designer = () => {
   const [currentView, setCurrentView] = useState('front');
   const [hasChanges, setHasChanges] = useState(false); //
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [contextMenuOptions, setContextMenuOptions] = useState([]);
+
 
 
   const [elements, setElements] = useState({ //
@@ -115,7 +121,7 @@ const Designer = () => {
   const handlePatternColorChange = (e) => document.documentElement.style.setProperty('--pattern-color', e.target.value);
 
   const addTextInput = () => {
-    const newText = { id: Date.now(), text: '', x: 50, y: 50, width: 100, height: 50, fontSize: '16px', fontFamily: 'Arial',  view: currentView }
+    const newText = { id: Date.now(), text: 'Texto de ejemplo', x: 50, y: 50, width: 100, height: 50, fontSize: '16px', fontFamily: 'Arial',  view: currentView }
     setTexts(prevTexts => [...prevTexts, newText]);
     setSelectedItem(newText);
   };  
@@ -371,9 +377,67 @@ const Designer = () => {
       console.error('Error saving shirt:', error);
     }
   };
+
+  const showContextMenu = (event) => {
+    event.preventDefault(); // Prevent default context menu
+    setContextMenuPosition({ x: event.pageX, y: event.pageY });
+    setContextMenuOptions([
+      { label: 'Add Text', action: addTextOption },
+      { label: 'Add Shape', action: addShapeOption },
+    ]);
+    setContextMenuVisible(true);
+    console.log("showcontextmenucorrido")
+  };
+
+  const hideContextMenu = () => {
+    setContextMenuVisible(false);
+  };
+
+  const addTextOption = () => {
+    addTextInput()
+    hideContextMenu();
+  };
+
+  const addShapeOption = () => {
+    addShape()
+    hideContextMenu();
+  };
+
+  
+
+  const handleRightClickOnItem = (event, item) => {
+    event.preventDefault();
+    event.stopPropagation()
+    setContextMenuPosition({ x: event.pageX, y: event.pageY });
+    console.log("options ", contextMenuOptions)
+    setContextMenuOptions([
+      { label: 'Bring Up', action: () => bringUp(item.id) },
+      { label: 'Send Down', action: () => sendDown(item.id) },
+      { label: 'Bring to Front', action: () => bringToFront(item.id) },
+      { label: 'Send to Back', action: () => sendToBack(item.id) },
+    ]);
+    setContextMenuVisible(true);
+  };
+
+  const bringUp = (id) => {
+    // Logic to bring up the item
+  };
+  
+  const sendDown = (id) => {
+    // Logic to send down the item
+  };
+  
+  const bringToFront = (id) => {
+    // Logic to bring the item to the front
+  };
+  
+  const sendToBack = (id) => {
+    // Logic to send the item to the back
+  };
   
   return (
-    <div className="designer">
+    <div className="designer"
+    onContextMenu={showContextMenu}>
       <h2>Create a Design</h2>
       
       <div className="view-controls">
@@ -394,13 +458,14 @@ const Designer = () => {
       <div className="properties-panel">
   {selectedItem != null && (
     <div>
-      <h3>Properties</h3>
+      <h3>Propiedades</h3>
       {selectedItem.shape && (
         <div>
           <input
             type="text"
             value={selectedItem.text}
             onChange={(e) => handleTextChange(selectedItem.id, e.target.value)}
+            
           />
           <button onClick={() => removeTextInput(selectedItem.id)}>- Remove</button>
           <label>Font Color:</label>
@@ -590,6 +655,8 @@ const Designer = () => {
   .filter((text) => text.view === currentView) // Filtrar por vista
   .map((text) => (
     <Rnd
+    onContextMenu={(e) => handleRightClickOnItem(e, text)} // Handle right-click for the design area
+
       key={text.id}
       size={{ width: text.width, height: text.height }}
       position={{ x: text.x, y: text.y }}
@@ -624,6 +691,7 @@ const Designer = () => {
           {shapes && shapes.filter((shape) => shape.view === currentView)
           .map((shape) => (
             <Rnd
+                onContextMenu={(e) => handleRightClickOnItem(e, shape)}
               className="rnd"
               key={shape.id}
               onClick={() => setSelectedItem(shape)}
@@ -710,6 +778,13 @@ const Designer = () => {
     ) : (
       <h3>Diseño guardado.</h3> // Mensaje cuando no hay cambios
     )}
+    {contextMenuVisible && (
+        <ContextMenu
+          options={contextMenuOptions}
+          position={contextMenuPosition}
+          onClose={hideContextMenu}
+        />
+      )}
       {modalVisible && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -721,7 +796,7 @@ const Designer = () => {
               <button onClick={handleModalClose}>No</button>
             </div>
           </div>
-          </div>
+          </div> 
       )}
     </div>
         </div>

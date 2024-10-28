@@ -14,6 +14,8 @@ import profile from '../vendor/imgs/profileicon.png'
 import { handleSearch } from '../universalhandlers';
 import { useNavigate } from "react-router-dom";
 import logo from "../vendor/imgs/logo.png"
+import magGlass from "../vendor/imgs/magGlass.png"
+import standardUser from "../vendor/imgs/standardUser.png"
 
 let openModal, closeModal;
 //hacemos una copia de hangover y ahi modificamos todo react-native o usamos todo lo original? y supongo que pushearemos otra branch buen
@@ -26,6 +28,7 @@ const Navbar = () => {
   const [infoPopupVisible,setInfoPopupVisible]=useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [isInfoClicked, setIsInfoClicked] = useState(false)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -55,9 +58,11 @@ const Navbar = () => {
 
   const openInfoThingy = () =>{
     setInfoPopupVisible(true)
+    setIsInfoClicked(true)
   }
   const closeInfo = ()=>{
     setInfoPopupVisible(false)
+    setIsInfoClicked(false)
   }
   
   const toggleMenu = () => {
@@ -86,10 +91,13 @@ const Navbar = () => {
   
   return (
     <div className="headerCointain">
+        
       <header className="header">
-        <Link to="/"><img className='pagelogo' src={logo} alt="Hangover Logo" /></Link> {/*el que haya hecho la navbar la hizo muy mal y esto se ve muy chico*/ }
+
+
+        <Link className='logoA' to="/"><img className='pagelogo' src={logo} alt="Hangover Logo" /></Link> {/*el que haya hecho la navbar la hizo muy mal y esto se ve muy chico*/ }
         {isMenuOpen ? <nav className="verticalNav">
-          <ul>
+          <ul >
             <li><button className="hamburger" onClick={toggleMenu}>
             &#9776; {/* Hamburger icon */}
             </button></li> 
@@ -124,19 +132,20 @@ const Navbar = () => {
         <button className="hamburger" onClick={toggleMenu}>
           &#9776; {/* Hamburger icon */}
         </button>}
-        <nav>
-          
+        
+       
+        <nav >
+          <div className='navBotonesNavbar'>
+      
           <ul className="botonesNavbar">
-          <li><Link to="/">Explorar</Link></li>
-            <li>
-              <div className="busqueda">
-                <form onSubmit={handleSubmitSearch}>
-                  <input onChange={(e) => {setSearchQuery(e.target.value);}} type="search" id="gsearch" name="gsearch" style={{ width: '300px' }} />
-                  <button type="submit">Buscar</button>
+            <li><div className="busqueda">
+                <form onSubmit={handleSubmitSearch} className='searchForm'>
+                  
+                  <input onChange={(e) => {setSearchQuery(e.target.value);}} type="search" id="gsearch" name="gsearch" style={{ width: '400px', height: '27px' }} placeholder='Busca alguna prenda o usuario...' />
+                 <div className="centrador"> <button type="submit"><img className='busquedaIcono' src={magGlass}></img></button></div>
                 </form> 
-              </div>
-            </li>
-            <li><Link to="/chatsview">chats</Link></li>
+              </div></li>
+            <li><Link to="/chatsview">Mensajes</Link></li>
             <li><div onMouseEnter={openInfoThingy} onMouseLeave={closeInfo}> {
              infoPopupVisible  && (<div className='infoPopup'>
               <div className="compactedInfo">
@@ -145,10 +154,14 @@ const Navbar = () => {
             <Link to="/informacion/contacto"> Contáctanos</Link>
             </div>
            </div>)
-           } <a>Información</a></div>
+           } <a>
+           Información
+         </a>
+         </div>
+          
             </li>
             <li><Link to="/carrito">Carrito</Link></li>
-            <li><Link className='navbarBurgerElement' to="/designer"><span className='nombrelink'>Designer</span> <span class="flecha">&#128898;</span></Link></li>
+            <li className='textoNuevoDiseño'><Link className='nuevoDiseño' to="/designer">Nuevo Diseño</Link></li>
             <li> 
               {isLoggedIn ? (
                 <Link to="/Biblioteca">Biblioteca</Link>
@@ -156,19 +169,22 @@ const Navbar = () => {
                 <a onClick={openModal}>Biblioteca</a>
               )}
             </li>
-            <li>
-              {isLoggedIn ? (
+          </ul>
+          </div>
+          <div className='userThingsDiv'>
+          {isLoggedIn ? (
                 <>
-                  {user ? <Link to={"/user/"+user.id}>{user.username}</Link> : null} 
+                {console.log(user)}
+                  {user ? <Link className='userThingsA' to={"/user/"+user.id}>{user.username}<img className='profPic' src={user.profile_photo}></img></Link> : null} 
                   {/* yo le pondria que en lugar de decir el nombre de usuario mostrara su fotito */}
-                  <button onClick={LogOut}>Cerrar sesión</button>
+                 
                 </>
               ) : (
-                <a onClick={openModal}>Iniciar sesión</a>
+                <a className='userThingsA' onClick={openModal}><img className='profPic' src={standardUser}/></a>
               )}
-            </li>
-          </ul>
+        </div>
         </nav>
+        
       </header>
 
       {/* Renderizar el componente de inicio de sesión si modalVisible es true */}
