@@ -17,24 +17,22 @@ const ChatView = () => {
     const [friendsError, setFriendsError] = useState(null);
 
     const groupNameRef = useRef();
-
+    const fetchRecentChats = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${config.url}chat/get/chats`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setChats(response.data.chats);
+            setLoading(false);
+            setOwnId(response.data.ownId);
+        } catch (err) {
+            console.error('Error fetching recent chats:', err);
+            setError('Error fetching recent chats');
+            setLoading(false);
+        }
+    };
     useEffect(() => {
-        const fetchRecentChats = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const response = await axios.get(`${config.url}chat/get/chats`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setChats(response.data.chats);
-                setLoading(false);
-                setOwnId(response.data.ownId);
-            } catch (err) {
-                console.error('Error fetching recent chats:', err);
-                setError('Error fetching recent chats');
-                setLoading(false);
-            }
-        };
-
         fetchRecentChats();
     }, []);
 
@@ -90,8 +88,10 @@ const ChatView = () => {
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
+            fetchRecentChats();
             alert('Group created successfully!');
             closeModal();
+            
         } catch (error) {
             console.error('Error creating group:', error);
             alert('Error creating group');

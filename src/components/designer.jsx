@@ -31,7 +31,7 @@ const Designer = () => {
   const [hasChanges, setHasChanges] = useState(false); //
   const [selectedItem, setSelectedItem] = useState(null);
   const [zindexes,setZindexes]=useState([])
-  const {brushColor,setBrushColor}=useState("rgba(56, 117, 109, 1)")
+  const {brushColor,setBrushColor}=useState('rgba(56, 117, 109, 1)')
 
   const Z_DISPONIBLE  = 10000
 
@@ -230,7 +230,19 @@ const Designer = () => {
     setShapes(prevShapes => [...prevShapes, newShape]);
     setSelectedItem(newShape)
   };
-
+  const setDrawFalse = () =>{
+    setCanDraw(false)
+    setBrushColor('rgba(56, 117, 109, 1)')
+  }
+  const setDrawTrue = () =>{
+    setCanDraw(false)
+    setBrushColor('rgb(68, 138, 128)')
+  }
+  const setDraw616Southside = (_op) =>{
+    setCanDraw(_op)
+    const defBrushColor = (brushColor == 'rgba(56, 117, 109, 1)' ? 'rgb(68, 138, 128)' : 'rgba(56, 117, 109, 1)')
+    setBrushColor('' + defBrushColor)
+  }
   const addImage = (event) => {
     const z = newObjectZ()
     const file = event.target.files[0];
@@ -346,7 +358,7 @@ const Designer = () => {
     if (!canDraw) return;
     
     setIsDrawing(true);
-    setBrushColor("rgb(68, 138, 128);")
+    
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -383,7 +395,7 @@ const Designer = () => {
     setPaths(prevPaths => [...prevPaths, currentPath]);
     setCurrentPath(null);
     setIsDrawing(false);
-    setBrushColor("rgba(56, 117, 109, 1)")
+    
   };
 
   const handleBrushSizeChange = (e) => {
@@ -490,7 +502,7 @@ const Designer = () => {
     setContextMenuVisible(true);
   };
 
-  
+ 
   return (
     <div className="designer"
     onContextMenu={showContextMenu}>
@@ -544,7 +556,7 @@ const Designer = () => {
       
 
         {/* Pincel */}
-      <button className={`designer-button ${canDraw ? 'active' : ''}`} onClick={() => setCanDraw(!canDraw)} style={{backgroundColor:{brushColor}}}>
+      <button className={`designer-button ${canDraw ? 'active' : ''}`} onClick={() => setDraw616Southside(!canDraw)} style={{backgroundColor:{brushColor}}}  >
         {canDraw ? '✏️' : '✏️'}
       </button>
       <label>
@@ -635,7 +647,7 @@ const Designer = () => {
           </div>
         )}
     </div>
-  
+
 </div>)}</div>
       
 
@@ -692,7 +704,7 @@ const Designer = () => {
       style={{zIndex:text.z}} 
       onClick={() => setSelectedItem(text)}
       bounds=".shirt"
-      onDragStart={() => setCanDraw(false)}
+      onDragStart={() => setDrawFalse()}
       onDragStop={(e, d) => handleTextDragStop(text.id, d.x, d.y)}
       onResizeStop={(e, direction, ref, delta, position) => {
         handleTextResizeStop(text.id, parseInt(ref.style.width, 10), parseInt(ref.style.height, 10));
@@ -729,7 +741,7 @@ const Designer = () => {
               style={{zIndex:shape.z}} 
               position={{ x: shape.x, y: shape.y }}
               bounds=".shirt"
-              onDragStart={() => setCanDraw(false)}
+              onDragStart={() => setDrawFalse()}
               onDragStop={(e, d) => handleShapeDragStop(shape.id, d.x, d.y)}
               onResizeStop={(e, direction, ref, delta, position) => {
                 const newWidth = ref.offsetWidth;
@@ -764,7 +776,7 @@ const Designer = () => {
         onClick={() => setSelectedItem(image)}
         size={{ width: image.width, height: image.height }}
         position={{ x: image.x, y: image.y }} 
-        onDragStart={() => setCanDraw(false)}
+        onDragStart={() => setDrawFalse()}
         onDragStop={(e, d) => handleImageDragStop(image.id, d.x, d.y)}
         style={{zIndex:image.z}} 
         onResizeStop={(e, direction, ref, delta, position) => {
