@@ -30,6 +30,10 @@ const Designer = () => {
   const [currentView, setCurrentView] = useState('front');
   const [hasChanges, setHasChanges] = useState(false); //
   const [selectedItem, setSelectedItem] = useState(null);
+  const [zindexes,setZindexes]=useState([])
+  const {brushColor,setBrushColor}=useState("rgba(56, 117, 109, 1)")
+
+  const Z_DISPONIBLE  = 10000
 
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -85,6 +89,11 @@ const Designer = () => {
     setHasChanges(true); // Marca como cambiado cuando se actualiza el diseño
   }, [color, pattern, texts, shapes, images, paths]);
 
+
+  /*useEffect(() => { //ORDENAR Z USADO CADA VEZ QUE CAMBIA
+    setZindexes((prevZUsado) => [...prevZUsado].sort((a, b) => a - b));
+  }, [zindexes])*/
+
   const nav = useNavigate();
 
   const getShirt = useCallback(async () => {
@@ -96,7 +105,6 @@ const Designer = () => {
       
       const data = JSON.parse(response.data);
 
-      console.log("response", data);
 
       setColor(data.info.design_data.color || 'rgb(255,255,255)');
       setPattern(data.info.design_data.pattern || 'none');
@@ -120,11 +128,36 @@ const Designer = () => {
   const handlePatternChange = (e) => setPattern(e.target.value);
   const handlePatternColorChange = (e) => document.documentElement.style.setProperty('--pattern-color', e.target.value);
 
-  const addTextInput = () => {
-    const newText = { id: Date.now(), text: 'Texto de ejemplo', x: 50, y: 50, width: 100, height: 50, fontSize: '16px', fontFamily: 'Arial',  view: currentView }
-    setTexts(prevTexts => [...prevTexts, newText]);
-    setSelectedItem(newText);
-  };  
+    const addTextInput = () => {
+      const z = newObjectZ()
+      const newText = { id: Date.now(), text: 'Texto de ejemplo', x: 50, y: 50, z:z, width: 100, height: 50, fontSize: '16px', fontFamily: 'Arial',  view: currentView }
+      setTexts(prevTexts => [...prevTexts, newText]);
+      setSelectedItem(newText);
+    };  
+
+ 
+  const newObjectZ = () => {
+    let z = Math.floor(Z_DISPONIBLE / 2); // Start at the middle
+
+    // Find the closest available z-index
+    if (!zindexes.includes(z)) {
+      setZindexes((prev) => [...prev, z].sort((a, b) => a - b));
+      return z;
+    }
+
+    let offset = 1;
+    while (true) {
+      if (!zindexes.includes(z + offset)) {
+        setZindexes((prev) => [...prev, z + offset].sort((a, b) => a - b));
+        return z + offset;
+      }
+      if (!zindexes.includes(z - offset)) {
+        setZindexes((prev) => [...prev, z - offset].sort((a, b) => a - b));
+        return z - offset;
+      }
+      offset++;
+    }
+  };
 
   
   
@@ -134,9 +167,6 @@ const Designer = () => {
     setCanDraw(false);
   
   };
-  document.body.addEventListener('click', function(e) {
-    console.log(e.target.className);
-  })
   const handleImageResizeStart = (id) => {
     setActiveImageId(id);
     setCanDraw(false);
@@ -144,13 +174,29 @@ const Designer = () => {
   };
   const removeTextInput = (id) => {
     setTexts(prevTexts => prevTexts.filter((text) => text.id !== id));
+    setSelectedItem(null)
   };
 
   const handleTextChange = (id, newText) => {
     setTexts(prevTexts => prevTexts.map((text) => (text.id === id ? { ...text, text: newText } : text)));
+    selectedItem.text = newText
   };
 
-
+  const handleImageResizeStop = (id, _width,_height, position) => {
+    setImages(prevImages => prevImages.map((image) => {
+      if (image.id === id) {
+        return {
+          ...image,
+          width: _width,
+          height: _height,
+          x: position.x,
+          y: position.y
+        };
+      }
+      return image;
+    }));
+    setActiveImageId(null);
+  };
   
 
   const handleTextDragStop = (id, x, y) => {
@@ -168,8 +214,10 @@ const Designer = () => {
 
   const handleFontSizeChange = (id, fontSize) => {
     const newFontSize = parseInt(fontSize, 10);
-    fontSize = newFontSize > 100 ? "60px" : `${newFontSize}px`;
+    fontSize = newFontSize > 100 ? "100px" : `${newFontSize}px`;
+    fontSize = newFontSize < 0 ? "0" : `${newFontSize}px`;
     setTexts(prevTexts => prevTexts.map((text) => (text.id === id ? { ...text, fontSize } : text)));
+    selectedItem.fontSize = fontSize
   };
 
   const handleFontFamilyChange = (id, family) => {
@@ -177,17 +225,29 @@ const Designer = () => {
   };
 
   const addShape = () => {
-    const newShape={ id: Date.now(), shape: 'square', x: 50, y: 50, width: 50, height: 50,  view: currentView }
+    const z = newObjectZ()
+    const newShape={ id: Date.now(), shape: 'square', x: 50, y: 50,z:z, width: 50, height: 50,  view: currentView }
     setShapes(prevShapes => [...prevShapes, newShape]);
     setSelectedItem(newShape)
   };
 
   const addImage = (event) => {
+    const z = newObjectZ()
     const file = event.target.files[0];
     const reader = new FileReader();
-    console.log((event.target.files[0]))
     reader.onloadend = () => {
       setImages(prevImages => [...prevImages, { 
+        id: Date.now(), 
+        src: reader.result, 
+        name: file.name, 
+        x: 50, 
+        y: 50, 
+        z: z,
+        width: 100, 
+        height: 100,
+        view: currentView
+      }]);
+      const newImage= { 
         id: Date.now(), 
         src: reader.result, 
         name: file.name, 
@@ -196,43 +256,58 @@ const Designer = () => {
         width: 100, 
         height: 100,
         view: currentView
-      }]);
+      };
+      setSelectedItem(newImage)
     };
-    const newImage= { 
-      id: Date.now(), 
-      src: reader.result, 
-      name: file.name, 
-      x: 50, 
-      y: 50, 
-      width: 100, 
-      height: 100,
-      view: currentView
-    };
-    setSelectedItem(newImage)
-    console.log(newImage)
+  
+
+
+   
       if (event.target.files[0]) {
           // ...
           event.target.value = "";
       }
   
     reader.readAsDataURL(file);
+
   };
  
+  const moveItem = (id, direction, type) => {
+    let items, setItems;
+    if (type === "text") {
+      items = texts;
+      setItems = setTexts;
+    } else if (type === "shape") {
+      items = shapes;
+      setItems = setShapes;
+    } else if (type === "image") {
+      items = images;
+      setItems = setImages;
+    }
 
-  const handleImageResizeStop = (id, _width,_height, position) => {
-    setImages(prevImages => prevImages.map((image) => {
-      if (image.id === id) {
-        return {
-          ...image,
-          width: _width,
-          height: _height,
-          x: position.x,
-          y: position.y
-        };
-      }
-      return image;
-    }));
-    setActiveImageId(null);
+    const itemIndex = items.findIndex((item) => item.id === id);
+    if (itemIndex === -1) return;
+
+    const targetItem = items[itemIndex];
+    let newZ;
+
+    if (direction === "sendBack") {
+      newZ = Math.min(...zindexes) - 1;
+    } else if (direction === "bringFront") {
+      newZ = Math.max(...zindexes) + 1;
+    } else if (direction === "up") {
+      newZ = targetItem.z + 1;
+    } else if (direction === "down") {
+      newZ = targetItem.z - 1;
+    }
+
+    // Ensure no duplicates in zindexes
+    setZindexes((prev) => [...prev.filter((z) => z !== targetItem.z), newZ].sort((a, b) => a - b));
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, z: newZ } : item
+      )
+    );
   };
 
   const handleImageDragStop = (id, x, y) => {
@@ -243,18 +318,19 @@ const Designer = () => {
   
   const removeImage = (id) => {
     setImages(prevImages => prevImages.filter((image) => image.id !== id));
+    setSelectedItem(null)
   };
 
   const removeShape = (id) => {
-    console.log(selectedItem.shape != null)
     setShapes(prevShapes => prevShapes.filter((shape) => shape.id !== id));
-  
+    setSelectedItem(null)   
   };
   
 
 
   const handleShapeChange = (id, newShape) => {
     setShapes(prevShapes => prevShapes.map((shape) => (shape.id === id ? { ...shape, shape: newShape } : shape)));
+    selectedItem.shape = newShape
   };
 
   const handleShapeDragStop = (id, x, y) => {
@@ -262,16 +338,15 @@ const Designer = () => {
   };
 
   const handleShapeResizeStop = (id, width, height) => {
-    console.log('Resizing shape:', id, 'New width:', width, 'New height:', height);
     setShapes(prevShapes => prevShapes.map((shape) => shape.id === id ? { ...shape, width, height } : shape));
   };
   
-  console.log("Holaa");
   
   const handleDrawStart = (event) => {
     if (!canDraw) return;
     
     setIsDrawing(true);
+    setBrushColor("rgb(68, 138, 128);")
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -308,6 +383,7 @@ const Designer = () => {
     setPaths(prevPaths => [...prevPaths, currentPath]);
     setCurrentPath(null);
     setIsDrawing(false);
+    setBrushColor("rgba(56, 117, 109, 1)")
   };
 
   const handleBrushSizeChange = (e) => {
@@ -315,7 +391,6 @@ const Designer = () => {
   };
 
   const handleCapture = async () => {
-    console.log("Capturing image...");
     if (shirtRef.current && isLoggedIn) {
       const canvas = await html2canvas(shirtRef.current);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
@@ -346,11 +421,11 @@ const Designer = () => {
   
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      console.log('Link pressed, saving to database.');
       saveShirt(dataUrl);
     });
   
     link.click();
+    setHasChanges(false)
   }
 
   const saveShirt = async (dataUrl) => {
@@ -363,7 +438,6 @@ const Designer = () => {
       paths, 
     };
 
-    console.log(pattern);
     const designJSON = JSON.stringify(designData);
     console.log(designJSON);
     const token = localStorage.getItem('token');
@@ -371,7 +445,6 @@ const Designer = () => {
       const response = await axios.post(`${config.url}design/save`, { designId: designId, image: dataUrl, designData: designJSON }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      console.log('id:', response.data);
       setSavedShirtId(response.data)
     } catch (error) {
       console.error('Error saving shirt:', error);
@@ -386,7 +459,6 @@ const Designer = () => {
       { label: 'Add Shape', action: addShapeOption },
     ]);
     setContextMenuVisible(true);
-    console.log("showcontextmenucorrido")
   };
 
   const hideContextMenu = () => {
@@ -405,35 +477,19 @@ const Designer = () => {
 
   
 
-  const handleRightClickOnItem = (event, item) => {
+  const handleRightClickOnItem = (event, item,type) => {
     event.preventDefault();
     event.stopPropagation()
     setContextMenuPosition({ x: event.pageX, y: event.pageY });
-    console.log("options ", contextMenuOptions)
     setContextMenuOptions([
-      { label: 'Bring Up', action: () => bringUp(item.id) },
-      { label: 'Send Down', action: () => sendDown(item.id) },
-      { label: 'Bring to Front', action: () => bringToFront(item.id) },
-      { label: 'Send to Back', action: () => sendToBack(item.id) },
+      { label: 'Adelante', action: () =>  moveItem(item.id,"up",type) },
+      { label: 'Atras', action: () =>  moveItem(item.id,"down",type) },
+      { label: 'Traer al frente', action: () =>  moveItem(item.id,"bringFront",type) },
+      { label: 'Enviar al fondo', action: () =>  moveItem(item.id,"sendBack",type) },
     ]);
     setContextMenuVisible(true);
   };
 
-  const bringUp = (id) => {
-    // Logic to bring up the item
-  };
-  
-  const sendDown = (id) => {
-    // Logic to send down the item
-  };
-  
-  const bringToFront = (id) => {
-    // Logic to bring the item to the front
-  };
-  
-  const sendToBack = (id) => {
-    // Logic to send the item to the back
-  };
   
   return (
     <div className="designer"
@@ -455,67 +511,8 @@ const Designer = () => {
           Back View
         </button>
       </div>
-      <div className="properties-panel">
-  {selectedItem != null && (
-    <div>
-      <h3>Propiedades</h3>
-      {selectedItem.shape && (
-        <div>
-          <input
-            type="text"
-            value={selectedItem.text}
-            onChange={(e) => handleTextChange(selectedItem.id, e.target.value)}
-            
-          />
-          <button onClick={() => removeTextInput(selectedItem.id)}>- Remove</button>
-          <label>Font Color:</label>
-          <input
-            type="color"
-            value={selectedItem.color}
-            onChange={(e) => handleFontColorChange(selectedItem.id, e.target.value)}
-          />
-          <label>Font Size:</label>
-          <input
-            type="number"
-            value={parseInt(selectedItem.fontSize, 10)}
-            onChange={(e) => handleFontSizeChange(selectedItem.id, `${e.target.value}px`)}
-          />
-          <label>Font Family:</label>
-          <select
-            value={selectedItem.fontFamily}
-            onChange={(e) => handleFontFamilyChange(selectedItem.id, e.target.value)}
-          >
-            {/* Font options */}
-          </select>
-        </div>
-      )}
-      {selectedItem.type === 'image' && (
-        <div>
-          <p>{selectedItem.name}</p>
-          <button onClick={() => removeImage(selectedItem.id)}>- Remove</button>
-        </div>
-      )}
-     {shapes && shapes
-        .filter((shape) => shape.view === currentView) // Mostrar solo formas de la vista actual
-        .map((shape) => (
-          <div key={shape.id}>
-            <select
-              value={shape.shape}
-              onChange={(e) => handleShapeChange(shape.id, e.target.value)}
-            >
-              <option value="square">Square</option>
-              <option value="circle">Circle</option>
-              <option value="rectangle">Rectangle</option>
-              <option value="triangle">Triangle</option>
-              <option value="diamond">Diamond</option>
-            </select>
-            <button className="designer-button" onClick={() => removeShape(shape.id)}>-</button>
-          </div>
-        ))}
-    </div>
-  )}
-</div>
-      <div className="controls">
+     
+<div className="_616southside"> <div className="controls">
         <label>
           Color:
           <input type="color" value={color} onChange={handleColorChange} />
@@ -536,68 +533,19 @@ const Designer = () => {
           <input type="color" onChange={handlePatternColorChange} />
         </label>
         <button className="designer-button" onClick={addTextInput}>+ Text</button>
-        {texts && texts
-        .filter((text) => text.view === currentView) // Mostrar solo textos de la vista actual
-        .map((text) => (
-          <div key={text.id}>
-            <input
-              type="text"
-              className="gamer"
-              value={text.text}
-              onChange={(e) => handleTextChange(text.id, e.target.value)}
-            />
-            <button className="designer-button" onClick={() => removeTextInput(text.id)}>-</button>
-            <label>
-              Font Color:
-              <input
-                type="color"
-                value={text.color}
-                onChange={(e) => handleFontColorChange(text.id, e.target.value)}
-              />
-            </label>
-            <label>
-              Font Size:
-              <input
-                type="number"
-                value={parseInt(text.fontSize, 10)}
-                onChange={(e) => handleFontSizeChange(text.id, `${e.target.value}px`)}
-              />
-            </label>
-            <label>
-              Font Family:
-              <select
-                value={text.fontFamily}
-                onChange={(e) => handleFontFamilyChange(text.id, e.target.value)}
-              >
-                <option value="Arial">Arial</option>
-                <option value="Courier New">Courier New</option>
-                <option value="Georgia">Georgia</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Verdana">Verdana</option>
-              </select>
-            </label>
-          </div>
-        ))}
         
         <button className="designer-button" onClick={addShape}>+ Shape</button>
         
          {/* Imágenes */}
       
          <label for="file-upload" className='designer-button'>+ Image</label>
-<input type="file" id="file-upload" onChange={addImage} accept="image/*" />
+<input className='inputParaEsconder' type="file" id="file-upload" onChange={addImage} accept="image/*" />
 
-      {images && images
-        .filter((image) => image.view === currentView) // Mostrar solo imágenes de la vista actual
-        .map((image) => (
-          <div key={image.id}>
-            <p>{image.name}</p>
-            <button className="designer-button" onClick={() => removeImage(image.id)}>Remove Image</button>
-          </div>
-        ))}
+      
 
         {/* Pincel */}
-      <button className={`designer-button ${canDraw ? 'active' : ''}`} onClick={() => setCanDraw(!canDraw)}>
-        {canDraw ? '✏️ Drawing Mode (On)' : '✏️ Drawing Mode (Off)'}
+      <button className={`designer-button ${canDraw ? 'active' : ''}`} onClick={() => setCanDraw(!canDraw)} style={{backgroundColor:{brushColor}}}>
+        {canDraw ? '✏️' : '✏️'}
       </button>
       <label>
         Drawing Color:
@@ -609,6 +557,87 @@ const Designer = () => {
         {brushSize}px
       </label>
     </div>
+    {selectedItem != null && (
+    <div className="properties-panel">
+
+    <div className='properties'>
+      <h3>Propiedades</h3>
+      {selectedItem.fontSize &&
+        (
+          
+          <div key={selectedItem.id}>
+              <label>
+                Texto
+            <input
+              type="text"
+              className="gamer"
+              value={selectedItem.text}
+              onChange={(e) => handleTextChange(selectedItem.id, e.target.value)}
+            />
+              </label>
+            <label>
+              Color de fuente
+              <input
+                type="color"
+                value={selectedItem.color}
+                onChange={(e) => handleFontColorChange(selectedItem.id, e.target.value)}
+              />
+            </label>
+            <label>
+              Tamaño de fuente
+              <input
+                type="number"
+                value={parseInt(selectedItem.fontSize, 10)}
+                onChange={(e) => handleFontSizeChange(selectedItem.id, `${e.target.value}px`)}
+              />
+            </label>
+            <label>
+              Fuente
+              <select
+                value={selectedItem.fontFamily}
+                onChange={(e) => handleFontFamilyChange(selectedItem.id, e.target.value)}
+              >
+                <option value="Arial">Arial</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+              </select>
+            </label>
+            <button className="designer-button" onClick={() => removeTextInput(selectedItem.id)}>Eliminar</button>
+          </div>
+        
+        )}
+        
+      {selectedItem.src && (
+      
+            <div key={selectedItem.id}>
+              
+              {console.log(selectedItem)}
+              <p>{selectedItem.name}</p>
+              <button className="designer-button" onClick={() => removeImage(selectedItem.id)}>Remove Image</button>
+            </div>
+          )}
+     {selectedItem.shape &&
+        (
+          <div key={selectedItem.id}>
+            <select
+              value={selectedItem.shape}
+              onChange={(e) => handleShapeChange(selectedItem.id, e.target.value)}
+            >
+              <option value="square">Square</option>
+              <option value="circle">Circle</option>
+              <option value="rectangle">Rectangle</option>
+              <option value="triangle">Triangle</option>
+              <option value="diamond">Diamond</option>
+            </select>
+            <button className="designer-button" onClick={() => removeShape(selectedItem.id)}>-</button>
+          </div>
+        )}
+    </div>
+  
+</div>)}</div>
+      
 
     <div
       className="preview"
@@ -655,11 +684,12 @@ const Designer = () => {
   .filter((text) => text.view === currentView) // Filtrar por vista
   .map((text) => (
     <Rnd
-    onContextMenu={(e) => handleRightClickOnItem(e, text)} // Handle right-click for the design area
+    onContextMenu={(e) => handleRightClickOnItem(e, text,"text")} // Handle right-click for the design area
 
       key={text.id}
       size={{ width: text.width, height: text.height }}
       position={{ x: text.x, y: text.y }}
+      style={{zIndex:text.z}} 
       onClick={() => setSelectedItem(text)}
       bounds=".shirt"
       onDragStart={() => setCanDraw(false)}
@@ -691,11 +721,12 @@ const Designer = () => {
           {shapes && shapes.filter((shape) => shape.view === currentView)
           .map((shape) => (
             <Rnd
-                onContextMenu={(e) => handleRightClickOnItem(e, shape)}
+                onContextMenu={(e) => handleRightClickOnItem(e, shape,"shape")}
               className="rnd"
               key={shape.id}
               onClick={() => setSelectedItem(shape)}
               size={{ width: shape.width, height: shape.height }}
+              style={{zIndex:shape.z}} 
               position={{ x: shape.x, y: shape.y }}
               bounds=".shirt"
               onDragStart={() => setCanDraw(false)}
@@ -726,6 +757,7 @@ const Designer = () => {
  {images && images.filter((image) => image.view === currentView)
  .map((image) => (
       <Rnd
+      onContextMenu={(e) => handleRightClickOnItem(e, image,"image")} // Handle right-click for the design area
         key={image.id}
         className='rnd'
         bounds=".shirt"
@@ -734,14 +766,11 @@ const Designer = () => {
         position={{ x: image.x, y: image.y }} 
         onDragStart={() => setCanDraw(false)}
         onDragStop={(e, d) => handleImageDragStop(image.id, d.x, d.y)}
-        style={{
-          zIndex: activeImageId === image.id ? 1000 : 1,
-        }}
+        style={{zIndex:image.z}} 
         onResizeStop={(e, direction, ref, delta, position) => {
           const newWidth = ref.style.width;
           const newHeight = ref.style.height;
           handleImageResizeStop(image.id, newWidth,newHeight, position);
-          console.log(newWidth, newHeight);
         }}
        
        
@@ -792,7 +821,7 @@ const Designer = () => {
             <h2>¡Diseño guardado!</h2>
             <p>¿Quieres publicarlo?</p>
             <div className="modal-actions">
-              <button onClick={handlePublicar}>Yes</button>
+              <button onClick={handlePublicar}>Sí</button>
               <button onClick={handleModalClose}>No</button>
             </div>
           </div>

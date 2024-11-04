@@ -9,6 +9,10 @@ import bag from '../vendor/imgs/bagicon.png'
 import home from '../vendor/imgs/homeicon.png'
 import info from '../vendor/imgs/infoicon.png'
 import library from '../vendor/imgs/libraryicon.png'
+//import southside from '../vendor/imgs/Sin titulowrr.png'
+import southside from '../vendor/imgs/hangoverLogo2-02.png'
+import southside2 from '../vendor/imgs/logo2.png'
+
 import newdesign from '../vendor/imgs/newicon.png'
 import profile from '../vendor/imgs/profileicon.png'
 import { handleSearch } from '../universalhandlers';
@@ -95,7 +99,7 @@ const Navbar = () => {
       <header className="header">
 
 
-        <Link className='logoA' to="/"><img className='pagelogo' src={logo} alt="Hangover Logo" /></Link> {/*el que haya hecho la navbar la hizo muy mal y esto se ve muy chico*/ }
+        <Link className='logoA' to="/"><img className='pagelogo' src={southside2} alt="Hangover Logo" /></Link> {/*el que haya hecho la navbar la hizo muy mal y esto se ve muy chico*/ }
         {isMenuOpen ? <nav className="verticalNav">
           <ul >
             <li><button className="hamburger" onClick={toggleMenu}>

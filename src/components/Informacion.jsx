@@ -38,9 +38,9 @@ function Informacion() {
 
       <footer className="App-footer">
         <ul>
-          <li>Av. Hangover 1075</li>
+          <li>Av. 616 southside</li>
           <li>+54 11  6598 5434</li>
-          <li>Av. Hangover 1075</li>
+          <li>Av. 616 southside</li>
         </ul>
         <ul>
           <li>Hangover</li>

@@ -42,19 +42,48 @@ const Carrito = () => {
         setTotalAmount(totalPrice);
         
     }, [carritoStuff]);
+    
 
-    const handleCheckout = async () => {
-        try {
+    const mp = new MercadoPago("YOUR_PUBLIC_KEY", {
+        locale: "es-AR",
+    });
+
+    const handleCheckout = async (totalAmount) => {
+        try{
+        
+            const orderData = {
+                title: "YO",
+                total_price: totalAmount
+            };
+
+            const response = await axios.post(`${config.url}payment/create_preference`, { 
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(orderData),
+            });
+
+            const preference = await response.json();
+            createCheckoutButton(preference.id);
+        } catch (error){
+            alert("error :(");
+        }
+        /*try {
             const res = await axios.post(`${config.url}payment/create-order`);
             const data = res.data; // Axios ya parsea la respuesta JSON
             window.location.href = data.init_point;
         } catch (error) {
             console.error('Error during checkout:', error);
-        }
+        }*/
     };
+
+    const createCheckoutButton = () => {
+        
+    }
 
     return (
         <>
+        <script src="https://sdk.mercadopago.com/js/v2"></script>
             {error && <p>{error}</p>}
             {console.log(carritoStuff)}
             {carritoStuff && carritoStuff.map((item, index) => (
@@ -69,7 +98,8 @@ const Carrito = () => {
                 </div>
             ))}
             <h3>Precio total del carrito: {totalAmount}</h3>
-            <button id="checkout" onClick={handleCheckout}>Pay</button>
+            <button id="checkout" onClick={handleCheckout(totalAmount)}>Pay</button>
+            <div id="wallet_container"></div>
         </>
     );
 };

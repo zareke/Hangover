@@ -41,6 +41,7 @@ const NewPost = () => {
 
             if (response.status === 201) {
                 console.log("Post created successfully!");
+                window.location.href = '/'; // southside
             } else {
                 setErrorMessage("Failed to create post");
             }
@@ -124,7 +125,7 @@ const NewPost = () => {
                     />
                 </div>
                 {errorMessage && <p className="error-message">{errorMessage}</p>}
-                <button className="submit-button" type="submit">Submit</button>
+                <button className="submit-button" type="submit">Publicar</button>
             </form>
         </div>
     );

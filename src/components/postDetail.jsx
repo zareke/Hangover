@@ -367,10 +367,16 @@ const PostDetail = () => {
                   type="number"
                   id="quantity"
                   value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    if (value >= 1) {
+                      setQuantity(value);
+                    }
+                  }}
                   min="1"
                   className={styles.quantityInput}
                 />
+
               </div>
 
               <Button onClick={agregarCarritoHandler}>

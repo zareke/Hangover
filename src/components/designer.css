@@ -8,7 +8,32 @@
   --border-color: #dddddd; /* Border color for inputs */
   --pattern-color: #000000; /* Default pattern color */
 }
-
+._616southside{
+  display: flex;
+  flex-direction: column;
+}
+.properties{
+display: flex;
+flex-direction: column;
+left: 0;
+}
+.properties h3{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.properties-panel{
+  position: absolute;
+  margin-top: 8rem;
+  width: 12rem;
+  display: flex;
+  
+  padding: 15px;
+  background-color: var(--secondary-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex-direction: column;
+}
 .designer {
   display: flex;
   flex-direction: column;
@@ -32,14 +57,20 @@ h2 {
   margin-bottom: 20px;
   align-items: center;
 }
-
+.inputParaEsconder{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 label {
   display: flex;
   flex-direction: column;
   font-size: 14px;
   color: var(--text-color);
 }
-
+.properties-panel label{
+  margin-bottom: 1rem;
+}
 input[type="color"],
 input[type="number"],
 select {
@@ -52,7 +83,7 @@ select {
 }
 
 .modal-overlay {
-  z-index: 14001;
+  z-index: 10010;
   position: fixed;
   top: 0;
   left: 0;
@@ -84,7 +115,6 @@ button {
   padding: 10px;
   border-radius: 5px;
   border: 1px solid var(--border-color);
-  width: 100px;
 }
 /* Estilos generales del botón en el Designer */
 .designer-button {
@@ -117,7 +147,7 @@ input[type="range"] {
 
 .uploaded-image {
   max-height: 333px;
-  z-index: 15;
+  
 }
 
 .shirt {
@@ -130,7 +160,7 @@ input[type="range"] {
   width: 300px;
   height: auto;
   position: absolute;
-  z-index: 14000;
+  z-index: 10002;
   user-select: none;
   pointer-events: none;
 }
@@ -208,7 +238,7 @@ input[type="file"] {
 }
 .shape-overlay {
   position: absolute;
-  z-index: 11;
+  
 }
 
 .shape-overlay.square {
@@ -246,7 +276,7 @@ input[type="file"] {
 
 .drawing-line {
   background-color: var(--drawing-color);
-  z-index: 2000;
+  z-index: 10001;
   position: absolute;
   border-radius: 50%;
 }
