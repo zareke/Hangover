@@ -44,9 +44,9 @@ const Carrito = () => {
     }, [carritoStuff]);
     
 
-    const mp = new MercadoPago("YOUR_PUBLIC_KEY", {
+   /* const mp = new MercadoPago("YOUR_PUBLIC_KEY", { //el pete de shebar dejo un error y se fue shebar sos alto pete dejaste un error aca y te fuiste esto es un error
         locale: "es-AR",
-    });
+    });*/
 
     const handleCheckout = async (totalAmount) => {
         try{

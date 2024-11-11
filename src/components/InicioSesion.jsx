@@ -15,9 +15,6 @@ const InicioSesion = ({ closeModal }) => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
-  const [description, setDescription] = useState("");
-  const [profilePhoto, setProfilePhoto] = useState("");
-  const [roleId, setRoleId] = useState(2); // Assuming 2 is the default role ID for new users
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -46,10 +43,10 @@ const InicioSesion = ({ closeModal }) => {
     }
   };
 
-  const   handleRegister = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(config.url + "/user/register", {
+      const response = await axios.post(config.url + "user/register", {
         username: username,
         first_name: firstName,
         last_name: lastName,
@@ -60,17 +57,20 @@ const InicioSesion = ({ closeModal }) => {
         profile_photo: "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg",
         role_id: 0
       });
-     
+      
       if (response.data.success) {
-        localStorage.setItem("token", response.data.token);
-        closePopup();
-        window.location.reload();
+        
+        //localStorage.setItem("token", response.data.token);
+        handleLogin(e)
+        //closePopup();
+        //window.location.reload();
       } else {
         window.confirm(response.data.message || "Registro fallido");
       }
+
     } catch (e) {
       if (e.response && e.response.status === 400) {
-        const errorMessage = e.response.data.mensaje || "Error en los campos del registro.";
+        const errorMessage = e.response.data.mensaje /*|| "Error en los campos del registro."*/;
         window.confirm(errorMessage);
       } else {
         console.error(e);

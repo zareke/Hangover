@@ -26,6 +26,7 @@ const Profile = () => {
     last_name:"",
     username: "",
     description: "",
+    profileImage: "",
   });
 
   useEffect(() => {
@@ -87,6 +88,20 @@ const Profile = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]; 
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFormData({
+          ...formData,
+          profileImage: e.target.result, 
+        });
+      };
+      reader.readAsDataURL(file); 
+    }
+  };
+
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -146,11 +161,13 @@ const Profile = () => {
                 placeholder="Nombre"
               />
 
-              <input type="text"
-              name="last_name"
-              value={formData.last_name}
-              onChange={handleInputChange}
-              placeholder="Apellido"/>
+              <input 
+                type="text"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleInputChange}
+                placeholder="Apellido"
+              />
               <input
                 type="text"
                 name="username"
@@ -164,6 +181,57 @@ const Profile = () => {
                 onChange={handleInputChange}
                 placeholder="Descripción"
               />
+
+              <div className="image-upload">
+                <label 
+                  htmlFor="profile-image-input" 
+                  className="image-upload-label"
+                  style={{
+                    cursor: 'pointer',
+                    display: 'block',
+                    position: 'relative'
+                  }}
+                >
+                  <img
+                    src={formData.profileImage || userData.user_data.profile_photo}
+                    alt="Imagen de perfil"
+                    className="profile-img"
+                    style={{
+                      width: '150px',
+                      height: '150px',
+                      objectFit: 'cover'
+                    }}
+                  />
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'rgba(0,0,0,0.5)',
+                      color: 'white',
+                      opacity: 0,
+                      transition: 'opacity 0.3s',
+                      ':hover': {
+                        opacity: 1
+                      }
+                    }}
+                  >
+                    Cambiar imagen
+                  </div>
+                </label>
+                <input
+                  type="file"
+                  id="profile-image-input"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ display: 'none' }}
+                />
+              </div>
               <Button text="Guardar" onClick={handleSave} />
               <Button text="Cancelar" onClick={() => setEditing(false)} />
             </>
