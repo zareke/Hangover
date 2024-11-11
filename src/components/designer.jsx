@@ -240,8 +240,9 @@ const Designer = () => {
   }
   const setDraw616Southside = (_op) =>{
     setCanDraw(_op)
-    const defBrushColor = (brushColor == 'rgba(56, 117, 109, 1)' ? 'rgb(68, 138, 128)' : 'rgba(56, 117, 109, 1)')
-    setBrushColor('' + defBrushColor)
+    const defBrushColor = (brushColor === 'rgba(56, 117, 109, 1)' ? 'rgb(68, 138, 128)' : 'rgba(56, 117, 109, 1)')
+    //setBrushColor('' + defBrushColor) //que hace esto? cuando esta puesto da error (setBrushColor is not a function)
+    // setBrushColor('defBrushColor')
   }
   const addImage = (event) => {
     const z = newObjectZ()
@@ -272,9 +273,6 @@ const Designer = () => {
       setSelectedItem(newImage)
     };
   
-
-
-   
       if (event.target.files[0]) {
           // ...
           event.target.value = "";

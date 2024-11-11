@@ -89,7 +89,9 @@ const Profile = () => {
   };
 
   const handleImageChange = (e) => {
+    
     const file = e.target.files[0]; 
+    console.log(file)
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -106,7 +108,7 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `${config.url}user/simple`,
+        `${config.url}user/profile/simple/${userId}`,
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
