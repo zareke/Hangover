@@ -232,7 +232,7 @@ const Designer = () => {
   };
   const setDrawFalse = () =>{
     setCanDraw(false)
-    setBrushColor('rgba(56, 117, 109, 1)')
+    setBrushColor('rgba(56, 117, 109, 1)')//que hace esto? cuando esta puesto da error (setBrushColor is not a function)
   }
   const setDrawTrue = () =>{
     setCanDraw(false)
