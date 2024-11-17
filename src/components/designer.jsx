@@ -159,7 +159,9 @@ const Designer = () => {
     }
   };
 
-  
+  const handleClick = (event) => {
+    hideContextMenu();
+  };
   
 
   const handleImageDragStart = (id) => {
@@ -573,13 +575,27 @@ const Designer = () => {
   };
 
   const showContextMenu = (event) => {
-    event.preventDefault(); // Prevent default context menu
-    setContextMenuPosition({ x: event.pageX, y: event.pageY });
-    setContextMenuOptions([
-      { label: 'Add Text', action: addTextOption },
-      { label: 'Add Shape', action: addShapeOption },
-    ]);
-    setContextMenuVisible(true);
+    // Get the shirt element's bounds
+    const shirtElement = shirtRef.current;
+    if (!shirtElement) return;
+    
+    const shirtRect = shirtElement.getBoundingClientRect();
+    
+    // Check if click is inside the shirt bounds
+    if (
+      event.clientX >= shirtRect.left &&
+      event.clientX <= shirtRect.right &&
+      event.clientY >= shirtRect.top &&
+      event.clientY <= shirtRect.bottom
+    ) {
+      event.preventDefault(); // Only prevent default if click is inside shirt
+      setContextMenuPosition({ x: event.pageX, y: event.pageY });
+      setContextMenuOptions([
+        { label: 'Add Text', action: addTextOption },
+        { label: 'Add Shape', action: addShapeOption },
+      ]);
+      setContextMenuVisible(true);
+    }
   };
 
   const hideContextMenu = () => {
@@ -613,7 +629,7 @@ const Designer = () => {
 
  
   return (
-    <div className="designer" onContextMenu={showContextMenu}>
+    <div className="designer" onClick={handleClick}>
       <h2>Create a Design</h2>
       
       <div className="view-controls">
@@ -787,9 +803,12 @@ const Designer = () => {
     )}</div>
       
 
-<div 
+      <div 
         className="preview"
-        onClick={clearSelection}
+        onClick={(e) => {
+          clearSelection();
+          hideContextMenu();
+        }}
         onMouseDown={(e) => {
           if (canDraw) handleDrawStart(e);
         }}
@@ -797,7 +816,12 @@ const Designer = () => {
         onMouseUp={handleDrawEnd}
         onMouseLeave={handleDrawEnd}
       >
-        <div className={`shirt ${currentView}`} ref={shirtRef}>
+        <div 
+          className={`shirt ${currentView}`} 
+          ref={shirtRef}
+          onContextMenu={showContextMenu}
+          style={{ position: 'relative', zIndex: 1 }} // Ensure shirt is above other elements
+        >
         <svg 
       style={{ 
         position: 'absolute', 
@@ -963,11 +987,12 @@ const Designer = () => {
     ) : (
       <h3>Diseño guardado.</h3> // Mensaje cuando no hay cambios
     )}
-    {contextMenuVisible && (
+     {contextMenuVisible && (
         <ContextMenu
           options={contextMenuOptions}
           position={contextMenuPosition}
           onClose={hideContextMenu}
+          style={{ zIndex: Z_DISPONIBLE + 1 }} // Ensure context menu is above everything
         />
       )}
       {modalVisible && (
