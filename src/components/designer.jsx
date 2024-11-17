@@ -32,7 +32,7 @@ const Designer = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [zindexes,setZindexes]=useState([])
   const {brushColor,setBrushColor}=useState('rgba(56, 117, 109, 1)')
-
+  const [selectedItemType, setSelectedItemType] = useState(null); // 'text', 'shape', 'image', o null
   const Z_DISPONIBLE  = 10000
 
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
@@ -204,7 +204,7 @@ const Designer = () => {
   };
 
   const handleTextResizeStop = (id, width, height) => {
-    const newFontSize = Math.min(width, height) / 5; // Adjust as needed
+    const newFontSize = Math.min(width, height)/3.5; // Adjust as needed
     setTexts(prevTexts => prevTexts.map((text) => (text.id === id ? { ...text, width, height, fontSize: `${newFontSize}px` } : text)));
   };
 
@@ -232,11 +232,11 @@ const Designer = () => {
   };
   const setDrawFalse = () =>{
     setCanDraw(false)
-    setBrushColor('rgba(56, 117, 109, 1)')//que hace esto? cuando esta puesto da error (setBrushColor is not a function)
+   // setBrushColor('rgba(56, 117, 109, 1)')//que hace esto? cuando esta puesto da error (setBrushColor is not a function)
   }
   const setDrawTrue = () =>{
     setCanDraw(false)
-    setBrushColor('rgb(68, 138, 128)')
+   // setBrushColor('rgb(68, 138, 128)')
   }
   const setDraw616Southside = (_op) =>{
     setCanDraw(_op)
@@ -281,7 +281,6 @@ const Designer = () => {
     reader.readAsDataURL(file);
 
   };
- 
   const moveItem = (id, direction, type) => {
     let items, setItems;
     if (type === "text") {
@@ -293,33 +292,46 @@ const Designer = () => {
     } else if (type === "image") {
       items = images;
       setItems = setImages;
+    } else if (type === "path") {
+      items = paths;
+      setItems = setPaths;
     }
-
+  
     const itemIndex = items.findIndex((item) => item.id === id);
     if (itemIndex === -1) return;
-
+  
     const targetItem = items[itemIndex];
     let newZ;
-
+  
+    // Get all z-indexes from all items including paths
+    const allZIndexes = [
+      ...texts.map(t => t.z),
+      ...shapes.map(s => s.z),
+      ...images.map(i => i.z),
+      ...paths.map(p => p.z || 0) // Asegurarse de que los paths tengan z-index
+    ].sort((a, b) => a - b);
+  
     if (direction === "sendBack") {
-      newZ = Math.min(...zindexes) - 1;
+      newZ = Math.min(...allZIndexes) - 1;
     } else if (direction === "bringFront") {
-      newZ = Math.max(...zindexes) + 1;
+      newZ = Math.max(...allZIndexes) + 1;
     } else if (direction === "up") {
-      newZ = targetItem.z + 1;
+      const nextZ = allZIndexes.find(z => z > targetItem.z);
+      newZ = nextZ ? nextZ + 1 : targetItem.z + 1;
     } else if (direction === "down") {
-      newZ = targetItem.z - 1;
+      const nextZ = [...allZIndexes].reverse().find(z => z < targetItem.z);
+      newZ = nextZ ? nextZ - 1 : targetItem.z - 1;
     }
-
-    // Ensure no duplicates in zindexes
-    setZindexes((prev) => [...prev.filter((z) => z !== targetItem.z), newZ].sort((a, b) => a - b));
-    setItems((prevItems) =>
-      prevItems.map((item) =>
+  
+    // Update the item's z-index
+    setItems(prevItems =>
+      prevItems.map(item =>
         item.id === id ? { ...item, z: newZ } : item
       )
     );
+  
+    setZindexes(prev => [...prev.filter(z => z !== targetItem.z), newZ].sort((a, b) => a - b));
   };
-
   const handleImageDragStop = (id, x, y) => {
     setImages(prevImages => prevImages.map((image) => 
       (image.id === id ? { ...image, x, y } : image)
@@ -361,11 +373,23 @@ const Designer = () => {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     
+    // Get max z-index from all elements
+    const allZIndexes = [
+      ...texts.map(t => t.z),
+      ...shapes.map(s => s.z),
+      ...images.map(i => i.z),
+      ...paths.map(p => p.z || 0)
+    ];
+    
+    const newZ = allZIndexes.length > 0 ? Math.max(...allZIndexes) + 1 : Z_DISPONIBLE;
+    
     const newPath = {
+      id: Date.now(), // Agregar ID para poder manejar el z-index
       points: [{x, y}],
       color: drawingColor,
       size: brushSize,
-      view: currentView
+      view: currentView,
+      z: newZ
     };
     
     setCurrentPath(newPath);
@@ -393,13 +417,40 @@ const Designer = () => {
     setPaths(prevPaths => [...prevPaths, currentPath]);
     setCurrentPath(null);
     setIsDrawing(false);
-    
   };
-
   const handleBrushSizeChange = (e) => {
     setBrushSize(parseInt(e.target.value));
   };
-
+  const handleSelectItem = (item, type) => {
+    setSelectedItem(item);
+    setSelectedItemType(type);
+    setCanDraw(false); // Disable drawing when selecting an item
+  };
+  const handlePathColorChange = (id, newColor) => {
+    setPaths(prevPaths => prevPaths.map(path => 
+      path.id === id ? { ...path, color: newColor } : path
+    ));
+    if (selectedItem && selectedItem.id === id) {
+      setSelectedItem(prev => ({ ...prev, color: newColor }));
+    }
+  };
+  const handlePathSizeChange = (id, newSize) => {
+    setPaths(prevPaths => prevPaths.map(path => 
+      path.id === id ? { ...path, size: newSize } : path
+    ));
+    if (selectedItem && selectedItem.id === id) {
+      setSelectedItem(prev => ({ ...prev, size: newSize }));
+    }
+  };
+  const removePath = (id) => {
+    setPaths(prevPaths => prevPaths.filter(path => path.id !== id));
+    setSelectedItem(null);
+    setSelectedItemType(null);
+  };
+  const clearSelection = () => {
+    setSelectedItem(null);
+    setSelectedItemType(null);
+  };
   const handleCapture = async () => {
     if (shirtRef.current && isLoggedIn) {
       const canvas = await html2canvas(shirtRef.current);
@@ -502,8 +553,7 @@ const Designer = () => {
 
  
   return (
-    <div className="designer"
-    onContextMenu={showContextMenu}>
+    <div className="designer" onContextMenu={showContextMenu}>
       <h2>Create a Design</h2>
       
       <div className="view-controls">
@@ -567,11 +617,10 @@ const Designer = () => {
         {brushSize}px
       </label>
     </div>
-    {selectedItem != null && (
-    <div className="properties-panel">
-
-    <div className='properties'>
-      <h3>Propiedades</h3>
+    {selectedItem !== null && (
+      <div className="properties-panel">
+        <div className='properties'>
+          <h3>Propiedades</h3>
       {selectedItem.fontSize &&
         (
           
@@ -617,7 +666,10 @@ const Designer = () => {
             <button className="designer-button" onClick={() => removeTextInput(selectedItem.id)}>Eliminar</button>
           </div>
         
-        )}
+        )
+        
+        }
+        
         
       {selectedItem.src && (
       
@@ -644,167 +696,231 @@ const Designer = () => {
             <button className="designer-button" onClick={() => removeShape(selectedItem.id)}>-</button>
           </div>
         )}
-    </div>
-
-</div>)}</div>
+      {selectedItemType === 'path' && (
+            <div key={selectedItem.id}>
+              <label>
+                Color del trazo
+                <input
+                  type="color"
+                  value={selectedItem.color}
+                  onChange={(e) => handlePathColorChange(selectedItem.id, e.target.value)}
+                />
+              </label>
+              <label>
+                Grosor del trazo
+                <input
+                  type="range"
+                  min="1"
+                  max="20"
+                  value={selectedItem.size}
+                  onChange={(e) => handlePathSizeChange(selectedItem.id, parseInt(e.target.value))}
+                />
+                {selectedItem.size}px
+              </label>
+              <button className="designer-button" onClick={() => removePath(selectedItem.id)}>
+                Eliminar trazo
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    )}</div>
       
 
-    <div
-      className="preview"
-      onMouseDown={handleDrawStart}
-      onMouseMove={handleDrawMove}
-      onMouseUp={handleDrawEnd}
-      onMouseLeave={handleDrawEnd}
+<div 
+        className="preview"
+        onClick={clearSelection}
+        onMouseDown={(e) => {
+          if (canDraw) handleDrawStart(e);
+        }}
+        onMouseMove={handleDrawMove}
+        onMouseUp={handleDrawEnd}
+        onMouseLeave={handleDrawEnd}
+      >
+        <div className={`shirt ${currentView}`} ref={shirtRef}>
+        <svg 
+      style={{ 
+        position: 'absolute', 
+        top: 0, 
+        left: 0, 
+        width: '100%', 
+        height: '100%', 
+        pointerEvents: canDraw ? 'auto' : 'none',
+        zIndex: Z_DISPONIBLE - 1
+      }}
     >
-      <div className={`shirt ${currentView}`} ref={shirtRef}>
-        <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1000 }}>
-          {paths.filter((path) => path.view === currentView) // Filtrar caminos según la vista actual
-            .map((path, pathIndex) => (
-              <path
-                key={pathIndex}
-                d={`M ${path.points[0].x} ${path.points[0].y} ${path.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')}`}
-                stroke={path.color}
-                strokeWidth={path.size}
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            ))}
-          {currentPath && currentPath.view === currentView && ( // Filtrar camino actual según la vista actual
+      {paths
+        .filter((path) => path.view === currentView)
+        .map((path) => (
+          <g key={path.id || Math.random()}>
             <path
-              d={`M ${currentPath.points[0].x} ${currentPath.points[0].y} ${currentPath.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')}`}
-              stroke={currentPath.color}
-              strokeWidth={currentPath.size}
+              d={`M ${path.points[0].x} ${path.points[0].y} ${path.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')}`}
+              stroke={path.color}
+              strokeWidth={path.size}
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
+              style={{ 
+                zIndex: path.z,
+                pointerEvents: canDraw ? 'none' : 'auto'
+              }}
             />
-          )}
-        </svg>
-        <img
-          src={shirt}
-          alt={`Shirt ${currentView} view`}
-          className="shirt-image"
-          style={{ transform: currentView === 'back' ? 'scaleX(-1)' : 'none' }}
-        />
-        <div className="color-overlay" style={{ backgroundColor: color }}></div>
-        <div className={`pattern-overlay ${pattern}`}></div>
+            {/* Invisible wider path for easier selection */}
+            <path
+              d={`M ${path.points[0].x} ${path.points[0].y} ${path.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')}`}
+              stroke="transparent"
+              strokeWidth={Math.max(10, path.size + 5)}
+              fill="none"
+              style={{ 
+                cursor: 'pointer',
+                pointerEvents: canDraw ? 'none' : 'auto'
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSelectItem(path, 'path');
+              }}
+              onContextMenu={(e) => handleRightClickOnItem(e, path, "path")}
+            />
+          </g>
+        ))}
+            {currentPath && currentPath.view === currentView && (
+              <path
+                d={`M ${currentPath.points[0].x} ${currentPath.points[0].y} ${currentPath.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')}`}
+                stroke={currentPath.color}
+                strokeWidth={currentPath.size}
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ zIndex: currentPath.z }}
+              />
+            )}
+          </svg>
+          <img
+            src={shirt}
+            alt={`Shirt ${currentView} view`}
+            className="shirt-image"
+            style={{ transform: currentView === 'back' ? 'scaleX(-1)' : 'none' }}
+          />
+          <div className="color-overlay" style={{ backgroundColor: color }}></div>
+          <div className={`pattern-overlay ${pattern}`}></div>
           <div className={`design-elements ${currentView}`}>
-          {texts && texts
-  .filter((text) => text.view === currentView) // Filtrar por vista
-  .map((text) => (
-    <Rnd
-    onContextMenu={(e) => handleRightClickOnItem(e, text,"text")} // Handle right-click for the design area
+    {texts && texts
+      .filter((text) => text.view === currentView)
+      .map((text) => (
+        <Rnd
+          key={text.id}
+          onContextMenu={(e) => handleRightClickOnItem(e, text, "text")}
+          size={{ width: text.width, height: text.height }}
+          position={{ x: text.x, y: text.y }}
+          style={{ 
+            zIndex: text.z,
+            pointerEvents: selectedItem ? (selectedItem.id === text.id ? 'auto' : 'none') : 'auto'
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSelectItem(text, 'text');
+          }}
+          bounds=".shirt"
+          onDragStart={() => setDrawFalse()}
+          onDragStop={(e, d) => handleTextDragStop(text.id, d.x, d.y)}
+          onResizeStop={(e, direction, ref, delta, position) => {
+            handleTextResizeStop(text.id, parseInt(ref.style.width, 10), parseInt(ref.style.height, 10));
+            handleTextDragStop(text.id, position.x, position.y);
+          }}
+          enableResizing={selectedItem && selectedItem.id === text.id}
+          disableDragging={!selectedItem || selectedItem.id !== text.id}
+        >
+          <div
+            className="text-overlay"
+            style={{ 
+              fontSize: text.fontSize, 
+              fontFamily: text.fontFamily, 
+              width: '100%', 
+              height: '100%', 
+              color: text.color,
+              border: selectedItem && selectedItem.id === text.id ? '2px dashed #000' : 'none'
+            }}
+          >
+            {text.text}
+          </div>
+        </Rnd>
+      ))}
 
-      key={text.id}
-      size={{ width: text.width, height: text.height }}
-      position={{ x: text.x, y: text.y }}
-      style={{zIndex:text.z}} 
-      onClick={() => setSelectedItem(text)}
-      bounds=".shirt"
-      onDragStart={() => setDrawFalse()}
-      onDragStop={(e, d) => handleTextDragStop(text.id, d.x, d.y)}
-      onResizeStop={(e, direction, ref, delta, position) => {
-        handleTextResizeStop(text.id, parseInt(ref.style.width, 10), parseInt(ref.style.height, 10));
-        handleTextDragStop(text.id, position.x, position.y);
-      }}
-      enableResizing={{
-        top: true,
-        right: true,
-        bottom: true,
-        left: true,
-        topRight: true,
-        bottomRight: true,
-        bottomLeft: true,
-        topLeft: true,
-      }}
-    >
-      <div
-        className="text-overlay"
-        style={{ fontSize: text.fontSize, fontFamily: text.fontFamily, width: '100%', height: '100%', color: text.color }}
-      >
-        {text.text}
-      </div>
-    </Rnd>
-  ))}
+    {shapes && shapes
+      .filter((shape) => shape.view === currentView)
+      .map((shape) => (
+        <Rnd
+          key={shape.id}
+          onContextMenu={(e) => handleRightClickOnItem(e, shape, "shape")}
+          size={{ width: shape.width, height: shape.height }}
+          position={{ x: shape.x, y: shape.y }}
+          style={{ 
+            zIndex: shape.z,
+            pointerEvents: selectedItem ? (selectedItem.id === shape.id ? 'auto' : 'none') : 'auto'
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSelectItem(shape, 'shape');
+          }}
+          bounds=".shirt"
+          onDragStart={() => setDrawFalse()}
+          onDragStop={(e, d) => handleShapeDragStop(shape.id, d.x, d.y)}
+          onResizeStop={(e, direction, ref, delta, position) => {
+            handleShapeResizeStop(shape.id, parseInt(ref.style.width, 10), parseInt(ref.style.height, 10));
+            handleShapeDragStop(shape.id, position.x, position.y);
+          }}
+          enableResizing={selectedItem && selectedItem.id === shape.id}
+          disableDragging={!selectedItem || selectedItem.id !== shape.id}
+        >
+          <div
+            className={`shape-overlay ${shape.shape}`}
+            style={{ 
+              width: '100%', 
+              height: '100%',
+              border: selectedItem && selectedItem.id === shape.id ? '2px dashed #000' : 'none'
+            }}
+          />
+        </Rnd>
+      ))}
 
-          {shapes && shapes.filter((shape) => shape.view === currentView)
-          .map((shape) => (
-            <Rnd
-                onContextMenu={(e) => handleRightClickOnItem(e, shape,"shape")}
-              className="rnd"
-              key={shape.id}
-              onClick={() => setSelectedItem(shape)}
-              size={{ width: shape.width, height: shape.height }}
-              style={{zIndex:shape.z}} 
-              position={{ x: shape.x, y: shape.y }}
-              bounds=".shirt"
-              onDragStart={() => setDrawFalse()}
-              onDragStop={(e, d) => handleShapeDragStop(shape.id, d.x, d.y)}
-              onResizeStop={(e, direction, ref, delta, position) => {
-                const newWidth = ref.offsetWidth;
-                const newHeight = ref.offsetHeight;
-                handleShapeResizeStop(shape.id, newWidth, newHeight);
-                handleShapeDragStop(shape.id, position.x, position.y);
-              }}
-              enableResizing={{
-                top: true,
-                right: true,
-                bottom: true,
-                left: true,
-                topRight: true,
-                bottomRight: true,
-                bottomLeft: true,
-                topLeft: true,
-              }}
-            >
-              <div
-                className={`shape-overlay ${shape.shape}`}
-                style={{ width: '100%', height: '100%' }}
-              ></div>
-            </Rnd>
-          ))}
- {images && images.filter((image) => image.view === currentView)
- .map((image) => (
-      <Rnd
-      onContextMenu={(e) => handleRightClickOnItem(e, image,"image")} // Handle right-click for the design area
-        key={image.id}
-        className='rnd'
-        bounds=".shirt"
-        onClick={() => setSelectedItem(image)}
-        size={{ width: image.width, height: image.height }}
-        position={{ x: image.x, y: image.y }} 
-        onDragStart={() => setDrawFalse()}
-        onDragStop={(e, d) => handleImageDragStop(image.id, d.x, d.y)}
-        style={{zIndex:image.z}} 
-        onResizeStop={(e, direction, ref, delta, position) => {
-          const newWidth = ref.style.width;
-          const newHeight = ref.style.height;
-          handleImageResizeStop(image.id, newWidth,newHeight, position);
-        }}
-       
-       
-        enableResizing={{
-          top: true,
-          right: true,
-          bottom: true,
-          left: true,
-          topRight: true,
-          bottomRight: true,
-          bottomLeft: true,
-          topLeft: true,
-        }}
-      >
-        
-        <img 
-        draggable={false}
-          src={image.src} 
-          alt={image.name}
-          className='image-added'
-          style={{ width: '100%', height: '100%' }}
-        />
-      </Rnd>
-    ))} 
+    {images && images
+      .filter((image) => image.view === currentView)
+      .map((image) => (
+        <Rnd
+          key={image.id}
+          onContextMenu={(e) => handleRightClickOnItem(e, image, "image")}
+          size={{ width: image.width, height: image.height }}
+          position={{ x: image.x, y: image.y }}
+          style={{ 
+            zIndex: image.z,
+            pointerEvents: selectedItem ? (selectedItem.id === image.id ? 'auto' : 'none') : 'auto'
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSelectItem(image, 'image');
+          }}
+          bounds=".shirt"
+          onDragStart={() => setDrawFalse()}
+          onDragStop={(e, d) => handleImageDragStop(image.id, d.x, d.y)}
+          onResizeStop={(e, direction, ref, delta, position) => {
+            handleImageResizeStop(image.id, ref.style.width, ref.style.height, position);
+          }}
+          enableResizing={selectedItem && selectedItem.id === image.id}
+          disableDragging={!selectedItem || selectedItem.id !== image.id}
+        >
+          <img 
+            draggable={false}
+            src={image.src} 
+            alt={image.name}
+            className='image-added'
+            style={{ 
+              width: '100%', 
+              height: '100%',
+              border: selectedItem && selectedItem.id === image.id ? '2px dashed #000' : 'none'
+            }}
+          />
+        </Rnd>
+      ))}
         </div>
       </div>
       
