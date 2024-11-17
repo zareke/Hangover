@@ -281,56 +281,116 @@ const Designer = () => {
     reader.readAsDataURL(file);
 
   };
+  const renderPaths = () => {
+    return paths
+      .filter((path) => path.view === currentView)
+      .map((path) => (
+        <g key={path.id || Math.random()}>
+          <path
+            d={`M ${path.points[0].x} ${path.points[0].y} ${path.points
+              .slice(1)
+              .map(p => `L ${p.x} ${p.y}`)
+              .join(' ')}`}
+            stroke={path.color}
+            strokeWidth={path.size}
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ 
+              zIndex: path.z || Z_DISPONIBLE,
+              pointerEvents: canDraw ? 'none' : 'auto'
+            }}
+          />
+          <path
+            d={`M ${path.points[0].x} ${path.points[0].y} ${path.points
+              .slice(1)
+              .map(p => `L ${p.x} ${p.y}`)
+              .join(' ')}`}
+            stroke="transparent"
+            strokeWidth={Math.max(10, path.size + 5)}
+            fill="none"
+            style={{ 
+              cursor: 'pointer',
+              pointerEvents: canDraw ? 'none' : 'auto',
+              zIndex: path.z || Z_DISPONIBLE // Ensure z-index is applied to the hit area
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelectItem(path, 'path');
+            }}
+            onContextMenu={(e) => handleRightClickOnItem(e, path, "path")}
+          />
+        </g>
+      ));
+  };
+
   const moveItem = (id, direction, type) => {
-    let items, setItems;
-    if (type === "text") {
-      items = texts;
-      setItems = setTexts;
-    } else if (type === "shape") {
-      items = shapes;
-      setItems = setShapes;
-    } else if (type === "image") {
-      items = images;
-      setItems = setImages;
-    } else if (type === "path") {
-      items = paths;
-      setItems = setPaths;
-    }
-  
-    const itemIndex = items.findIndex((item) => item.id === id);
-    if (itemIndex === -1) return;
-  
-    const targetItem = items[itemIndex];
-    let newZ;
-  
-    // Get all z-indexes from all items including paths
+    // Get all z-indexes from all elements, ensuring paths are included correctly
     const allZIndexes = [
-      ...texts.map(t => t.z),
-      ...shapes.map(s => s.z),
-      ...images.map(i => i.z),
-      ...paths.map(p => p.z || 0) // Asegurarse de que los paths tengan z-index
-    ].sort((a, b) => a - b);
-  
-    if (direction === "sendBack") {
-      newZ = Math.min(...allZIndexes) - 1;
-    } else if (direction === "bringFront") {
-      newZ = Math.max(...allZIndexes) + 1;
-    } else if (direction === "up") {
-      const nextZ = allZIndexes.find(z => z > targetItem.z);
-      newZ = nextZ ? nextZ + 1 : targetItem.z + 1;
-    } else if (direction === "down") {
-      const nextZ = [...allZIndexes].reverse().find(z => z < targetItem.z);
-      newZ = nextZ ? nextZ - 1 : targetItem.z - 1;
+      ...texts.map(t => ({ z: t.z || 0, id: t.id, type: 'text' })),
+      ...shapes.map(s => ({ z: s.z || 0, id: s.id, type: 'shape' })),
+      ...images.map(i => ({ z: i.z || 0, id: i.id, type: 'image' })),
+      ...paths.map(p => ({ z: p.z || 0, id: p.id, type: 'path' }))
+    ].sort((a, b) => a.z - b.z);
+
+    const currentItemIndex = allZIndexes.findIndex(item => item.id === id && item.type === type);
+    if (currentItemIndex === -1) return;
+
+    let newZ;
+    switch (direction) {
+      case "sendBack":
+        newZ = Math.min(...allZIndexes.map(item => item.z)) - 1;
+        break;
+      case "bringFront":
+        newZ = Math.max(...allZIndexes.map(item => item.z)) + 1;
+        break;
+      case "up":
+        if (currentItemIndex < allZIndexes.length - 1) {
+          newZ = allZIndexes[currentItemIndex + 1].z + 1;
+        }
+        break;
+      case "down":
+        if (currentItemIndex > 0) {
+          newZ = allZIndexes[currentItemIndex - 1].z - 1;
+        }
+        break;
+      default:
+        return;
     }
-  
-    // Update the item's z-index
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, z: newZ } : item
-      )
-    );
-  
-    setZindexes(prev => [...prev.filter(z => z !== targetItem.z), newZ].sort((a, b) => a - b));
+
+    // Ensure newZ is defined before proceeding
+    if (typeof newZ !== 'number') return;
+
+    // Update the item based on its type
+    switch (type) {
+      case "text":
+        setTexts(prev => prev.map(item => 
+          item.id === id ? { ...item, z: newZ } : item
+        ));
+        break;
+      case "shape":
+        setShapes(prev => prev.map(item => 
+          item.id === id ? { ...item, z: newZ } : item
+        ));
+        break;
+      case "image":
+        setImages(prev => prev.map(item => 
+          item.id === id ? { ...item, z: newZ } : item
+        ));
+        break;
+        case "path":
+        setPaths(prev => prev.map(path => 
+          path.id === id ? { ...path, z: newZ } : path
+        ));
+        // Update selectedItem if it's the current path
+        if (selectedItem && selectedItem.id === id) {
+          setSelectedItem(prev => ({ ...prev, z: newZ }));
+        }
+        break;
+    }
+
+    // Update zindexes state
+    setZindexes(prev => [...prev.filter(z => z !== allZIndexes[currentItemIndex].z), newZ].sort((a, b) => a - b));
   };
   const handleImageDragStop = (id, x, y) => {
     setImages(prevImages => prevImages.map((image) => 
@@ -373,18 +433,18 @@ const Designer = () => {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     
-    // Get max z-index from all elements
+    // Get current highest z-index
     const allZIndexes = [
-      ...texts.map(t => t.z),
-      ...shapes.map(s => s.z),
-      ...images.map(i => i.z),
+      ...texts.map(t => t.z || 0),
+      ...shapes.map(s => s.z || 0),
+      ...images.map(i => i.z || 0),
       ...paths.map(p => p.z || 0)
     ];
     
     const newZ = allZIndexes.length > 0 ? Math.max(...allZIndexes) + 1 : Z_DISPONIBLE;
     
     const newPath = {
-      id: Date.now(), // Agregar ID para poder manejar el z-index
+      id: Date.now(),
       points: [{x, y}],
       color: drawingColor,
       size: brushSize,
@@ -393,8 +453,8 @@ const Designer = () => {
     };
     
     setCurrentPath(newPath);
+    setZindexes(prev => [...prev, newZ].sort((a, b) => a - b));
   };
-  
   const handleDrawMove = useCallback((event) => {
     if (!isDrawing || !canDraw) return;
     
@@ -749,52 +809,22 @@ const Designer = () => {
         zIndex: Z_DISPONIBLE - 1
       }}
     >
-      {paths
-        .filter((path) => path.view === currentView)
-        .map((path) => (
-          <g key={path.id || Math.random()}>
-            <path
-              d={`M ${path.points[0].x} ${path.points[0].y} ${path.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')}`}
-              stroke={path.color}
-              strokeWidth={path.size}
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{ 
-                zIndex: path.z,
-                pointerEvents: canDraw ? 'none' : 'auto'
-              }}
-            />
-            {/* Invisible wider path for easier selection */}
-            <path
-              d={`M ${path.points[0].x} ${path.points[0].y} ${path.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')}`}
-              stroke="transparent"
-              strokeWidth={Math.max(10, path.size + 5)}
-              fill="none"
-              style={{ 
-                cursor: 'pointer',
-                pointerEvents: canDraw ? 'none' : 'auto'
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleSelectItem(path, 'path');
-              }}
-              onContextMenu={(e) => handleRightClickOnItem(e, path, "path")}
-            />
-          </g>
-        ))}
-            {currentPath && currentPath.view === currentView && (
-              <path
-                d={`M ${currentPath.points[0].x} ${currentPath.points[0].y} ${currentPath.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')}`}
-                stroke={currentPath.color}
-                strokeWidth={currentPath.size}
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{ zIndex: currentPath.z }}
-              />
-            )}
-          </svg>
+      {renderPaths()}
+      {currentPath && currentPath.view === currentView && (
+        <path
+          d={`M ${currentPath.points[0].x} ${currentPath.points[0].y} ${currentPath.points
+            .slice(1)
+            .map(p => `L ${p.x} ${p.y}`)
+            .join(' ')}`}
+          stroke={currentPath.color}
+          strokeWidth={currentPath.size}
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ zIndex: currentPath.z }}
+        />
+      )}
+    </svg>
           <img
             src={shirt}
             alt={`Shirt ${currentView} view`}
